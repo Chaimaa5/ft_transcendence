@@ -6,7 +6,7 @@ import { ChatContent } from './ChatContent';
 
 
 
-const Chat = () => {
+export const Chat = () => {
 
   return (
     
@@ -27,5 +27,3 @@ const Chat = () => {
     </div> 
   )
 }
-
-export default Chat;
