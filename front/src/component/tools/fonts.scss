@@ -1,0 +1,60 @@
+@font-face{
+    font-family: Myfont_b;
+    src: url(/Users/mmoutawa/Desktop/ft_transcendence/src/component/tools/fonts/Quicksand-Bold.ttf);
+}
+@font-face{
+    font-family: Myfont_r;
+    src: url(/Users/mmoutawa/Desktop/ft_transcendence/src/component/tools/fonts/Quicksand-Regular.ttf);
+}
+@font-face{
+    font-family: Myfont_m;
+    src: url(/Users/mmoutawa/Desktop/ft_transcendence/src/component/tools/fonts/Quicksand-Medium.ttf);
+}
+@font-face{
+    font-family: Myfont_l;
+    src: url(/Users/mmoutawa/Desktop/ft_transcendence/src/component/tools/fonts/Quicksand-Light.ttf);
+}
+@font-face{
+    font-family: Myfont_sb;
+    src: url(/Users/mmoutawa/Desktop/ft_transcendence/src/component/tools/fonts/Quicksand-SemiBold.ttf);
+}
+
+:root{
+    --white: #F1FAEE;
+    --lightBlue: #A8DADC;
+    --darkBlue: #1D3557;
+    --red: #E63946;
+    --blue: #457B9D;
+}
+
+h1{
+    font-family: Myfont_b;
+    font-size: 6vw;
+    text-align: center;
+}
+h5{
+    font-family: Myfont_l;
+    font-size: 2vw;
+    line-height: 86.4%;
+}
+
+h3{
+    font-family: Myfont_b;
+    font-size: 6vw;
+    text-align: center;
+}
+
+h2{
+    font-family: Myfont_r;
+    font-size: 0.6vw;
+}
+
+h4{
+    font-size: Myfont_m;
+    font-size: 0.7vw;
+}
+
+h6{
+    font-family: Myfont_l;
+    font-size: 1vw;
+}

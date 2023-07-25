@@ -1,0 +1,36 @@
+.container-status{
+    width: 40%;
+    height: 97%;
+    background-color: var(--darkBlue);
+    border-radius: 2vw;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0vw 0vw 1.4vw  #091424;
+    justify-content: flex-start;
+    padding-top: 5%;
+    padding-left: 3%;
+    overflow-y: scroll;
+}
+
+.status-{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.status-cr{
+    position: absolute;
+    height: 10%;
+    width: 10%;
+    border-radius: 50%;
+    top: 23%;
+    left: 78%;
+    z-index: 10;
+}
+
+.st-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

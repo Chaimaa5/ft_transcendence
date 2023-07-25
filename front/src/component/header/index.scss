@@ -1,0 +1,102 @@
+@import url("../tools/fonts.scss");
+.header-{
+    height: 5vw;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.icons{
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;    
+}
+
+.logo{
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search{
+    width: 83%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+}
+
+.search-box:focus{
+   outline: solid 0.08vw var(--lightBlue);
+}
+
+.search-box::placeholder{
+    font-family: Myfont_r;
+    color: var(--lightBlue);
+    font-size: 0.6vw;
+    position: relative;
+    top: 5%;
+}
+
+.search-box{
+    background-color: var(--blue);
+    border-radius: 3vw;
+    color: var(--lightBlue);
+    padding: 0.5%;
+    padding-left: 2%;
+    font-family: Myfont_r;
+    font-size: 0.6vw;
+    box-shadow: 0.3vw 0.3vw 0.2vw 0 rgba(0, 0, 0, 0.25) inset;
+}
+
+.search-icon{
+    position: absolute;
+    left: 3%;
+}
+
+.search-txt{
+    font-family: Myfont_r;
+    color: var(--lightBlue);
+}
+
+.notfication{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.notfication-box{
+    position: absolute;
+    height: 14vw;
+    width: 13vw;
+    top: 100%;
+    right: 35%;
+    background: linear-gradient(135deg, var(--lightBlue) 0%, var(--blue) 100%);
+    z-index: 101;
+    border-radius: 1.2vw 0.2vw 1.2vw 1.2vw;
+    box-shadow: 0.3vw 0.3vw 0.2vw 0 rgba(0, 0, 0, 0.25);
+
+}
+
+
+.search-list{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background: linear-gradient(135deg, var(--lightBlue) 0%, var(--blue) 100%);
+    flex-direction: column;
+}
+
+.name{
+    text-transform: uppercase;
+    font-size: 1vw;
+    font-family: Myfont_sb;
+    color: var(--white);
+}

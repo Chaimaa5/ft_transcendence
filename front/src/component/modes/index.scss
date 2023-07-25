@@ -1,0 +1,60 @@
+.first-container{
+    width: 30%;
+    height: 95%;
+    border: var(--darkBlue) solid 2px;
+    position: absolute;
+    right: 0%;
+}
+
+.modes-{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-mode{
+    position: relative;
+    height: 95%;
+    background: linear-gradient(120deg, var(--blue) 0%, var(--darkBlue) 100%);
+    align-self: flex-end;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    align-self: center;
+    transition: width 0.9s ease;
+    box-shadow: 0.5vw 0.5vw 1.3vw  #0c182b;
+    cursor: pointer;
+}
+
+.mode-dsc{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    bottom: 1vw;
+}
+
+.mode-img{
+    position: relative;
+    bottom: 2vw;
+    height: 50%;
+}
+
+.multi-mode{
+    background: linear-gradient(180deg, #ED636D 0%, var(--red) 100%);
+}
+
+.vs-mode{
+    background: linear-gradient(180deg, #A7D1EB 0%, var(--blue) 100%);
+
+}
+
+.close-title{
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    text-transform: uppercase;
+    color: var(--white);
+    font-family: Myfont_r;
+}

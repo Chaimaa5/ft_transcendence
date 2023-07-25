@@ -1,0 +1,58 @@
+.background {
+    overflow: hidden;   
+    width: 100vw;
+    height: 100vh;
+    background-image: url(../tools/home/background.png);
+}
+
+// @media (max-height: 1400px){
+//     .background{
+//         overflow: scroll;
+//     }
+// }
+
+
+.allcontent {
+    display: grid;
+    grid-template-rows: 1fr, 9fr;
+    grid-template-columns: 1fr;
+    grid-template-areas: "header" "container";
+}
+
+.header_ {
+    grid-area: header;
+}
+
+.content_{
+    grid-area: container;
+    display: grid;
+    grid-template-rows: repeat(1 ,minmax(300px, 1fr));
+    grid-template-columns: 1fr 8fr 1fr;
+    grid-template-areas: "navbar_ content_ status_";
+}
+
+.navbar{
+    grid-area: navbar_;
+    height: 90vh;
+    width: 10vw;
+    display: flex;
+}
+
+.page{
+    grid-area: content_;
+    display: flex;
+}
+
+.status{
+    grid-area: status_;
+    height: 44vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.chat{
+    grid-area: content_;
+    
+}

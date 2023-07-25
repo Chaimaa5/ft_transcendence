@@ -1,0 +1,109 @@
+@import '../home/index.scss';
+
+.sign-bg{
+    position: absolute;
+    width: 100%;
+    height: auto;
+    bottom: 0;
+}
+
+.login{
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 30vh 70vh;
+    grid-template-areas: "3d_" "btn_";
+    background-image: linear-gradient(to bottom right, #1D3557, #020B18);
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn-container{
+    margin: 1vh;
+}
+
+.sign-btn{
+    border: #1D3557 solid 2px;
+    height: 100%;
+    width: 100%;
+    padding: 1%;
+    border-radius: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.-btn{
+    width: 20vw;
+    background-color: #1D3557;
+    border-radius: 5vh;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.btn-dsc{
+    color: var(--lightBlue);
+    margin: 2%;
+}
+
+button:hover{
+    .-btn{
+        background-color:var(--lightBlue);
+    }
+    .btn-dsc{
+        color: #1D3557;
+    }
+    .login-icon{
+        fill: #1D3557;
+    }
+    .sign-btn{
+        border: var(--lightBlue) solid 2px;
+    }
+
+}
+
+.login-prop{
+    z-index: 1;
+    grid-area: btn_;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.spline{
+    grid-area: 3d_;
+    top: 10vh;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+
+.login-icon{
+    width: 1vw;
+
+}
+
+.sb-title{
+    color:#253b5a;
+    font-size: 0.8vw;
+}
+
+.title_{
+    font-size: 3vw;
+    color: var(--lightBlue);
+}
+
+#spline-container{
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 40px;
+}
+
