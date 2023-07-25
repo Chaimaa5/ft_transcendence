@@ -7,12 +7,13 @@ import upload_icon from '../tools/sign/upload.svg'
 import Avatar from "../avatar/index";
 import { ReactSVG } from "react-svg";
 import './index.scss'
-
+import axios from 'axios'
 
 const Setup = () => {
   const fileInputRef = useRef(null);
   const [avatar_img, setavatar_img] = useState(av_img);
   const [username_, setusername] = useState("");
+  const [avatar, setimage] = useState("");
   const [up, setup] = useState(false);
   const handleButtonClick = () => {
     fileInputRef.current.click();
@@ -20,8 +21,9 @@ const Setup = () => {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setavatar_img (URL.createObjectURL(file));
+    const avatar = event.target.files[0];
+    setavatar_img (URL.createObjectURL(avatar));
+    setimage(avatar);
   };
 
   const handleInputChange = (e) => {
@@ -30,10 +32,23 @@ const Setup = () => {
       setusername(e.target.value);
   }
 
-  const nav = useNavigate();
+
+  const handleSubmit = event =>{
+    event.preventDefault();
+    let UpdateUserDTO = new FormData();
+    const header = {   
+      withCredentials: true,  
+      headers: { 'content-type': 'multipart/form-data' }
+    }
+    UpdateUserDTO.append('username', username_);
+    UpdateUserDTO.append('avatar', avatar);
+
+     axios.post('http://localhost:3000/user/setup', UpdateUserDTO, header).then(res => {console.log(res.data);})
+  }
+  
 
   return (
-    <div className="setup">
+    <div className="setup" >
       <div className="upload">
           <input
             type="file"
@@ -61,11 +76,11 @@ const Setup = () => {
             />
         </div>
       <div>
-        <button onClick={() =>{nav('/home')}}>
-          <Button_ option="coninue"/>
+        <button onClick={handleSubmit}>
+          <Button_ option="coninue" />
         </button>
       </div>
-    </div>
+      </div>
   );
 };
 
