@@ -40,7 +40,7 @@ type leaderboard = {
       ]
 }
 
-const Leaderboord = () => {
+const Leaderbaord = () => {
     const [data, setData] = useState<leaderboard[]>();
     useEffect(() => {
         Instanse.get("/leaderboard")
@@ -126,4 +126,4 @@ const Leaderboord = () => {
     )
 }
 
-export default Leaderboord
+export default Leaderbaord

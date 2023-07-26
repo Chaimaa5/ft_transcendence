@@ -42,7 +42,7 @@ function Login () {
           <h1 className="title_">Unlock The Game <br/>And Have Fun</h1>
           
           <button onClick={() => {
-                window.location.href= "http://localhost:3000/login";
+                window.location.href= "http://localhost/api/login";
             }}  className="btn-container" >
                 <Signbottun  title={"Log in With 42 Intra"}/>
           </button>

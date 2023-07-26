@@ -96,6 +96,7 @@ export class UserService {
         if (username){
             await this.prisma.user.update({where: {id: id}, data: {username: username}});
         }
+
     }
 
     async updateOnlineStatus(id: string, status: boolean) {
@@ -160,7 +161,7 @@ export class UserService {
                 if (user.avatar)
                 {
                     if (!user.avatar.includes('cdn.intra')){
-                        user.avatar = 'http://' + process.env.HOST + ':'+ process.env.BPORT + user.avatar
+                        user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar
                     }
                 }
             return user
@@ -359,7 +360,7 @@ export class UserService {
                 if (player.avatar)
                 {
                     if (!player.avatar.includes('cdn.intra')){
-                        player.avatar = 'http://' + process.env.HOST + ':'+ process.env.BPORT + player.avatar
+                        player.avatar = 'http://' + process.env.HOST + '/api' + player.avatar
                     }
                 }
             }

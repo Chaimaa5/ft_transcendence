@@ -20,7 +20,7 @@ const Rooms = () => {
     const [response, setResponse] = useState<friends_[]>([]);
     const HandleProfile = () => {
       return axios
-            .get<friends_[]>('http://localhost:3000/profile/friends/' + "mmoutawa", {withCredentials: true})
+            .get<friends_[]>('/profile/friends/' + "mmoutawa", {withCredentials: true})
             .then((res) => {
                 setResponse(res.data)
             })
@@ -55,7 +55,7 @@ const Rooms = () => {
                 <div className="flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black ">
                     <button onClick={() => {
                         return axios
-                        .get<friends_[]>('http://localhost:3000/profile/friends/' + value.username, {withCredentials: true})
+                        .get<friends_[]>('/profile/friends/' + value.username, {withCredentials: true})
                         .then((res) => {
                             setResponse(res.data)
                     })

@@ -8,7 +8,7 @@ import Status from "../status/index";
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Leaderboord from "../leaderboord";
+import Leaderbaord from "../leaderbaord/index";
 import Instanse from "../api/api";
 import CrContext from "../context/context";
 import Chat from "../chat/Chat";
@@ -32,7 +32,7 @@ function Container(){
     const context = useContext<cntx>(CrContext);
     const [data, setData] = useState(context);
     useEffect(() => {
-            Instanse.get("http://localhost:3000/user", {withCredentials: true})
+            Instanse.get("/user", {withCredentials: true})
             .then((res) => setData(res.data))
         }
     )
@@ -50,7 +50,7 @@ function Container(){
                     <div className="page">
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
-                        {location.pathname == "/leaderboord" && <Leaderboord/>}
+                        {location.pathname == "/Leaderbaord" && <Leaderbaord/>}
                         {location.pathname == "/chat" && <Chat/>}
                     </div>
                     <div className="status">

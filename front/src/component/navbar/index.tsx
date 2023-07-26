@@ -58,7 +58,7 @@ const Navbar = () => {
                 <Link to={"/home"}>
                     <ReactSVG  className="icon-svg" src={home_icon}/>
                 </Link>
-                <Link to={"/leaderboord"}>
+                <Link to={"/Leaderbaord"}>
                     <ReactSVG className="icon-svg" src={leader_icon}/>
                 </Link>
                 <Link to="/chat">

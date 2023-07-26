@@ -43,7 +43,7 @@ export class AuthService {
     signOut(res: Response) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-        res.redirect('http://localhost:8000/login');
+        res.redirect('http://localhost/login');
     } 
 
 
