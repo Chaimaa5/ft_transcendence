@@ -75,7 +75,7 @@ type cntx = {
 
 const Profile = () => {
     const [response, setResponse] = useState<profile_>();
-    const data = useContext<cntx>(CrContext)
+    // const data = useContext<cntx>(CrContext)
     const username = useParams().username
     useEffect(() => {
         Instanse.get<profile_>('profile/' + username)
@@ -84,7 +84,7 @@ const Profile = () => {
         });
     },[response]);
     
-    if(response?.isBlocked) return
+    // if(response?.isBlocked) return
     return(
         <div className="Profile">
             <div className="half-container">

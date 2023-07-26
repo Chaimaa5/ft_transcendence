@@ -1,15 +1,17 @@
 @import url("../../tools/fonts.scss");
 
 .font1::-webkit-input-placeholder {
-    font-family: Myfont_l;
+    font-family: Myfont_m;
     color: #A8DADC;
 }
 
 .font2
 {
-    font-family: Myfont_l;
+    font-family: Myfont_b;
     
 }
+
+
 
 .frame::-webkit-scrollbar {
     
@@ -19,7 +21,7 @@
 
 }
 
-.frame::-webkit-scrollbar-thumb{
+.frame::-webkit-scrollbar-thumb:hover{
     background: #a8dadc71;
     border-radius: 1.5vw;
     height: 80%;

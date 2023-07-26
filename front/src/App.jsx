@@ -9,7 +9,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Leaderbaord from './component/leaderbaord/index';
 import axios from 'axios';
 import { useEffect } from 'react';
-import Chat from "./component/chat/Chat";
+// import Chat from "./component/chat/Chat";
+import Game from "./component/game/GameApp";
 
 
 function App() {
@@ -21,8 +22,14 @@ function App() {
           <Route path={"/home"}  element={<Container />} />
           <Route path="/setup" element={<Setup />} />
           <Route path="/profile/:username" element={<Container />} />
+<<<<<<< HEAD
           <Route path="/leaderbaord" element={<Container />} />
           <Route path="/Chat" element={<Container />} />
+=======
+          <Route path="/leaderboord" element={<Container />} />
+          {/* <Route path="/Chat" element={<Container />} /> */}
+		  <Route path="/game" element={<Game />} />
+>>>>>>> 33cb4d5263452a7593745c9ec4d541d9d187dff3
         </Routes>
     </Router>
     </div>
