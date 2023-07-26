@@ -28,7 +28,6 @@ const RoundsBoard: React.FC = () => {
  
 	return (
 		<div className="rounds-board">
-			<div className="rounds-container">
 				<span>ROUND</span>
 				<div className="rounds-points">
 					{roundNumbers.map((roundNumber) => (
@@ -40,7 +39,6 @@ const RoundsBoard: React.FC = () => {
 					))
 					}
 				</div>
-			</div>
 		</div>
 	)
 }

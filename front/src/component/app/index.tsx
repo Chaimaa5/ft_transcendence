@@ -11,7 +11,7 @@ import axios from "axios";
 import Leaderboord from "../leaderboord";
 import Instanse from "../api/api";
 import CrContext from "../context/context";
-import Game from "../game/GameComponent"
+import Game from "../game/GameApp"
 // import Chat from "../chat/Chat";
 
 

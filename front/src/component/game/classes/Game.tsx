@@ -33,7 +33,7 @@ export class Game{
 		this.round = {
 			roundNumber : 1,
 			leftPlayerScore : 0, 
-			rightPlayerScore : 0
+			rightPlayerScore : 1
 		};
 	}
 

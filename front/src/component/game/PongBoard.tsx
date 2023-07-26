@@ -1,13 +1,11 @@
 import React, { TrackHTMLAttributes, useEffect, useRef, useState } from "react";
-import P5, { Table } from 'p5'
+import P5 from 'p5'
 import { ReactP5Wrapper } from "react-p5-wrapper";
-import { parseConfigFileTextToJson } from "typescript";
-import { dirxml, table } from "console";
-import { Game } from "./Game"
-import { Paddle, PaddleSide } from "./Paddle";
-import { GameTable } from "./GameTable";
-import { Player } from "./Player";
-import { Ball } from "./Ball";
+import { Game } from "./classes/Game"
+import { Paddle, PaddleSide } from "./classes/Paddle";
+import { GameTable } from "./classes/GameTable";
+import { Player } from "./classes/Player";
+import { Ball } from "./classes/Ball";
 
 
 const PongBoard: React.FC = () => {
@@ -53,12 +51,12 @@ const PongBoard: React.FC = () => {
 				game.leftPaddle.update();
 				game.rightPaddle.show();
 				game.rightPaddle.update();
+				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
 				game.ball.show();
 				game.ball.update();
 				game.ball.edges();
 				game.ball.checkPaddleHits(game.rightPaddle);
 				game.ball.checkPaddleHits(game.leftPaddle);
-				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
 			}
 	
 			p.windowResized = () => {

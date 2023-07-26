@@ -24,6 +24,8 @@ export class GameTable {
 			// define colors i'll be using to display the score
 			const blue = this.p.color(69, 123, 157, 80);
 			const extraLightBlue = this.p.color(168, 218, 220);
+			const transExtraLightBlue = this.p.color(168, 218, 220, 80);
+
 
 			const pongNetX = this.tableWidth/2 - ((this.tableWidth/70)/2);
 			const pongNetY = this.tableWidth/100;
@@ -32,23 +34,50 @@ export class GameTable {
 			this.p.fill(blue);
 			this.p.rect( pongNetX, pongNetY, pongNetW, pongNetH);
 			
-			this.p.fill(extraLightBlue);
 			this.p.textFont("Quicksand");
-			this.p.textSize(this.tableWidth/40);
 			this.p.textStyle(this.p.BOLD);
 			this.p.textLeading(1.159);
 			
 			
-			// display the left score
+			// display the left player username
+			this.p.textSize(this.tableWidth/60);
+			this.p.fill(extraLightBlue);
 			this.p.textAlign(this.p.RIGHT, this.p.TOP);
-			this.p.text(addLetterSpacing(leftPlayer.userName, 1), this.tableWidth/2 - (pongNetW*2), pongNetY);
+			this.p.text(addLetterSpacing(leftPlayer.userName, 1), this.tableWidth/2 - (pongNetW*7), pongNetY + 5);
+			// display the left player rounds score
+			this.p.fill(transExtraLightBlue);
+			this.p.text(leftPlayer.score, this.tableWidth/2 - (pongNetW*2), pongNetY + 5 );
+			// display the current round's score of the left player
+			this.p.fill(blue);
+			this.p.textSize(this.tableWidth/7);
+			let roundScore = padNumberWithZero(round.leftPlayerScore);
+			this.p.text(roundScore, this.tableWidth/2 - (pongNetW*6), pongNetY + this.tableHeight/15);
 
-			// display the right score
+
+
+			// display the right player username
+			this.p.textSize(this.tableWidth/60);
+			this.p.fill(extraLightBlue);
 			this.p.textAlign(this.p.LEFT, this.p.TOP);
-			this.p.text(addLetterSpacing(rightPlayer.userName, 1), this.tableWidth/2 + (pongNetW*2), pongNetY);
+			this.p.text(addLetterSpacing(rightPlayer.userName, 1), this.tableWidth/2 + (pongNetW*7), pongNetY + 5);
+			// display the right player score
+			this.p.fill(transExtraLightBlue);
+			this.p.text(rightPlayer.score, this.tableWidth/2 + (pongNetW*2), pongNetY + 5 );
+			// display the current round's score of the right player 
+			this.p.fill(blue);
+			this.p.textSize(this.tableWidth/7);
+			roundScore = padNumberWithZero(round.rightPlayerScore);
+			this.p.text(roundScore, this.tableWidth/2 + (pongNetW*6), pongNetY + this.tableHeight/15);
 		}
 	}
+}
 
+function padNumberWithZero(number : number) : string {
+	if (number < 10) {
+		return `0${number}`;
+	} else {
+	return `${number}`;
+	}
 }
 
 function addLetterSpacing(input: string, amount: number) : string {

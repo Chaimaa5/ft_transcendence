@@ -1,5 +1,5 @@
 import P5 from "p5"
-import { drawPAddle } from "./DrawingUtils";
+import { drawPAddle } from "../DrawingUtils";
 import { GameTable } from "./GameTable";
 
 

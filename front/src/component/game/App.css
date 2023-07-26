@@ -1,11 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
 
 
-* {
-	margin: 0;
-	border: 0;
-	height: 100%;
-}
 
 :root {
 	--blue: #457B9D;
@@ -17,15 +12,15 @@
 .App {
 	background: linear-gradient(225deg, var(--dark-blue) 0%, var(--blue) 100%);
 	display: flex;
-	height: 45vw;
-	width: 100%;
+	height: 100vh;
+	width: 100vw;
 	flex-direction: column;
 }
 
 .rounds-board {
 	height: 10%;
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 	flex-direction: column;
 	align-items: center;
 }
@@ -39,7 +34,7 @@
 .rounds-board span {
 	color : var(--extra-light-blue);
 	font-family: QuickSand;
-	font-style: normal;
+	font-style: bold;
 	font-weight: bold;
 	font-size: 3vw;
 }
@@ -47,9 +42,10 @@
 
 .rounds-points {
 	display: flex;
+	align-items: center;
 	justify-content: center;
 	height: 30%;
-	padding : 30px;
+	width: 100%;
 }
 
 .round {
@@ -57,7 +53,7 @@
 	height: 1vw;
 	border-radius: 50%;
 	border: 1px solid var(--dark-blue);
-	margin: 0px 10px;
+	margin:  1vw;
 }
 
 .full {
