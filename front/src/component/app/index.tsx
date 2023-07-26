@@ -11,7 +11,8 @@ import axios from "axios";
 import Leaderboord from "../leaderboord";
 import Instanse from "../api/api";
 import CrContext from "../context/context";
-import Chat from "../chat/Chat";
+import Game from "../game/GameComponent"
+// import Chat from "../chat/Chat";
 
 
 type cntx = {
@@ -51,7 +52,8 @@ function Container(){
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
                         {location.pathname == "/leaderboord" && <Leaderboord/>}
-                        {location.pathname == "/chat" && <Chat/>}
+                        {/* {location.pathname == "/chat" && <Chat/>} */}
+						{location.pathname == "/game" && <Game/>}
                     </div>
                     <div className="status">
                         <Status/>

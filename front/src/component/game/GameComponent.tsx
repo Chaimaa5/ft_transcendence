@@ -4,7 +4,7 @@ import PongBoard from './PongBoard'
 
 import './App.css';
 
-function App() {
+const Game = () => {
   return (
     <div className="App">
 		<RoundsBoard/>
@@ -13,4 +13,4 @@ function App() {
   );
 }
 
-export default App;
+export default Game;
