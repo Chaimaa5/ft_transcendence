@@ -1,11 +1,13 @@
 import P5 from "p5";
 import {GameTable} from "./GameTable";
 import {Paddle , PaddleSide} from "./Paddle";
+import {Game} from "./Game"
 
 const randomDirection = ():number => {
 	const twoPi = Math.PI * 2;
 	return((Math.random() * twoPi));
 }
+
 
 export class Ball {
 	ballPosX : number;
@@ -39,23 +41,32 @@ export class Ball {
 		console.log(this.speedX);
 	};
 
-	update() {
+	move() {
 		this.ballPosX = this.ballPosX + this.speedX;
 		this.ballPosY = this.ballPosY + this.speedY;
 	}
 
 	reset() {
+		const randomAngle : number = randomDirection();
 		this.ballPosX = this.table.tableWidth/2;
 		this.ballPosY = this.table.tableHeight/2;
+		this.speedX = this.table.tableWidth/200 * Math.cos(randomAngle);
+		this.speedY = this.table.tableWidth/200 * Math.sin(randomAngle);
 	}
 
-	edges() {
+	edges(game : Game) {
 		if((this.ballPosY - this.radius) < 0 || (this.ballPosY + this.radius) > this.table.tableHeight)
 			this.speedY *= -1;
 		if(this.ballPosX > this.table.tableWidth)
-			this.reset()
-		if(this.ballPosX < 0)
+		{
+			game.updateScore(PaddleSide.Left);
 			this.reset();
+		}
+		if(this.ballPosX < 0)
+		{
+			game.updateScore(PaddleSide.Right);
+			this.reset();
+		}
 	}
 
 	setInitialBallPosition(width: number, height: number) {

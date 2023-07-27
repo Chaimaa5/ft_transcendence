@@ -1,7 +1,7 @@
 import {Player} from "./Player";
 import {Ball} from "./Ball";
 import {GameTable} from "./GameTable";
-import {Paddle} from "./Paddle";
+import {Paddle, PaddleSide} from "./Paddle";
 
 export interface Round {
 	roundNumber : number;
@@ -53,5 +53,9 @@ export class Game{
 		this.rightPaddle.paddlePosY = height/2 - ((height*0.3)/2);
 		this.rightPaddle.paddleWidth = width*0.02;
 		this.rightPaddle.paddleHeight = height*0.3;
+	}
+	
+	updateScore(side : PaddleSide) {
+		//score update
 	}
 };

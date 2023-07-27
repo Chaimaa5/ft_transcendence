@@ -22,14 +22,9 @@ function App() {
           <Route path={"/home"}  element={<Container />} />
           <Route path="/setup" element={<Setup />} />
           <Route path="/profile/:username" element={<Container />} />
-<<<<<<< HEAD
-          <Route path="/leaderbaord" element={<Container />} />
-          <Route path="/Chat" element={<Container />} />
-=======
           <Route path="/leaderboord" element={<Container />} />
           {/* <Route path="/Chat" element={<Container />} /> */}
 		  <Route path="/game" element={<Game />} />
->>>>>>> 33cb4d5263452a7593745c9ec4d541d9d187dff3
         </Routes>
     </Router>
     </div>

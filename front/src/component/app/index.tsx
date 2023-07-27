@@ -51,14 +51,9 @@ function Container(){
                     <div className="page">
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
-<<<<<<< HEAD
-                        {location.pathname == "/Leaderbaord" && <Leaderbaord/>}
-                        {location.pathname == "/chat" && <Chat/>}
-=======
                         {location.pathname == "/leaderboord" && <Leaderboord/>}
                         {/* {location.pathname == "/chat" && <Chat/>} */}
 						{location.pathname == "/game" && <Game/>}
->>>>>>> 33cb4d5263452a7593745c9ec4d541d9d187dff3
                     </div>
                     <div className="status">
                         <Status/>

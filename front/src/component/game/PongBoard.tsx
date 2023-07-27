@@ -53,8 +53,8 @@ const PongBoard: React.FC = () => {
 				game.rightPaddle.update();
 				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
 				game.ball.show();
-				game.ball.update();
-				game.ball.edges();
+				game.ball.move();
+				game.ball.edges(game);
 				game.ball.checkPaddleHits(game.rightPaddle);
 				game.ball.checkPaddleHits(game.leftPaddle);
 			}
