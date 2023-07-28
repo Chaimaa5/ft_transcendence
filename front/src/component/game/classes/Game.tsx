@@ -29,11 +29,11 @@ export class Game{
 		this.rightPaddle = new Paddle(this.table);
 		this.leftPaddle = new Paddle(this.table);
 		this.roundsNumber = 3;
-		this.roundRequiredPoints = 5;
+		this.roundRequiredPoints = 2;
 		this.round = {
-			roundNumber : 1,
+			roundNumber : 0,
 			leftPlayerScore : 0, 
-			rightPlayerScore : 1
+			rightPlayerScore : 0
 		};
 	}
 
@@ -56,6 +56,40 @@ export class Game{
 	}
 	
 	updateScore(side : PaddleSide) {
-		//score update
+		if(side === PaddleSide.Left) {
+			this.round.leftPlayerScore++;
+			if(this.round.leftPlayerScore === this.roundRequiredPoints) {
+				this.nextRound();
+				this.leftPlayer.score++;
+				if(this.round.roundNumber === this.roundsNumber)
+				{
+					this.endGame(); 
+				}
+			}
+		}
+		else {
+			this.round.rightPlayerScore++;
+			if(this.round.rightPlayerScore === this.roundRequiredPoints) {
+				this.nextRound();
+				this.rightPlayer.score++;
+				if(this.round.roundNumber === this.roundsNumber)
+				{
+					this.endGame(); 
+				}
+			}
+		}
+		this.table.displayScore(this.leftPlayer, this.rightPlayer, this.round);
+	}
+
+	nextRound() {
+		this.round.roundNumber++;
+		this.round.leftPlayerScore = 0;
+		this.round.rightPlayerScore = 0;
+	}
+
+	endGame() {
+		this.ball.setInitialBallPosition(this.table.tableWidth, this.table.tableHeight);
+		this.ball.speedX = 0;
+		this.ball.speedY = 0;
 	}
 };

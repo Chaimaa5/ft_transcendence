@@ -47,16 +47,16 @@ const PongBoard: React.FC = () => {
 	
 			p.draw = () => {
 				p.clear();
-				game.leftPaddle.show();
-				game.leftPaddle.update();
 				game.rightPaddle.show();
 				game.rightPaddle.update();
-				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
+				game.leftPaddle.show();
+				game.leftPaddle.update();
 				game.ball.show();
 				game.ball.move();
 				game.ball.edges(game);
 				game.ball.checkPaddleHits(game.rightPaddle);
 				game.ball.checkPaddleHits(game.leftPaddle);
+				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
 			}
 	
 			p.windowResized = () => {

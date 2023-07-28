@@ -4,8 +4,16 @@ import {Paddle , PaddleSide} from "./Paddle";
 import {Game} from "./Game"
 
 const randomDirection = ():number => {
-	const twoPi = Math.PI * 2;
-	return((Math.random() * twoPi));
+	const minValue = -Math.PI / 4;
+	const maxValue = Math.PI / 4;
+  
+	// Generate a random number between 0 and 1
+	const randomZeroToOne = Math.random();
+  
+	// Scale and shift the random number to fit the desired range
+	const randomValueInRange = randomZeroToOne * (maxValue - minValue) + minValue;
+  
+	return randomValueInRange;
 }
 
 
@@ -38,7 +46,6 @@ export class Ball {
 			this.table.p.noStroke();
 			this.table.p.ellipse(this.ballPosX, this.ballPosY, this.ballSize, this.ballSize);
 		}
-		console.log(this.speedX);
 	};
 
 	move() {
@@ -55,15 +62,17 @@ export class Ball {
 	}
 
 	edges(game : Game) {
-		if((this.ballPosY - this.radius) < 0 || (this.ballPosY + this.radius) > this.table.tableHeight)
+		if((this.ballPosY - this.radius) <= 0 || (this.ballPosY + this.radius) >= this.table.tableHeight)
 			this.speedY *= -1;
-		if(this.ballPosX > this.table.tableWidth)
+		if((this.ballPosX + this.radius) >= this.table.tableWidth)
 		{
+			console.log("am here");
 			game.updateScore(PaddleSide.Left);
 			this.reset();
 		}
-		if(this.ballPosX < 0)
+		if((this.ballPosX - this.radius) <= 0)
 		{
+			console.log("no am here");
 			game.updateScore(PaddleSide.Right);
 			this.reset();
 		}
@@ -89,15 +98,43 @@ export class Ball {
 		this.ballSize = (this.table.tableWidth * 0.02) + 5;
 		this.radius = this.ballSize/2;
 	}
-
 	checkPaddleHits(paddle : Paddle) {
-		if(this.ballPosY <= paddle.paddlePosY + paddle.paddleHeight
-			&& this.ballPosY >= paddle.paddlePosY) {
-				if(paddle.side === PaddleSide.Right && (this.ballPosX + this.radius) >= paddle.paddlePosX)
-					this.speedX *= -1;
-				else if(paddle.side === PaddleSide.Left && (this.ballPosX - this.radius) <= (paddle.paddlePosX + paddle.paddleWidth))
-					this.speedX *= -1;
+		if((this.ballPosY + this.radius) > paddle.paddlePosY
+			&& (this.ballPosY - this.radius )< (paddle.paddlePosY + paddle.paddleHeight)) {
+			let angle;
+			if(paddle.side === PaddleSide.Right && (this.ballPosX + this.radius) > paddle.paddlePosX)
+			{
+				if(this.ballPosX < paddle.paddlePosX) {
+					const diff = this.ballPosY - paddle.paddlePosY;
+					if(this.table.p) {
+						console.log("right speed X " + this.speedX);
+						console.log("right speed Y " + this.speedY);
+						angle = this.table.p.map(diff, 0, paddle.paddleHeight, this.table.p.radians(225), this.table.p.radians(135));
+						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
+						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
+						this.ballPosX = paddle.paddlePosX - this.radius;
+						console.log("right after X " + this.speedX);
+						console.log("right after Y " + this.speedY);
+					}
+				}
 			}
+			else if(paddle.side === PaddleSide.Left && (this.ballPosX - this.radius) < (paddle.paddlePosX + paddle.paddleWidth))
+			{
+				if(this.ballPosX > paddle.paddlePosX){
+					const diff = this.ballPosY - paddle.paddlePosY;
+					if(this.table.p) {
+						console.log("left paddle speed X " + this.speedX);
+						console.log("left speed Y " + this.speedY);
+						angle = this.table.p.map(diff, 0, paddle.paddleHeight, -this.table.p.radians(45), this.table.p.radians(45));
+						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
+						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
+						this.ballPosX = paddle.paddlePosX + paddle.paddleWidth + this.radius;
+						console.log("left after X " + this.speedX);
+						console.log("left after Y " + this.speedY);
+					}
+				}
+			}
+		}
 	}
 
 	adjustBallSpeed() {
