@@ -1,14 +1,5 @@
 import React, { ChangeEvent, useState, useTransition } from 'react'
 
-/* typescript :
-	- function paramaters : function deleteUser(user : User) {}
-	- function return value : function getAdminUser() : User {}
-	- two ways to declate the shape of an object :
-		. interfaces : a way of describing the shape of an object. and sometimes we run into cases where not all properties are required, for that we follow the name of the property by a ?. and if we want to create properties that are immutable, we add the the readonly before the property name.
-		. type aliases : 
-*/
-
-
 class Game {
 	playedRounds : number;
 	requiredRounds: number;

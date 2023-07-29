@@ -4,7 +4,7 @@ import PongBoard from './PongBoard'
 
 import './App.css';
 
-const Game = () => {
+const MultiPlayerGame = () => {
   return (
     <div className="App">
 		<RoundsBoard/>
@@ -13,4 +13,4 @@ const Game = () => {
   );
 }
 
-export default Game;
+export default MultiPlayerGame;

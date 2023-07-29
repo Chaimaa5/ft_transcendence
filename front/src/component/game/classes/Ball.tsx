@@ -66,13 +66,11 @@ export class Ball {
 			this.speedY *= -1;
 		if((this.ballPosX + this.radius) >= this.table.tableWidth)
 		{
-			console.log("am here");
 			game.updateScore(PaddleSide.Left);
 			this.reset();
 		}
 		if((this.ballPosX - this.radius) <= 0)
 		{
-			console.log("no am here");
 			game.updateScore(PaddleSide.Right);
 			this.reset();
 		}
@@ -107,14 +105,10 @@ export class Ball {
 				if(this.ballPosX < paddle.paddlePosX) {
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
-						console.log("right speed X " + this.speedX);
-						console.log("right speed Y " + this.speedY);
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, this.table.p.radians(225), this.table.p.radians(135));
 						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
 						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX - this.radius;
-						console.log("right after X " + this.speedX);
-						console.log("right after Y " + this.speedY);
 					}
 				}
 			}
@@ -123,14 +117,10 @@ export class Ball {
 				if(this.ballPosX > paddle.paddlePosX){
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
-						console.log("left paddle speed X " + this.speedX);
-						console.log("left speed Y " + this.speedY);
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, -this.table.p.radians(45), this.table.p.radians(45));
 						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
 						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX + paddle.paddleWidth + this.radius;
-						console.log("left after X " + this.speedX);
-						console.log("left after Y " + this.speedY);
 					}
 				}
 			}

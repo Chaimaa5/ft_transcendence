@@ -84,4 +84,51 @@ export class Paddle {
 		else if(this.side == PaddleSide.Right)
 			this.paddlePosX = this.table.tableWidth - this.table.tableWidth*0.02 - (this.table.tableWidth/100);
 	}
+	
+	moveToCenter(direction : number) {
+		if(this.table.p) {
+			if(direction === -1) {
+				this.paddlePosY -= this.stepsY;
+				this.paddlePosY = this.table.p.constrain(
+					this.paddlePosY,
+					this.table.tableHeight/2 - (this.paddleHeight/2),
+					this.table.tableHeight
+				);
+			}
+			else if(direction === 1) {
+				this.paddlePosY += this.stepsY;
+				this.paddlePosY = this.table.p.constrain(
+					this.paddlePosY,
+					0,
+					this.table.tableHeight/2 + (this.paddleHeight/2)
+				);
+			}
+		}
+	}
+
+	chaseBall(direction : number, ballPosY: number) {
+		if(this.table.p) {
+			if(direction === 1) {
+				this.paddlePosY += this.stepsY;
+				console.log("before constrain :" + this.paddlePosY)
+				this.paddlePosY = this.table.p.constrain(
+					this.paddlePosY,
+					0,
+					ballPosY
+				)
+				console.log("after constrain : " + this.paddlePosY)
+			}
+			else if(direction === -1) {
+				this.paddlePosY -= this.stepsY;
+				console.log("before constrain : " + this.paddlePosY);
+				this.paddlePosY = this.table.p.constrain(
+					this.paddlePosY,
+					ballPosY - this.paddleHeight/2,
+					this.table.tableHeight - this.paddleHeight
+				);
+				console.log("after constrain : " + this.paddlePosY)
+
+			}
+		}
+	}
 };

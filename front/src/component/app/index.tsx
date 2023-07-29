@@ -11,7 +11,8 @@ import axios from "axios";
 import Leaderbaord from "../leaderbaord/index";
 import Instanse from "../api/api";
 import CrContext from "../context/context";
-import Game from "../game/GameApp"
+import MultiPlayerGame from "../game/MultiPlayerGame";
+import TainingGame from "../game/TrainingGame";
 // import Chat from "../chat/Chat";
 
 
@@ -51,9 +52,10 @@ function Container(){
                     <div className="page">
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
-                        {location.pathname == "/leaderboord" && <Leaderboord/>}
+                        {location.pathname == "/leaderboord" && <Leaderbaord/>}
                         {/* {location.pathname == "/chat" && <Chat/>} */}
-						{location.pathname == "/game" && <Game/>}
+						{location.pathname == "/game" && <MultiPlayerGame/>}
+						{location.pathname == "/training" && <TrainingGame/>}
                     </div>
                     <div className="status">
                         <Status/>

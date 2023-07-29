@@ -10,7 +10,8 @@ import Leaderbaord from './component/leaderbaord/index';
 import axios from 'axios';
 import { useEffect } from 'react';
 // import Chat from "./component/chat/Chat";
-import Game from "./component/game/GameApp";
+import MultipPlayerGame from "./component/game/MultiPlayerGame";
+import TrainingGame  from './component/game/TrainingGame';
 
 
 function App() {
@@ -24,7 +25,8 @@ function App() {
           <Route path="/profile/:username" element={<Container />} />
           <Route path="/leaderboord" element={<Container />} />
           {/* <Route path="/Chat" element={<Container />} /> */}
-		  <Route path="/game" element={<Game />} />
+		  <Route path="/game" element={<MultipPlayerGame />} />
+		  <Route path="/training" element={<TrainingGame />} />
         </Routes>
     </Router>
     </div>

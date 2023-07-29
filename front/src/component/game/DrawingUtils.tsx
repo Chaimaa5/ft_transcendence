@@ -1,6 +1,5 @@
 import P5 from 'p5'
-import { Paddle } from './Paddle'
-import { table } from 'console';
+import { Paddle } from './classes/Paddle'
 
 export function setShadowParam(
     color: string,
