@@ -21,6 +21,7 @@ export class Paddle {
 	side ?: PaddleSide;
 	direction : number;
 	prevWindowHeight : number;
+	speedRatio : number;
 
 	constructor (table : GameTable) {
 		this.paddlePosX = NaN;
@@ -34,6 +35,7 @@ export class Paddle {
 		this.stepsY = NaN;
 		this.direction = 0;
 		this.prevWindowHeight = 0;
+		this.speedRatio = 100;
 	}
 
 	initPaddle(
@@ -54,7 +56,7 @@ export class Paddle {
 		}
 		this.paddleWidth = this.table.tableWidth*0.02;
 		this.paddleHeight = this.table.tableHeight*0.3;
-		this.stepsY = this.table.tableWidth/200;
+		this.stepsY = this.table.tableWidth/this.speedRatio;
 	}
 
 	show() {
@@ -78,7 +80,7 @@ export class Paddle {
 	}
 	
 	adjustPaddleSpeed() {
-		this.stepsY = this.table.tableWidth/200;
+		this.stepsY = this.table.tableWidth/this.speedRatio;
 		if(this.side == PaddleSide.Left)
 			this.paddlePosX = this.table.tableWidth/100;
 		else if(this.side == PaddleSide.Right)
@@ -108,27 +110,33 @@ export class Paddle {
 
 	chaseBall(direction : number, ballPosY: number) {
 		if(this.table.p) {
-			if(direction === 1) {
-				this.paddlePosY += this.stepsY;
-				console.log("before constrain :" + this.paddlePosY)
-				this.paddlePosY = this.table.p.constrain(
-					this.paddlePosY,
-					0,
-					ballPosY
-				)
-				console.log("after constrain : " + this.paddlePosY)
-			}
-			else if(direction === -1) {
-				this.paddlePosY -= this.stepsY;
-				console.log("before constrain : " + this.paddlePosY);
-				this.paddlePosY = this.table.p.constrain(
-					this.paddlePosY,
-					ballPosY - this.paddleHeight/2,
-					this.table.tableHeight - this.paddleHeight
-				);
-				console.log("after constrain : " + this.paddlePosY)
+			const min = (direction === 1) ? 0 : ballPosY;
+			const max = (direction === 1) ? ballPosY- this.paddleHeight : this.table.tableHeight - this.paddleHeight;
 
-			}
+			this.paddlePosY += direction * this.stepsY;
+			this.paddlePosY = this.table.p.constrain(
+				this.paddlePosY,
+				min,
+				max
+			)
+
+
+			// if(direction === 1) {
+			// 	this.paddlePosY += this.stepsY;
+			// 	this.paddlePosY = this.table.p.constrain(
+			// 		this.paddlePosY,
+			// 		0,
+			// 		ballPosY - this.paddleHeight
+			// 	)
+			// }
+			// else if(direction === -1) {
+			// 	this.paddlePosY -= this.stepsY;
+			// 	this.paddlePosY = this.table.p.constrain(
+			// 		this.paddlePosY,
+			// 		ballPosY,
+			// 		this.table.tableHeight - this.paddleHeight
+			// 	);
+			// }
 		}
 	}
 };

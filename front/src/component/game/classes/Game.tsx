@@ -91,5 +91,9 @@ export class Game{
 		this.ball.setInitialBallPosition(this.table.tableWidth, this.table.tableHeight);
 		this.ball.speedX = 0;
 		this.ball.speedY = 0;
+		if(this.table.p) {
+			this.table.p.clear();
+			this.table.p.noLoop();
+		}
 	}
 };

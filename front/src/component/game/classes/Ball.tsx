@@ -3,6 +3,8 @@ import {GameTable} from "./GameTable";
 import {Paddle , PaddleSide} from "./Paddle";
 import {Game} from "./Game"
 
+//normal speed ration tableWidth/200
+
 const randomDirection = ():number => {
 	const minValue = -Math.PI / 4;
 	const maxValue = Math.PI / 4;
@@ -27,6 +29,7 @@ export class Ball {
 	radius : number;
 	prevWindowWidth : number;
 	prevWindowHeight : number;
+	speedRatio : number;
 
 	constructor(table : GameTable) {
 		this.table = table;
@@ -38,6 +41,7 @@ export class Ball {
 		this.radius = this.ballSize/2;
 		this.prevWindowWidth = NaN;
 		this.prevWindowHeight = NaN;
+		this.speedRatio = NaN;
 	};
 
 	show() : void {
@@ -49,6 +53,7 @@ export class Ball {
 	};
 
 	move() {
+		
 		this.ballPosX = this.ballPosX + this.speedX;
 		this.ballPosY = this.ballPosY + this.speedY;
 	}
@@ -57,8 +62,8 @@ export class Ball {
 		const randomAngle : number = randomDirection();
 		this.ballPosX = this.table.tableWidth/2;
 		this.ballPosY = this.table.tableHeight/2;
-		this.speedX = this.table.tableWidth/200 * Math.cos(randomAngle);
-		this.speedY = this.table.tableWidth/200 * Math.sin(randomAngle);
+		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(randomAngle);
+		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(randomAngle);
 	}
 
 	edges(game : Game) {
@@ -83,10 +88,11 @@ export class Ball {
 
 	initBall() {
 		const randomAngle : number = randomDirection();
+		this.speedRatio = 100;
 		this.ballSize = (this.table.tableWidth * 0.02) + 5;
 		this.radius = this.ballSize/2;
-		this.speedX = this.table.tableWidth/200 * Math.cos(randomAngle);
-		this.speedY = this.table.tableWidth/200 * Math.sin(randomAngle);
+		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(randomAngle);
+		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(randomAngle);
 		this.prevWindowHeight = this.table.tableHeight;
 		this.prevWindowWidth = this.table.tableWidth;
 		this.setInitialBallPosition(this.table.tableWidth, this.table.tableHeight);
@@ -106,8 +112,8 @@ export class Ball {
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, this.table.p.radians(225), this.table.p.radians(135));
-						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
-						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
+						this.speedX = (this.table.tableWidth/this.speedRatio) *  Math.cos(angle);
+						this.speedY = (this.table.tableWidth/this.speedRatio) *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX - this.radius;
 					}
 				}
@@ -118,8 +124,8 @@ export class Ball {
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, -this.table.p.radians(45), this.table.p.radians(45));
-						this.speedX = (this.table.tableWidth/200) *  Math.cos(angle);
-						this.speedY = (this.table.tableWidth/200) *  Math.sin(angle);
+						this.speedX = (this.table.tableWidth/this.speedRatio) *  Math.cos(angle);
+						this.speedY = (this.table.tableWidth/this.speedRatio) *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX + paddle.paddleWidth + this.radius;
 					}
 				}
@@ -128,7 +134,7 @@ export class Ball {
 	}
 
 	adjustBallSpeed() {
-		this.speedX = this.table.tableWidth/200;
-		this.speedY = this.table.tableWidth/200;
+		this.speedX = this.table.tableWidth/this.speedRatio;
+		this.speedY = this.table.tableWidth/this.speedRatio;
 	}
 };
