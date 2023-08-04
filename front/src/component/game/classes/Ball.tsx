@@ -88,7 +88,7 @@ export class Ball {
 
 	initBall() {
 		const randomAngle : number = randomDirection();
-		this.speedRatio = 100;
+		this.speedRatio = 200;
 		this.ballSize = (this.table.tableWidth * 0.02) + 5;
 		this.radius = this.ballSize/2;
 		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(randomAngle);

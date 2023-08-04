@@ -9,6 +9,9 @@ import { UserModule } from './user/user.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { NotificationsGateway } from './socket/notifications.gateway';
+import { GameController } from './game/game.controller';
+import { GameGateway } from './game/game.gateway';
+import { roomManager } from './game/rooms/room.manager';
 
 @Module({
   imports: [
@@ -19,6 +22,6 @@ import { NotificationsGateway } from './socket/notifications.gateway';
     })
   ],
   controllers: [],
-  providers: [NotificationsGateway],
+  providers: [ GameGateway, roomManager],
 })
 export class AppModule {}

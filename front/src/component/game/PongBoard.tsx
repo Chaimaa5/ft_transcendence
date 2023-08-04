@@ -6,9 +6,11 @@ import { Paddle, PaddleSide } from "./classes/Paddle";
 import { GameTable } from "./classes/GameTable";
 import { Player } from "./classes/Player";
 import { Ball } from "./classes/Ball";
+import { io } from 'socket.io-client';
 
 
 const PongBoard: React.FC = () => {
+	const socket = io("ws://localhost:3000/game");
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
 		width: 0,
 		height: 0
@@ -78,18 +80,25 @@ const PongBoard: React.FC = () => {
 
 			p.keyPressed = () => {
 				if(p.keyCode === 87) // w
+				{
+					socket.emit('newPosition', {data : "awili"});	
 					game.leftPaddle.move(-1);
-				else if (p.keyCode === 83) // s
-					game.leftPaddle.move(1);
+				}
+				// else if (p.keyCode === 83) // s
+				// 	game.leftPaddle.move(1);
 				
-				if(p.keyCode === 73)
-					game.rightPaddle.move(-1) // i
-				else if(p.keyCode === 75)
-					game.rightPaddle.move(1) //k
+				// if(p.keyCode === 73)
+				// 	game.rightPaddle.move(-1) // i
+				// else if(p.keyCode === 75)
+				// 	game.rightPaddle.move(1) //k
 			}
 		}
 		return <ReactP5Wrapper sketch={sketch}/>;
 	}
+
+	useEffect(() => {
+
+	}, [socket]);
 
 	return (
 		<div className="pong-board">

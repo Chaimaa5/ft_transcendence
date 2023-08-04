@@ -24,7 +24,7 @@ export class Game{
 	constructor(tableWidth: number, tableHeight: number) {
 		this.table = new GameTable(tableWidth, tableHeight);
 		this.rightPlayer = new Player("shrooma");
-		this.leftPlayer = new Player("bot");
+		this.leftPlayer = new Player("cel-mhan");
 		this.ball = new Ball(this.table);
 		this.rightPaddle = new Paddle(this.table);
 		this.leftPaddle = new Paddle(this.table);

@@ -17,6 +17,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
     async afterInit(server: Socket) {
         console.log('WebSocket gateway initialized!');
+		
     }
     
     async handleDisconnect(client: Socket){

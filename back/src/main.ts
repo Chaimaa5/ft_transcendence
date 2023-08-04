@@ -18,7 +18,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new IoAdapter(app));
   app.use(cors(corsOptions));
   app.use(cookieParser());
-  app.setGlobalPrefix('api');
+//   app.setGlobalPrefix('api');
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();

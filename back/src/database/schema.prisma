@@ -106,6 +106,7 @@ model  Game {
   winner      String
 }
 
+
 model Notification {
   id          Int @default(autoincrement()) @id 
   type        String

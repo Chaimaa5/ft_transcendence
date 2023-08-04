@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY *.json ./
 
-RUN npm install 
+RUN npm install
+RUN npm install socket.io-client
 
 COPY . .
 

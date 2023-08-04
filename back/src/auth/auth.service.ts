@@ -133,4 +133,10 @@ export class AuthService {
         });
     }
 
+// 	async GetAccess(user : User)
+// {
+// 	const usertoken =  await this.prisma.user.FindUnique({where: {id: user.id}})
+
+// 	return usertoken.refresh_token
+// }
 }

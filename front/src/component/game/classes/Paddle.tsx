@@ -35,7 +35,7 @@ export class Paddle {
 		this.stepsY = NaN;
 		this.direction = 0;
 		this.prevWindowHeight = 0;
-		this.speedRatio = 100;
+		this.speedRatio = 200;
 	}
 
 	initPaddle(
@@ -89,29 +89,22 @@ export class Paddle {
 	
 	moveToCenter(direction : number) {
 		if(this.table.p) {
-			if(direction === -1) {
-				this.paddlePosY -= this.stepsY;
-				this.paddlePosY = this.table.p.constrain(
-					this.paddlePosY,
-					this.table.tableHeight/2 - (this.paddleHeight/2),
-					this.table.tableHeight
-				);
-			}
-			else if(direction === 1) {
-				this.paddlePosY += this.stepsY;
-				this.paddlePosY = this.table.p.constrain(
-					this.paddlePosY,
-					0,
-					this.table.tableHeight/2 + (this.paddleHeight/2)
-				);
-			}
+			const min = (direction === 1) ? 0 : this.table.tableHeight/2 - (this.paddleHeight/2);
+			const max = (direction === 1) ? this.table.tableHeight/2 + (this.paddleHeight/2) : this.table.tableHeight;
+
+			this.paddlePosY += this.stepsY * direction;
+			this.paddlePosY = this.table.p.constrain(
+				this.paddlePosY,
+				min,
+				max
+			);
 		}
 	}
 
 	chaseBall(direction : number, ballPosY: number) {
 		if(this.table.p) {
 			const min = (direction === 1) ? 0 : ballPosY;
-			const max = (direction === 1) ? ballPosY- this.paddleHeight : this.table.tableHeight - this.paddleHeight;
+			const max = (direction === 1) ? ballPosY - this.paddleHeight : this.table.tableHeight - this.paddleHeight;
 
 			this.paddlePosY += direction * this.stepsY;
 			this.paddlePosY = this.table.p.constrain(
@@ -119,24 +112,6 @@ export class Paddle {
 				min,
 				max
 			)
-
-
-			// if(direction === 1) {
-			// 	this.paddlePosY += this.stepsY;
-			// 	this.paddlePosY = this.table.p.constrain(
-			// 		this.paddlePosY,
-			// 		0,
-			// 		ballPosY - this.paddleHeight
-			// 	)
-			// }
-			// else if(direction === -1) {
-			// 	this.paddlePosY -= this.stepsY;
-			// 	this.paddlePosY = this.table.p.constrain(
-			// 		this.paddlePosY,
-			// 		ballPosY,
-			// 		this.table.tableHeight - this.paddleHeight
-			// 	);
-			// }
 		}
 	}
 };

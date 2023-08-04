@@ -65,4 +65,10 @@ export class AuthController {
         else
             return false
     }
+
+	// @Get('/access')
+	// async GetAccess(@Req() req: Request){
+	// 	const user : User = req.user as User;
+	// 	return await this.authservice.GetAccess(req.user)
+	// }
 }

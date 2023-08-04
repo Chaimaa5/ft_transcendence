@@ -98,12 +98,12 @@ const PongBoard: React.FC = () => {
 }
 
 function BOT(game : Game) {
-	if((game.ball.ballPosX)  < game.table.tableWidth/2 && game.ball.speedX < 0)
+	if((game.ball.ballPosX)  < (1*game.table.tableWidth)/2 && game.ball.speedX < 0)
 	{
-		if((game.leftPaddle.paddlePosY + game.leftPaddle.paddleHeight) < ( game.ball.ballPosY)) {
+		if((game.leftPaddle.paddlePosY + game.leftPaddle.paddleHeight/2) < ( game.ball.ballPosY + game.table.tableHeight/3)) {
 			game.leftPaddle.chaseBall(1, game.ball.ballPosY);
 		}
-		else if((game.leftPaddle.paddlePosY ) > (game.ball.ballPosY)) {
+		else if((game.leftPaddle.paddlePosY + game.leftPaddle.paddleHeight/2) > (game.ball.ballPosY - game.table.tableHeight/3)) {
 			game.leftPaddle.chaseBall(-1, game.ball.ballPosY);
 		}
 	}
