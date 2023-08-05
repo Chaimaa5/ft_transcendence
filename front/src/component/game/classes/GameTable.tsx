@@ -1,22 +1,26 @@
 import P5 from 'p5'
 import {Player} from './Player'
 import {Round} from './Game'
+import { Socket } from "socket.io-client";
+
 
 export class GameTable {
 	tableWidth: number;
 	tableHeight: number;
 	ctx?: CanvasRenderingContext2D;
 	p?: P5;
+	socket: Socket;
 	constructor(tableWidth: number, tableHeight: number){
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;
 	}
 
-	initTable(tableWidth : number, tableHeight : number, ctx : CanvasRenderingContext2D, p : P5) {
+	initTable(tableWidth : number, tableHeight : number, ctx : CanvasRenderingContext2D, p : P5, socket: Socket) {
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;
 		this.ctx = ctx;
 		this.p = p;
+		this.socket = socket;
 	}
 	
 	displayScore(leftPlayer : Player, rightPlayer : Player, round : Round) {

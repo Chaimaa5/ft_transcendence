@@ -10,13 +10,13 @@ import { io } from 'socket.io-client';
 
 
 const PongBoard: React.FC = () => {
-	const socket = io("ws://localhost:3000/game");
+	const socketRef = useRef(io('http://localhost:3000/game'));
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
 		width: 0,
 		height: 0
 	});
 
-	const game = new Game(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
+	const gameRef = useRef(new Game(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height));
 	
 	function getDivWidthAndHeight(divId : string) : {width : number, height : number} {
 		const Div = document.querySelector(divId) as HTMLElement;
@@ -41,64 +41,81 @@ const PongBoard: React.FC = () => {
 				canvas = p.createCanvas(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height).parent(div);
 				const html5Canvas = canvas.elt;
 				ctx = html5Canvas.getContext('2d');
-				game.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p);
-				game.ball.initBall();
-				game.rightPaddle.initPaddle(color1, color2, PaddleSide.Right);
-				game.leftPaddle.initPaddle(color1, color2, PaddleSide.Left);
+				gameRef.current.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p, socketRef.current);
+				gameRef.current.ball.initBall();
+				gameRef.current.myPaddle.initPaddle(color1, color2);
+				gameRef.current.opponentPaddle.initPaddle(color1, color2);
 			};
 	
 			p.draw = () => {
 				p.clear();
-				game.rightPaddle.show();
-				game.rightPaddle.update();
-				game.leftPaddle.show();
-				game.leftPaddle.update();
-				game.ball.show();
-				game.ball.move();
-				game.ball.edges(game);
-				game.ball.checkPaddleHits(game.rightPaddle);
-				game.ball.checkPaddleHits(game.leftPaddle);
-				game.table.displayScore(game.leftPlayer, game.rightPlayer, game.round);
+				gameRef.current.myPaddle.show();
+				gameRef.current.myPaddle.update();
+				gameRef.current.opponentPaddle.show();
+				gameRef.current.opponentPaddle.update();
+				gameRef.current.ball.show();
+				gameRef.current.ball.move();
+				gameRef.current.ball.edges(gameRef.current);
+				gameRef.current.ball.checkPaddleHits(gameRef.current.myPaddle);
+				gameRef.current.ball.checkPaddleHits(gameRef.current.opponentPaddle);
+				gameRef.current.table.displayScore(gameRef.current.leftPlayer, gameRef.current.rightPlayer, gameRef.current.round);
 			}
 	
 			p.windowResized = () => {
 				tableCanvasSizeRef.current.width = getDivWidthAndHeight(".pong-table").width;
 				tableCanvasSizeRef.current.height = getDivWidthAndHeight(".pong-table").height;
-				game.setTableDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
-				game.setPaddlesDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
-				game.ball.resizeBall();
-				game.ball.adjustBallSpeed();
-				game.leftPaddle.adjustPaddleSpeed();
-				game.rightPaddle.adjustPaddleSpeed();
+				gameRef.current.setTableDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
+				gameRef.current.setPaddlesDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
+				gameRef.current.ball.resizeBall();
+				gameRef.current.ball.adjustBallSpeed();
+				gameRef.current.myPaddle.adjustPaddleSpeed();
+				gameRef.current.opponentPaddle.adjustPaddleSpeed();
 				p.resizeCanvas(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, true);
 			}
 
 			p.keyReleased = () => {
-				game.rightPaddle.move(0);
-				game.leftPaddle.move(0);
+				gameRef.current.myPaddle.move(0);
+				gameRef.current.opponentPaddle.move(0);
 			}
 
 			p.keyPressed = () => {
-				if(p.keyCode === 87) // w
+				if(p.keyCode === 38) 
 				{
-					socket.emit('newPosition', {data : "awili"});	
-					game.leftPaddle.move(-1);
+					gameRef.current.myPaddle.move(-1);
 				}
-				// else if (p.keyCode === 83) // s
-				// 	game.leftPaddle.move(1);
-				
-				// if(p.keyCode === 73)
-				// 	game.rightPaddle.move(-1) // i
-				// else if(p.keyCode === 75)
-				// 	game.rightPaddle.move(1) //k
+				else if (p.keyCode === 40)
+				{
+					gameRef.current.myPaddle.move(1);
+				}
 			}
 		}
 		return <ReactP5Wrapper sketch={sketch}/>;
 	}
 
 	useEffect(() => {
+		socketRef.current.on('updatePositions', (payload) => {
+			gameRef.current.opponentPaddle.move(payload.direction);
+		})
+		socketRef.current.on('paddleSide', (side) => {
+			if(side === 'right') {
+				gameRef.current.myPaddle.side = PaddleSide.Right;
+				gameRef.current.opponentPaddle.side = PaddleSide.Left;
+			}
+			else if(side == 'left') {
+				gameRef.current.myPaddle.side = PaddleSide.Left;
+				gameRef.current.opponentPaddle.side = PaddleSide.Right;
+			}
+		})
 
-	}, [socket]);
+		socketRef.current.on('connect', () => {
+			console.log('client side : client connected to the server');
+		});
+		return() => {
+			socketRef.current.off('connect', () => {
+				console.log('client side : client disconnected from the server');
+			});
+		}
+	}, []);
 
 	return (
 		<div className="pong-board">

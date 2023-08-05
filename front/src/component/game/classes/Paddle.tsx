@@ -20,6 +20,7 @@ export class Paddle {
 	table : GameTable;
 	side ?: PaddleSide;
 	direction : number;
+	prevDirection : number;
 	prevWindowHeight : number;
 	speedRatio : number;
 
@@ -34,6 +35,7 @@ export class Paddle {
 		this.table = table;
 		this.stepsY = NaN;
 		this.direction = 0;
+		this.prevDirection = 0;
 		this.prevWindowHeight = 0;
 		this.speedRatio = 200;
 	}
@@ -41,16 +43,14 @@ export class Paddle {
 	initPaddle(
 		gradientColor1 : string,
 		gradientColor2 : string,
-		side : PaddleSide
 	) {
-		this.side = side;
 		this.gradientColor1 = gradientColor1;
 		this.gradientColor2 = gradientColor2;
 		if(this.side === PaddleSide.Left) {
 			this.paddlePosX = this.table.tableWidth/100;
 			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
 		}
-		else if(this.side === PaddleSide.Right && this.table.p) {
+		else if(this.side === PaddleSide.Right) {
 			this.paddlePosX = this.table.tableWidth - this.table.tableWidth*0.02 - (this.table.tableWidth/100);
 			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
 		}
@@ -66,12 +66,16 @@ export class Paddle {
 	}
 
 	update() {
-		if(this.table.p) {
+		if(this.table.p && this.table.socket) {
 			this.paddlePosY += this.stepsY * this.direction;
 			this.paddlePosY = this.table.p.constrain(
 				this.paddlePosY,
 				0,
 				this.table.tableHeight - this.paddleHeight);
+			if(this.direction != this.prevDirection) {
+				this.prevDirection = this.direction;
+				this.table.socket.emit('newPaddlePosition', {playerId: this.table.socket.id, direction: this.direction});
+			}
 		}
 	}
 

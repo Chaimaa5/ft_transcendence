@@ -12,8 +12,11 @@ export interface Round {
 export class Game{
 	rightPlayer : Player;
 	leftPlayer : Player;
-	rightPaddle : Paddle;
-	leftPaddle : Paddle;
+	// opponentPaddle : Paddle;
+	// myPaddle : Paddle;
+	
+	myPaddle : Paddle;
+	opponentPaddle : Paddle;
 	ball : Ball;
 	table : GameTable;
 	roundsNumber : number;
@@ -26,8 +29,10 @@ export class Game{
 		this.rightPlayer = new Player("shrooma");
 		this.leftPlayer = new Player("cel-mhan");
 		this.ball = new Ball(this.table);
-		this.rightPaddle = new Paddle(this.table);
-		this.leftPaddle = new Paddle(this.table);
+
+		this.myPaddle = new Paddle(this.table);
+		this.opponentPaddle = new Paddle(this.table);
+
 		this.roundsNumber = 3;
 		this.roundRequiredPoints = 2;
 		this.round = {
@@ -44,15 +49,15 @@ export class Game{
 
 	setPaddlesDimensions(width : number, height : number){
 		// left Paddle
-		this.leftPaddle.paddlePosX = 20;
-		this.leftPaddle.paddlePosY = height/2 - ((height*0.3)/2);
-		this.leftPaddle.paddleWidth = width*0.02;
-		this.leftPaddle.paddleHeight = height*0.3;
+		this.myPaddle.paddlePosX = 20;
+		this.myPaddle.paddlePosY = height/2 - ((height*0.3)/2);
+		this.myPaddle.paddleWidth = width*0.02;
+		this.myPaddle.paddleHeight = height*0.3;
 		// right Paddle
-		this.rightPaddle.paddlePosX = width - width*0.02 - 20;
-		this.rightPaddle.paddlePosY = height/2 - ((height*0.3)/2);
-		this.rightPaddle.paddleWidth = width*0.02;
-		this.rightPaddle.paddleHeight = height*0.3;
+		this.opponentPaddle.paddlePosX = width - width*0.02 - 20;
+		this.opponentPaddle.paddlePosY = height/2 - ((height*0.3)/2);
+		this.opponentPaddle.paddleWidth = width*0.02;
+		this.opponentPaddle.paddleHeight = height*0.3;
 	}
 	
 	updateScore(side : PaddleSide) {
