@@ -29,6 +29,7 @@ model User {
   games         Int?
   rank          Int
   refreshToken  String?
+  accessToken  String?
   status        Boolean
   badge         Achievement[]       @relation("Achieved")
   createdAt     DateTime             @default(now())

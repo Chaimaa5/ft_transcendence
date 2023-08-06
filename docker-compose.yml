@@ -40,13 +40,13 @@ services:
   #     - '80:80'
   #   networks:
   #     - app-network
-  frontend:
-    build: 
-     context: ./front
-    ports:
-      - '8000:8000'
-    networks:
-      - app-network
+  # frontend:
+  #   build: 
+  #    context: ./front
+  #   ports:
+  #     - '8000:8000'
+  #   networks:
+  #     - app-network
 volumes:
   postgres:
    driver: local

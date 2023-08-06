@@ -15,30 +15,32 @@ export class roomManager {
 		this.server = server;
 	}
 
-	createRoom(player1 : Socket, player2 : Socket) {
-		if(player1 && player2) {
+	createRoom(leftPlayer : Socket, rightPlayer : Socket) {
+		if(leftPlayer && rightPlayer) {
 			const roomId = `room_${this.roomIdCounter}`;
 			this.roomIdCounter++;
 			
 			// join the 2 players to a socket.io channel
-			player1.join(roomId);
-			player2.join(roomId);
+			leftPlayer.join(roomId);
+			leftPlayer.emit('paddleSide', 'left');
+			rightPlayer.join(roomId);
+			rightPlayer.emit('paddleSide', 'right')
 
-			const initialPaddleState1 : PaddleState = { playerId: player1.id, x: 0, y: 0 };
-			const initialPaddleState2 : PaddleState = { playerId: player2.id, x: 0, y: 0 };
+			const initialLeftPaddleState : PaddleState = { playerId: leftPlayer.id, side: "left", y: 0 };
+			const initialRightPaddleState : PaddleState = { playerId: rightPlayer.id, side: "right", y: 0 };
 
 			// construct the initial game state of the game
 			const initialGameState : GameState = {
 				id : roomId,
 				ball : {x : 0, y : 0},
-				paddles: [initialPaddleState1, initialPaddleState2]
+				paddles: [initialLeftPaddleState, initialRightPaddleState]
 			}
 
 			// push the room id and its appropriate gamestate to the rooms map
 			this.rooms.set(initialGameState['id'],initialGameState);
 		}
 		else {
-			console.error("player1 or/and player2 are null")
+			console.error("leftPlayer or/and rightPlayer are null")
 		}
 	}
 
@@ -46,8 +48,9 @@ export class roomManager {
 		return(this.rooms.get(roomId));
 	}
 
-	updateRoomState(roomId: string, newState : GameState) : void {
-		this.rooms.set(roomId, newState);
+	updateRoomState(roomId: string, payload: {playerId: string, y: number}) : void {
+		
+		// this.rooms.set(roomId, newState);
 	}
 }
 

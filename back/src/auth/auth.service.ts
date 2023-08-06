@@ -36,9 +36,9 @@ export class AuthService {
         res.cookie('access_token', Access_Token, {httpOnly: true});
         res.cookie('refresh_token', Refresh_Token, {httpOnly: true});
         const encryptedToken = this.encryptToken(Refresh_Token);
-        this.userService.UpdateRefreshToken(check.id, encryptedToken)
+        this.userService.UpdateRefreshToken(check.id, encryptedToken,Access_Token )
         return find
-    }
+    } 
 
     signOut(res: Response) {
         res.clearCookie('access_token');
@@ -91,7 +91,7 @@ export class AuthService {
             res.cookie('access_token', Access_Token, {httpOnly: true, secure: true,});
             res.cookie('refresh_token', Refresh_Token, {httpOnly: true, secure: true,});
             const encryptedToken = this.encryptToken(Refresh_Token);
-            await this.userService.UpdateRefreshToken(user.id , encryptedToken)
+            await this.userService.UpdateRefreshToken(user.id , encryptedToken, Access_Token)
             console.log('finished')
         }
         else{

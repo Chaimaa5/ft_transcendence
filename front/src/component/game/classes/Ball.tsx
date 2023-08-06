@@ -53,9 +53,8 @@ export class Ball {
 	};
 
 	move() {
-		
-		this.ballPosX = this.ballPosX + this.speedX;
-		this.ballPosY = this.ballPosY + this.speedY;
+		// this.ballPosX = this.ballPosX + this.speedX;
+		// this.ballPosY = this.ballPosY + this.speedY;
 	}
 
 	reset() {

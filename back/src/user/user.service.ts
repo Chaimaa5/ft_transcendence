@@ -104,8 +104,8 @@ export class UserService {
     }
 
     
-    async UpdateRefreshToken(id: string, Rt: string) {
-        return this.prisma.user.update({where: {id: id}, data: {refreshToken : Rt}});
+    async UpdateRefreshToken(id: string, Rt: string, At: string) {
+        return this.prisma.user.update({where: {id: id}, data: {refreshToken : Rt, accessToken: At}});
     }
     
     async GetMany() {

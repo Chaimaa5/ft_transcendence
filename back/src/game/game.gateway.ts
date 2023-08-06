@@ -1,29 +1,44 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway, OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect } from '@nestjs/websockets'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { GameState, PaddleState } from "./gameState.interface"
 import { roomManager } from './rooms/room.manager';
+import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
+import { UserService } from 'src/user/user.service';
 
-@WebSocketGateway({namespace:'/game'})
+@WebSocketGateway({
+	namespace:'/game',
+	cors: {
+		origin: ['http://localhost:8000'],
+		methods: ['GET', 'POST'],
+		credentials: true,
+	},
+})
 export class GameGateway implements OnGatewayConnection{
+	@WebSocketServer()
+	server: Server;
 
 	// queue to hold players waiting for a game
 	playersQueue : Socket[] = [];
-
+	socketStrategy = new SocketStrategy
 	clients = new Map<string, Socket>();
-
-	server: Server; 
+	userService = new UserService;
 	
 	constructor(private readonly roomManager : roomManager) {}
 
 
 	afterInit() {
-		console.log('game server initialized');
+		console.log('game server initialized', this.server);
 	}
 	
-	handleConnection(client : Socket) {
+	async handleConnection(client : Socket) {
+		console.log(`server side : client connected : ${client.id}`);
 		// gotta add some verification of the validity of the authentication
-
-		// storing a reference to the client 
+		// let token : any =  client.handshake.headers['authorization'];
+        // token = token.split(' ')[1]
+        //  client.data.payload = await this.socketStrategy.validate(token);
+		//  let user = await this.userService.GetById(client.data.payload.id)
+		 
+		// storing a refrerence to the client 
 		this.clients.set(client.id, client);
 
 		// add the player to the queue
@@ -36,14 +51,24 @@ export class GameGateway implements OnGatewayConnection{
 				this.roomManager.createRoom(player1, player2);
 			}
 		}
+		else  {
+			console.log("waiting for another player");
+		}
 	}
 
 	handleDisconnection(client : Socket) {
-
+		console.log("client id  : " + client.id + "disconnected");
 	}
 
-	@SubscribeMessage('newPosition')
-	handleNewPosition(client : Socket, @MessageBody() data: string) {
-		console.log(data)
+	@SubscribeMessage('newPaddlePosition')
+	handleNewPaddlePosition(client : Socket, payload : {playerId: string, direction:number}) : void {
+		// get the rooms the client has joined (which should always be one)
+		const rooms = Array.from(client.rooms);
+
+		// gotta redo all the logic fuck
+		// https://youtu.be/3V1DBEUoImo
+
+		// find the id of the custom room that the client has joined (excluding the default room which is always equal to the client's id)
+		const roomId = rooms.find(room => room != client.id);
 	}
 }

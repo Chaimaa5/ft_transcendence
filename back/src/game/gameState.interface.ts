@@ -1,6 +1,6 @@
 export interface PaddleState {
 	playerId : string;
-	x  : number;
+	side : string;
 	y : number;
 }
 
