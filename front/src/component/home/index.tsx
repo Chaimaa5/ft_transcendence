@@ -12,7 +12,6 @@ import Instanse from "../api/api"
 import CrContext from "../context/context"
 import Profile from "../profile/index";
 import { Link } from "react-router-dom";
-import Game from "../game/classes/Game";
 
 
 type home_ =  {
@@ -38,7 +37,7 @@ const TopPlayers = ()=> {
     const [response, setResponse] = useState<home_[]>([]);
     const HandleLogin = () => {
     return Instanse
-            .get<home_[]>('/home/bestRanked', {withCredentials: true})
+            .get<home_[]>('http://localhost:3000/home/bestRanked', {withCredentials: true})
             .then((res) => {
                 setResponse(res.data)
             });

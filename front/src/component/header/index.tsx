@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import logo from '../tools/header/logo.svg'
 import notfication from '../tools/header/notification.svg';
 import logout from '../tools/header/logout.svg';
@@ -7,8 +7,6 @@ import { ReactSVG } from "react-svg";
 import SearchIcon from "../tools/Search.svg"
 import axios from "axios";
 import Avatar from "../avatar/index";
-import Instanse from "../api/api";
-import { Link } from "react-router-dom";
 
 type search_ = {
     username: string,
@@ -18,40 +16,37 @@ type search_ = {
 
 const Search = () => {
     const [txt, settxt] = useState(true)
-    const [input, setValue] = useState("");
+    const [Value, setValue] = useState("");
     const [status, setStatus] = useState(0);
     const [response, setResponse] = useState<search_[]>([])
-    useEffect(
-        () => {
-            if(input){
-                Instanse.post('/home/search', {input})
-                .then((res) => {
-                    setResponse(res.data)
-                });
-            } else setResponse([]) 
-        },[input]
-    )
     return(
         <>
             <input onClick={() => settxt(false)}  className="search-box m-[2.5%] w-[20%] h-[35%]" 
                 type="text"
-                value={input}
+                value={Value}
                 placeholder="Search..."
                 onChange={(event) => {
                     setValue(event.target.value);
+                    if(Value[0]){
+                        let input = {Value}
+                        return axios
+                        .post('http://localhost:3000/home/search', input, {withCredentials: true})
+                        .then((res) => {
+                            setResponse(res.data)
+                        });
+                    }
+                    if(event.target.value.length <= 0) setResponse([]);
                 }}
              />
             <ReactSVG className="search-icon mr-[10%] w-[1vw]" src={SearchIcon}/>
             {
-                response[0] && input.length != 0 &&
+                response[0] && Value.length != 0 &&
                 <div className="search-list rounded-[1vw] absolute h-[12vw] z-[1000] w-[17%] top-[80%] left-[4%]">
                     {
                         response.map((value)=> {
                             return(
                                 <div className="flex m-[2%] h-[2.5vw] w-[95%] justify-evenly rounded-[2vw] items-center border-[0.1vw] border-[#F1FAEE]">
-                                    <Link to={"/profile/" + value.username}>
-                                        <Avatar src={value.avatar} wd_="2vw"/>
-                                    </Link>
+                                    <Avatar src={value.avatar} wd_="2vw"/>
                                     <h4 className="name">{value.username}</h4>
                                 </div>
                             )
@@ -67,6 +62,7 @@ const Search = () => {
 const Notification = () => {
     return(
         <div className="notfication-box">
+            
         </div>
     )
 }

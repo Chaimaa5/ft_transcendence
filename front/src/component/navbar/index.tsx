@@ -58,12 +58,10 @@ const Navbar = () => {
                 <Link to={"/home"}>
                     <ReactSVG  className="icon-svg" src={home_icon}/>
                 </Link>
-                <Link to={"/Leaderbaord"}>
+                <Link to={"/leaderboord"}>
                     <ReactSVG className="icon-svg" src={leader_icon}/>
                 </Link>
-                <Link to="/chat">
-                    <ReactSVG className="icon-svg" src={chat_icon}/>
-                </Link>
+                <ReactSVG className="icon-svg" src={chat_icon}/>
                 <ReactSVG className="icon-svg" src={setting_icon}/>
                 <span></span>
             </div>

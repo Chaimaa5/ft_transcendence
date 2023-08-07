@@ -1,6 +1,6 @@
 import React from "react";
 import { ReactSVG } from "react-svg";
-import setup_icon from '../tools/button/Continue.svg';
+import setup_icon from '../tools/button/continue.svg';
 import start_icon from '../tools/button/start.svg';
 import invite_icon from '../tools/button/invite.svg';
 import watch_icon from '../tools/button/watch.svg';

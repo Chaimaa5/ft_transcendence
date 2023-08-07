@@ -37,7 +37,7 @@ export class UserController{
     //working
     @Post('setup')
     @UseInterceptors(FileInterceptor('avatar', Config)) 
-    async UserSetup(@Req() req: Request,@Res() res: Response ,@UploadedFile() avatar: Express.Multer.File, @Body() data: UpdateUserDTO){
+    async UserSetup(@Req() req: Request, @UploadedFile() avatar: Express.Multer.File, @Body() data: UpdateUserDTO){
         const user : User = req.user as User;
         await this.userservice.userSetup(user.id, avatar, data);
     }

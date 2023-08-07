@@ -41,7 +41,9 @@ function Login () {
           <h6 className="sb-title">Use Your Mouse to Experience the 3D Animation</h6>
           <h1 className="title_">Unlock The Game <br/>And Have Fun</h1>
           
-          <button  className="btn-container" >
+          <button onClick={() => {
+                window.location.href= "http://localhost:3000/login";
+            }}  className="btn-container" >
                 <Signbottun  title={"Log in With 42 Intra"}/>
           </button>
           <button className="btn-container">

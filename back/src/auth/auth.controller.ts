@@ -23,9 +23,9 @@ export class AuthController {
     async handleAuth(@Req() req: Request, @Res() res: Response){
         const check = await this.authservice.signIn(res, req);
         if (check == 1)
-            return res.redirect('http://localhost/home');
+            return res.redirect('http://localhost:8000/home');
         else
-            return res.redirect('http://localhost/setup');
+            return res.redirect('http://localhost:8000/setup');
     }
 
     @Get('/refresh')

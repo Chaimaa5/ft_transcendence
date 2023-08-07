@@ -3,7 +3,7 @@ import { useEffect } from "react"
 
 const Instanse = axios.create(
     {
-        baseURL: "http://localhost/api",
+        baseURL: "http://localhost:3000",
         withCredentials: true,
     }
 )
@@ -14,7 +14,7 @@ Instanse.interceptors.response.use(
     },
     (error) => {
         if(error.response.data.message == "Unauthorized")
-            Instanse.get("http://localhost/api/refresh")
+            Instanse.get("http://localhost:3000/refresh")
     }
 )
 export default Instanse
