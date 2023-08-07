@@ -1,6 +1,7 @@
+import { PaddleSide } from '../../../front/src/component/game/classes/Paddle'
 export interface PaddleState {
 	playerId : string;
-	side : string;
+	side : PaddleSide;
 	y : number;
 }
 
@@ -9,8 +10,9 @@ interface BallState {
 	y : number;
 }
 
-export interface GameState {
-	id : string;
+export interface RoomState {
+	roomId : string;
+	playersNumber : number;
 	ball : BallState;
-	paddles: PaddleState[]
+	players : PaddleState[]
 }

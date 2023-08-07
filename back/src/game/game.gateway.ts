@@ -1,9 +1,12 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
-import { GameState, PaddleState } from "./gameState.interface"
+import { RoomState, PaddleState } from "./gameState.interface"
 import { roomManager } from './rooms/room.manager';
 import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { UserService } from 'src/user/user.service';
+import { Logger } from '@nestjs/common';
+import { PaddleSide  } from '../../../front/src/component/game/classes/Paddle'
+
 
 @WebSocketGateway({
 	namespace:'/game',
@@ -17,21 +20,26 @@ export class GameGateway implements OnGatewayConnection{
 	@WebSocketServer()
 	server: Server;
 
-	// queue to hold players waiting for a game
-	playersQueue : Socket[] = [];
-	socketStrategy = new SocketStrategy
-	clients = new Map<string, Socket>();
-	userService = new UserService;
+	roomIdCounter = 1;
+
+	// map to store the game state for each room 
+	private readonly rooms : Map<RoomState['roomId'], RoomState> = new Map<RoomState['roomId'], RoomState> ();
 	
-	constructor(private readonly roomManager : roomManager) {}
+
+	private logger : Logger = new Logger('gameGateway');
+
+	// queue to hold players waiting for a game
+	// playersQueue : Socket[] = [];
+	clients = new Map<string, Socket>();
+	
 
 
 	afterInit() {
-		console.log('game server initialized', this.server);
+		this.logger.log('game server initialized');
 	}
 	
 	async handleConnection(client : Socket) {
-		console.log(`server side : client connected : ${client.id}`);
+		this.logger.log(`server side : client connected : ${client.id}`);
 		// gotta add some verification of the validity of the authentication
 		// let token : any =  client.handshake.headers['authorization'];
         // token = token.split(' ')[1]
@@ -40,20 +48,40 @@ export class GameGateway implements OnGatewayConnection{
 		 
 		// storing a refrerence to the client 
 		this.clients.set(client.id, client);
+		this.joinPlayerToRoom(client);
+	}
 
-		// add the player to the queue
-		this.playersQueue.push(client);
-		if(this.playersQueue.length === 2 ) {
-			const player1 = this.playersQueue.shift();
-			const player2 = this.playersQueue.shift();
-
-			if(player1 && player2) {
-				this.roomManager.createRoom(player1, player2);
-			}
+	private joinPlayerToRoom(client : Socket) {
+		let roomId : string;
+		const availableRoom = [...this.rooms.values()].find(room => room.playersNumber === 1);
+		if (availableRoom) {
+			roomId = availableRoom.roomId;
+			availableRoom.players.push({playerId: client.id, side: PaddleSide.right, y: 0});
+			availableRoom.playersNumber++;
+			client.join(availableRoom.roomId);
+			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.right});
+		} else {
+			roomId = this.createRoom();
+			this.rooms.set(
+				roomId,
+				{
+					roomId : roomId,
+					playersNumber : 1, 
+					ball : {x : 0, y : 0}, 
+					players : [{playerId : client.id, side : PaddleSide.left, y : 0}],
+				})
+			client.join(roomId);
+			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.left});
 		}
-		else  {
-			console.log("waiting for another player");
+		if(this.rooms.get(roomId)?.playersNumber === 2) {
+			this.server.emit('startGame');
 		}
+	}
+	
+	private createRoom() : string{
+		const roomId = `room_${this.roomIdCounter}`;
+		this.roomIdCounter++;
+		return roomId;
 	}
 
 	handleDisconnection(client : Socket) {
@@ -61,14 +89,7 @@ export class GameGateway implements OnGatewayConnection{
 	}
 
 	@SubscribeMessage('newPaddlePosition')
-	handleNewPaddlePosition(client : Socket, payload : {playerId: string, direction:number}) : void {
-		// get the rooms the client has joined (which should always be one)
-		const rooms = Array.from(client.rooms);
-
-		// gotta redo all the logic fuck
-		// https://youtu.be/3V1DBEUoImo
-
-		// find the id of the custom room that the client has joined (excluding the default room which is always equal to the client's id)
-		const roomId = rooms.find(room => room != client.id);
+	handleNewPaddlePosition(client : Socket, payload : {roomId: string, direction:number}) : void {
+		client.to(payload.roomId).emit('updatePositions', { playerId : client.id ,direction : payload.direction});
 	}
 }

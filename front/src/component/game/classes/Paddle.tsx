@@ -74,7 +74,7 @@ export class Paddle {
 				this.table.tableHeight - this.paddleHeight);
 			if(this.direction != this.prevDirection) {
 				this.prevDirection = this.direction;
-				this.table.socket.emit('newPaddlePosition', {playerId: this.table.socket.id, direction: this.direction});
+				this.table.socket.emit('newPaddlePosition', {roomId: this.table.roomId, direction: this.direction});
 			}
 		}
 	}

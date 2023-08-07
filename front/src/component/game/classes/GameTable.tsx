@@ -10,6 +10,7 @@ export class GameTable {
 	ctx?: CanvasRenderingContext2D;
 	p?: P5;
 	socket: Socket;
+	roomId : string
 	constructor(tableWidth: number, tableHeight: number){
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;

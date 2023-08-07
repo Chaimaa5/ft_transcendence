@@ -12,8 +12,6 @@ export interface Round {
 export class Game{
 	rightPlayer : Player;
 	leftPlayer : Player;
-	// opponentPaddle : Paddle;
-	// myPaddle : Paddle;
 	
 	myPaddle : Paddle;
 	opponentPaddle : Paddle;

@@ -117,21 +117,22 @@ const PongBoard: React.FC = () => {
 				gameRef.current.opponentPaddle.move(payload.direction);
 			}
 		})
-		socket.on('paddleSide', (side) => {
-			if(side === 'right') {
-				gameRef.current.myPaddle.side = PaddleSide.Right;
-				gameRef.current.opponentPaddle.side = PaddleSide.Left;
-			}
-			else if(side == 'left') {
-				gameRef.current.myPaddle.side = PaddleSide.Left;
-				gameRef.current.opponentPaddle.side = PaddleSide.Right;
-			}
+
+		socket.on('joinedRoom', (payload) =>{
+			console.log(" the client has joined the room : " + payload.roomId);
+			gameRef.current.table.roomId = payload.roomId;
+			gameRef.current.myPaddle.side = payload.side;
+			gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
+		});
+
+		socket.on('startGame', () => {
 			setDataIsLoaded(true);
 		})
 
 		socket.on('connect', () => {
 			console.log('client side : client connected to the server');
 		});
+
 		return() => {
 			socket.off('connect', () => {
 				console.log('client side : client disconnected from the server');
