@@ -41,21 +41,26 @@ export class Game{
 	}
 
 	setTableDimensions(tableWidth: number, tableHeight: number) {
+		this.table.prevTableWidth = this.table.tableWidth;
+		this.table.prevTableHeight = this.table.tableHeight;
 		this.table.tableWidth = tableWidth;
 		this.table.tableHeight = tableHeight;
 	}
 
 	setPaddlesDimensions(width : number, height : number){
-		// left Paddle
-		this.myPaddle.paddlePosX = 20;
-		this.myPaddle.paddlePosY = height/2 - ((height*0.3)/2);
+		// left Paddle dimensions
 		this.myPaddle.paddleWidth = width*0.02;
 		this.myPaddle.paddleHeight = height*0.3;
-		// right Paddle
-		this.opponentPaddle.paddlePosX = width - width*0.02 - 20;
-		this.opponentPaddle.paddlePosY = height/2 - ((height*0.3)/2);
+		// right Paddle dimensions
 		this.opponentPaddle.paddleWidth = width*0.02;
 		this.opponentPaddle.paddleHeight = height*0.3;
+		if(this.table.p) {
+			// scale the paddles postion compared to the new canvas dimensions so the position remains the same
+			this.myPaddle.paddlePosX = this.table.p.map(this.myPaddle.paddlePosX, 0, this.table.prevTableWidth, 0, this.table.tableWidth);
+			this.myPaddle.paddlePosY = this.table.p.map(this.myPaddle.paddlePosY, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
+			this.opponentPaddle.paddlePosX = this.table.p.map(this.opponentPaddle.paddlePosX, 0, this.table.prevTableWidth, 0, this.table.tableWidth);
+			this.opponentPaddle.paddlePosY = this.table.p.map(this.opponentPaddle.paddlePosY, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
+		}
 	}
 	
 	updateScore(side : PaddleSide) {

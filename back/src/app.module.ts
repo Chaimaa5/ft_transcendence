@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { MuteService } from './chat/mute.service';
 import { GameModule } from './game/game.module';
+import { GameGateway } from './game/game.gateway';
 
 @Module({
   imports: [ScheduleModule.forRoot(),
@@ -19,7 +20,7 @@ import { GameModule } from './game/game.module';
     }), GameModule
   ],
   controllers: [],
-  providers: [ChatGateway, MuteService],
+  providers: [GameGateway, ChatGateway, MuteService],
 
   })
 export class AppModule {}

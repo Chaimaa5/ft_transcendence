@@ -6,9 +6,7 @@ import { Paddle, PaddleSide } from "./classes/Paddle";
 import { GameTable } from "./classes/GameTable";
 import { Player } from "./classes/Player";
 import { Ball } from "./classes/Ball";
-import { io } from 'socket.io-client';
-import Instanse from "../api/api";
-
+import { socket } from "./socket";
 
 const PongBoard: React.FC = () => {
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
@@ -16,21 +14,10 @@ const PongBoard: React.FC = () => {
 		height: 0
 	});
 
-	const [res, setRes] = useState("Bearer ");
-
-	Instanse.get('/game/auth').then((res)=>{setRes("Bearer " + res.data)});
 
 	const [dataIsLoaded, setDataIsLoaded] = useState(false);
+	const [isConnected, setIsConnected] = useState(socket.connected);
 	
-	const socket = io('http://localhost:3000/game', {
-		transportOptions: {
-        polling: {
-            extraHeaders: {
-                'Authorization': res
-            }
-        }
-    }});
-
 
 	const gameRef = useRef(new Game(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height));
 	
@@ -66,9 +53,9 @@ const PongBoard: React.FC = () => {
 			p.draw = () => {
 				p.clear();
 				gameRef.current.myPaddle.show();
-				gameRef.current.myPaddle.update();
+				gameRef.current.myPaddle.updateMyPaddle();
 				gameRef.current.opponentPaddle.show();
-				gameRef.current.opponentPaddle.update();
+				gameRef.current.opponentPaddle.updateOpponentPaddle();
 				gameRef.current.ball.show();
 				gameRef.current.ball.move();
 				gameRef.current.ball.edges(gameRef.current);
@@ -82,8 +69,7 @@ const PongBoard: React.FC = () => {
 				tableCanvasSizeRef.current.height = getDivWidthAndHeight(".pong-table").height;
 				gameRef.current.setTableDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
 				gameRef.current.setPaddlesDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
-				gameRef.current.ball.resizeBall();
-				gameRef.current.ball.adjustBallSpeed();
+				gameRef.current.ball.adjustBallDimensions();
 				gameRef.current.myPaddle.adjustPaddleSpeed();
 				gameRef.current.opponentPaddle.adjustPaddleSpeed();
 				p.resizeCanvas(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, true);
@@ -91,7 +77,6 @@ const PongBoard: React.FC = () => {
 
 			p.keyReleased = () => {
 				gameRef.current.myPaddle.move(0);
-				gameRef.current.opponentPaddle.move(0);
 			}
 
 			p.keyPressed = () => {
@@ -109,13 +94,12 @@ const PongBoard: React.FC = () => {
 	}
 
 	useEffect(() => {
-		console.log(socket.id);
+
+		socket.connect();
 
 		socket.on('updatePositions', (payload) => {
 			console.log("my socket id : " + socket.id + " the other id : " + payload.playerId);
-			if(payload.playerId != socket.id) {
-				gameRef.current.opponentPaddle.move(payload.direction);
-			}
+			gameRef.current.opponentPaddle.move(payload.direction);
 		})
 
 		socket.on('joinedRoom', (payload) =>{
@@ -125,18 +109,30 @@ const PongBoard: React.FC = () => {
 			gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 		});
 
-		socket.on('startGame', () => {
+		socket.on('startGame', (randomInitialBallDirection) => {
+			gameRef.current.ball.randomInitialBallDirection = randomInitialBallDirection;
 			setDataIsLoaded(true);
 		})
 
 		socket.on('connect', () => {
 			console.log('client side : client connected to the server');
+			setIsConnected(true);
 		});
+
+		socket.on('ballInitialDirection', (randomInitialBallDirection) => {
+			gameRef.current.ball.randomInitialBallDirection = randomInitialBallDirection;
+			gameRef.current.ball.reset();
+		})
+
+		socket.on('updateBall', (payload) => {
+			gameRef.current.ball.move(payload.speedX, payload.speedY);
+		})
 
 		return() => {
 			socket.off('connect', () => {
 				console.log('client side : client disconnected from the server');
 			});
+			socket.disconnect();
 		}
 	}, []);
 

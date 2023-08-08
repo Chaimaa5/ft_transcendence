@@ -6,7 +6,9 @@ import { Socket } from "socket.io-client";
 
 export class GameTable {
 	tableWidth: number;
+	prevTableWidth: number;
 	tableHeight: number;
+	prevTableHeight : number;
 	ctx?: CanvasRenderingContext2D;
 	p?: P5;
 	socket: Socket;
@@ -17,6 +19,8 @@ export class GameTable {
 	}
 
 	initTable(tableWidth : number, tableHeight : number, ctx : CanvasRenderingContext2D, p : P5, socket: Socket) {
+		this.prevTableWidth = tableWidth;
+		this.prevTableHeight = tableHeight;
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;
 		this.ctx = ctx;
@@ -74,6 +78,13 @@ export class GameTable {
 			roundScore = padNumberWithZero(round.rightPlayerScore);
 			this.p.text(roundScore, this.tableWidth/2 + (pongNetW*6), pongNetY + this.tableHeight/15);
 		}
+	}
+
+	mapValue(value: number, firstRangeEnd : number, secondRangeEnd : number) : number {
+		if(this.p){
+			return(this.p.map(value, 0, firstRangeEnd, 0, secondRangeEnd));
+		}
+		return(value)
 	}
 }
 

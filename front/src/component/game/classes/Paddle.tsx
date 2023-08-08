@@ -65,7 +65,17 @@ export class Paddle {
 		}
 	}
 
-	update() {
+	updateOpponentPaddle() {
+		if(this.table.p) {
+			this.paddlePosY += this.stepsY * this.direction;
+			this.paddlePosY = this.table.p.constrain(
+				this.paddlePosY,
+				0,
+				this.table.tableHeight - this.paddleHeight);
+		}
+	}
+
+	updateMyPaddle() {
 		if(this.table.p && this.table.socket) {
 			this.paddlePosY += this.stepsY * this.direction;
 			this.paddlePosY = this.table.p.constrain(
@@ -84,11 +94,7 @@ export class Paddle {
 	}
 	
 	adjustPaddleSpeed() {
-		this.stepsY = this.table.tableWidth/this.speedRatio;
-		if(this.side == PaddleSide.Left)
-			this.paddlePosX = this.table.tableWidth/100;
-		else if(this.side == PaddleSide.Right)
-			this.paddlePosX = this.table.tableWidth - this.table.tableWidth*0.02 - (this.table.tableWidth/100);
+		this.stepsY = this.table.mapValue(this.stepsY, this.table.prevTableWidth, this.table.tableWidth);
 	}
 	
 	moveToCenter(direction : number) {

@@ -25,7 +25,7 @@ function App() {
           <Route path="/chat" element={<Container />} />
           <Route path='/setting' element={<Container/>}/>
           <Route path="/game" element={<MultipPlayerGame />} />
-		      <Route path="/training" element={<TrainingGame />} />
+		  <Route path="/training" element={<TrainingGame />} />
         </Routes>
     </Router>
     </div>

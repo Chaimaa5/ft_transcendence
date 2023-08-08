@@ -31,6 +31,4 @@ export class GameController{
         const idNum : number = parseInt(id);
         return await  this.gameService.getChallengeSettings(idNum);
     }
-    
-
 }

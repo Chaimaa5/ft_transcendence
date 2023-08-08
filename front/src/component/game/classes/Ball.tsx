@@ -30,6 +30,7 @@ export class Ball {
 	prevWindowWidth : number;
 	prevWindowHeight : number;
 	speedRatio : number;
+	randomInitialBallDirection : number;
 
 	constructor(table : GameTable) {
 		this.table = table;
@@ -42,6 +43,7 @@ export class Ball {
 		this.prevWindowWidth = NaN;
 		this.prevWindowHeight = NaN;
 		this.speedRatio = NaN;
+		this.randomInitialBallDirection = NaN;
 	};
 
 	show() : void {
@@ -53,16 +55,15 @@ export class Ball {
 	};
 
 	move() {
-		// this.ballPosX = this.ballPosX + this.speedX;
-		// this.ballPosY = this.ballPosY + this.speedY;
+		this.ballPosX = this.ballPosX + this.speedX;
+		this.ballPosY = this.ballPosY + this.speedY;
 	}
 
 	reset() {
-		const randomAngle : number = randomDirection();
 		this.ballPosX = this.table.tableWidth/2;
 		this.ballPosY = this.table.tableHeight/2;
-		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(randomAngle);
-		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(randomAngle);
+		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(this.randomInitialBallDirection);
+		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(this.randomInitialBallDirection);
 	}
 
 	edges(game : Game) {
@@ -71,12 +72,12 @@ export class Ball {
 		if((this.ballPosX + this.radius) >= this.table.tableWidth)
 		{
 			game.updateScore(PaddleSide.Left);
-			this.reset();
+			this.table.socket.emit('resetRound');
 		}
 		if((this.ballPosX - this.radius) <= 0)
 		{
 			game.updateScore(PaddleSide.Right);
-			this.reset();
+			this.table.socket.emit('resetRound');
 		}
 	}
 
@@ -86,21 +87,27 @@ export class Ball {
 	}
 
 	initBall() {
-		const randomAngle : number = randomDirection();
 		this.speedRatio = 200;
 		this.ballSize = (this.table.tableWidth * 0.02) + 5;
 		this.radius = this.ballSize/2;
-		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(randomAngle);
-		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(randomAngle);
+		this.speedX = this.table.tableWidth/this.speedRatio * Math.cos(this.randomInitialBallDirection);
+		this.speedY = this.table.tableWidth/this.speedRatio * Math.sin(this.randomInitialBallDirection);
 		this.prevWindowHeight = this.table.tableHeight;
 		this.prevWindowWidth = this.table.tableWidth;
 		this.setInitialBallPosition(this.table.tableWidth, this.table.tableHeight);
 	}
 
-	resizeBall() {
-		this.ballSize = (this.table.tableWidth * 0.02) + 5;
-		this.radius = this.ballSize/2;
+	adjustBallDimensions() {
+		if(this.table.p) {
+			this.ballSize = this.table.mapValue(this.ballSize, this.table.prevTableWidth, this.table.tableWidth);
+			this.radius = this.ballSize/2;
+			this.ballPosX = this.table.mapValue(this.ballPosX, this.table.prevTableWidth, this.table.tableWidth)
+			this.ballPosY = this.table.mapValue(this.ballPosY, this.table.prevTableHeight, this.table.tableHeight);
+			this.speedX = this.table.mapValue(this.speedX, this.table.prevTableWidth, this.table.tableWidth);
+			this.speedY = this.table.mapValue(this.speedY, this.table.prevTableWidth, this.table.tableWidth);
+		}
 	}
+
 	checkPaddleHits(paddle : Paddle) {
 		if((this.ballPosY + this.radius) > paddle.paddlePosY
 			&& (this.ballPosY - this.radius )< (paddle.paddlePosY + paddle.paddleHeight)) {
@@ -111,8 +118,8 @@ export class Ball {
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, this.table.p.radians(225), this.table.p.radians(135));
-						this.speedX = (this.table.tableWidth/this.speedRatio) *  Math.cos(angle);
-						this.speedY = (this.table.tableWidth/this.speedRatio) *  Math.sin(angle);
+						this.speedX = this.speedX *  Math.cos(angle);
+						this.speedY = this.speedY *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX - this.radius;
 					}
 				}
@@ -123,17 +130,12 @@ export class Ball {
 					const diff = this.ballPosY - paddle.paddlePosY;
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, -this.table.p.radians(45), this.table.p.radians(45));
-						this.speedX = (this.table.tableWidth/this.speedRatio) *  Math.cos(angle);
-						this.speedY = (this.table.tableWidth/this.speedRatio) *  Math.sin(angle);
+						this.speedX = this.speedX *  Math.cos(angle);
+						this.speedY = this.speedY *  Math.sin(angle);
 						this.ballPosX = paddle.paddlePosX + paddle.paddleWidth + this.radius;
 					}
 				}
 			}
 		}
-	}
-
-	adjustBallSpeed() {
-		this.speedX = this.table.tableWidth/this.speedRatio;
-		this.speedY = this.table.tableWidth/this.speedRatio;
 	}
 };
