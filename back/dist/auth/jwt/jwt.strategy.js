@@ -22,13 +22,13 @@ let JWTStrategy = exports.JWTStrategy = class JWTStrategy extends (0, passport_1
                     let data = request.cookies["access_token"];
                     return data;
                 }]),
-            secretOrKey: process.env.JWT_REFRESH_SECRET,
+            secretOrKey: process.env.JWT_ACCESS_SECRET,
         });
         this.prisma = new client_1.PrismaClient();
     }
     async validate(payload) {
         try {
-            jwt.verify(payload.token, process.env.JWT_REFRESH_SECRET);
+            jwt.verify(payload.token, process.env.JWT_ACCESS_SECRET);
         }
         catch (err) {
             if (err instanceof jwt.TokenExpiredError)

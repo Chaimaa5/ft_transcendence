@@ -16,13 +16,15 @@ const leaderboard_controller_1 = require("./Leaderboard/leaderboard.controller")
 const leaderboard_service_1 = require("./Leaderboard/leaderboard.service");
 const home_service_1 = require("./Home/home.service");
 const home_controller_1 = require("./Home/home.controller");
+const chat_controller_1 = require("../chat/chat.controller");
+const chat_service_1 = require("../chat/chat.service");
 let UserModule = exports.UserModule = class UserModule {
 };
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         imports: [],
-        controllers: [user_controller_1.UserController, profile_controller_1.ProfileController, leaderboard_controller_1.LeaderboardController, home_controller_1.HomeController],
-        providers: [user_service_1.UserService, profile_service_1.ProfileService, leaderboard_service_1.LeaderboardService, home_service_1.HomeService],
+        controllers: [user_controller_1.UserController, profile_controller_1.ProfileController, leaderboard_controller_1.LeaderboardController, home_controller_1.HomeController, chat_controller_1.ChatController],
+        providers: [user_service_1.UserService, profile_service_1.ProfileService, leaderboard_service_1.LeaderboardService, home_service_1.HomeService, chat_service_1.ChatService],
         exports: [user_service_1.UserService]
     })
 ], UserModule);

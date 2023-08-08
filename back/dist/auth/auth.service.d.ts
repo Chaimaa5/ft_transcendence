@@ -20,4 +20,5 @@ export declare class AuthService {
     generateQRCode(id: string): Promise<string>;
     verifyTFA(user: any, code: string): Promise<boolean>;
     activateTFA(id: string): Promise<void>;
+    disableTFA(id: string): Promise<void>;
 }

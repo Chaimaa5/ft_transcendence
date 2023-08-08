@@ -1,0 +1,13 @@
+.colorBg
+{
+    z-index: 120;
+    background-color: rgb(29, 53, 87, 0.8);
+}
+.gradientBg
+{
+    background: linear-gradient(135deg, #457B9D 0%, #1D3557 100%);
+}
+.nop
+{
+    color: white;
+}

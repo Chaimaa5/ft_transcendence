@@ -80,11 +80,11 @@ const Profile = () => {
     useEffect(() => {
         Instanse.get<profile_>('profile/' + username)
         .then((res) => {
-            console.log(res.data)
             setResponse(res.data)
         });
     },[response]);
-
+    
+    if(response?.isBlocked) return
     return(
         <div className="Profile">
             <div className="half-container">
@@ -131,10 +131,7 @@ const Profile = () => {
                         <Circularprog size={"21vw"} pct={50}/>
                     </div>
                     <div className="w-[35%] h-[100%] pt-[1%] pr-[3%] matchs">
-                    {
-                        achve.map((arr) =>   
-                        <Match isWin={arr.isAchieved}/>)
-                    }
+                        <Match/>
                     </div>
                 </div>
             </div>

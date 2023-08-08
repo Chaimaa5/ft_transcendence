@@ -7,42 +7,19 @@ import { Value } from "sass";
 
 const OfforOn = () => {
     let color = "#E63946";
-    const lol = [
-        true,
-        true,
-        false,
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        false,
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        false,
-        true,
-        false,
-        true,
-        true,
-    ]
     return(
         <div className="status-">
             {
-                lol.map((value, key) => {
-                    if(value) color = "#29F125";
-                    return(
-                        <div className="cursor-pointer m-[5%] relative st-container">
-                            <div style={{background :color}} className="status-cr"></div>
-                            <Avatar src={avatar_img} wd_="3vw" />
-                        </div>
-                    )
-                }
-                )
+                // lol.map((value, key) => {
+                //     if(value) color = "#29F125";
+                //     return(
+                //         <div className="cursor-pointer m-[5%] relative st-container">
+                //             <div style={{background :color}} className="status-cr"></div>
+                //             <Avatar src={avatar_img} wd_="3vw" />
+                //         </div>
+                //     )
+                // }
+                // )
             }
             
         </div>

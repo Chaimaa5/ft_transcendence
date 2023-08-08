@@ -12,7 +12,7 @@ export class SocketStrategy extends PassportStrategy(Strategy, 'Websocket'){
      constructor(){
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: process.env.JWT_REFRESH_SECRET,
+            secretOrKey: process.env.JWT_ACCESS_SECRET,
           });
     }
     // prisma = new PrismaClient();
@@ -21,7 +21,7 @@ export class SocketStrategy extends PassportStrategy(Strategy, 'Websocket'){
         
 
         // try{
-            const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET as jwt.Secret)
+            const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as jwt.Secret)
         // }catch(err){
         //     if(err instanceof jwt.TokenExpiredError )
         //         throw  new UnauthorizedException('Expired Token Exception');

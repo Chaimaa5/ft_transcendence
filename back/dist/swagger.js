@@ -9,7 +9,7 @@ function setupSwagger(app) {
         .setVersion('1.0')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, options);
-    swagger_1.SwaggerModule.setup('api', app, document);
+    swagger_1.SwaggerModule.setup('swagger', app, document);
 }
 exports.setupSwagger = setupSwagger;
 //# sourceMappingURL=swagger.js.map

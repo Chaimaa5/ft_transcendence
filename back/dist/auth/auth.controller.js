@@ -27,9 +27,9 @@ let AuthController = exports.AuthController = class AuthController {
     async handleAuth(req, res) {
         const check = await this.authservice.signIn(res, req);
         if (check == 1)
-            return res.redirect('http://localhost:8000/home');
+            return res.redirect('http://localhost/home');
         else
-            return res.redirect('http://localhost:8000/setup');
+            return res.redirect('http://localhost/setup');
     }
     async RefreshToken(req, res) {
         res.clearCookie('access_token');
@@ -55,6 +55,10 @@ let AuthController = exports.AuthController = class AuthController {
         }
         else
             return false;
+    }
+    async DisableTFA(req) {
+        const user = req.user;
+        await this.authservice.disableTFA(user.id);
     }
 };
 __decorate([
@@ -108,6 +112,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, TFA_dto_1.TFA]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "EnableTFA", null);
+__decorate([
+    (0, common_1.Get)('/disable'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "DisableTFA", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)(''),
     (0, swagger_1.ApiTags)('auth'),

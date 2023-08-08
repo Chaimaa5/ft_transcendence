@@ -11,19 +11,22 @@ const common_1 = require("@nestjs/common");
 const auth_module_1 = require("./auth/auth.module");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
-const notifications_gateway_1 = require("./socket/notifications.gateway");
+const chat_gateway_1 = require("./socket/chat.gateway");
+const schedule_1 = require("@nestjs/schedule");
+const mute_service_1 = require("./chat/mute.service");
+const game_module_1 = require("./game/game.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [
+        imports: [schedule_1.ScheduleModule.forRoot(),
             auth_module_1.AuthModule, serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', 'upload'),
                 serveRoot: '/upload'
-            })
+            }), game_module_1.GameModule
         ],
         controllers: [],
-        providers: [notifications_gateway_1.NotificationsGateway],
+        providers: [chat_gateway_1.ChatGateway, mute_service_1.MuteService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

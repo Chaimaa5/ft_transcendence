@@ -16,9 +16,9 @@ const passport_42_1 = require("passport-42");
 let FortyTwoStrategy = exports.FortyTwoStrategy = class FortyTwoStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy, '42') {
     constructor() {
         super({
-            clientID: 'u-s4t2ud-a33178931dc881357a1a66223814603ea19aca5b62a336050138c8d1164dd56b',
-            clientSecret: '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',
-            callbackURL: 'http://localhost:3000/auth',
+            clientID: process.env.CLIENTID,
+            clientSecret: process.env.CLIENTSECRET,
+            callbackURL: process.env.CALLBACK,
         });
     }
     async validate(accessToken, refreshToken, profile) {

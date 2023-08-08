@@ -37,7 +37,7 @@ const TopPlayers = ()=> {
     const [response, setResponse] = useState<home_[]>([]);
     const HandleLogin = () => {
     return Instanse
-            .get<home_[]>('http://localhost:3000/home/bestRanked', {withCredentials: true})
+            .get<home_[]>('/home/bestRanked')
             .then((res) => {
                 setResponse(res.data)
             });
@@ -123,9 +123,12 @@ const Home = () => {
                     </button>
                 <motion.img whileHover={{scale: 1.06}} className="table" src={table_img}/>
             </motion.div>
-            <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
+            {/* <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
                     <Modes/>
-            </motion.div>
+            </motion.div> */}
+            <div className="modes pos">
+                    <Modes/>
+            </div>
             <TopPlayers/>
         </div>
     )

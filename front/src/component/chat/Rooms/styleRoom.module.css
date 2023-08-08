@@ -1,0 +1,49 @@
+@import url("../../tools/fonts.scss");
+
+.font1::-webkit-input-placeholder {
+    font-family: Myfont_m;
+    color: #A8DADC;
+}
+
+.font2
+{
+    font-family: Myfont_b;   
+}
+
+.font3
+{
+    font-family: Myfont_m; 
+    
+}
+
+.font4
+{
+    font-family: Myfont_r;   
+}
+
+
+
+.frame::-webkit-scrollbar {
+    
+    width: 0.4vw;
+    
+    
+
+}
+
+.frame::-webkit-scrollbar-thumb:hover{
+    background: #a8dadc71;
+    border-radius: 1.5vw;
+    height: 80%;
+    
+}
+
+.MembersListShadow
+{
+    box-shadow: 1.2vw 3vw 4.1vw  rgba(9, 18, 31, 0.44);
+
+}
+
+
+
+

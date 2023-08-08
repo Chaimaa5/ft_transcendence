@@ -1,73 +1,59 @@
-import React from "react";
-import Button_ from "../button";
-import av_img from '../tools/sign/avatar.png'
-import  { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import upload_icon from '../tools/sign/upload.svg'
-import Avatar from "../avatar/index";
+import React, { useEffect, useRef, useState } from "react";
 import { ReactSVG } from "react-svg";
-import './index.scss'
+import icon1 from "../tools/btnsIcons/3.svg"
+import icon2 from "../tools/btnsIcons/st1.svg"
+import icon3 from "../tools/btnsIcons/st2.svg"
+import "./index.scss"
+import Instanse from "../api/api";
+import TfaContainer from "./tfa";
+import ProfileSt from "./profileSt";
+import BlockList from "./blocklist";
 
+const Setting = () => {
+    const [profile, setProfile] = useState(true);
+    const [Twofa, setTwofa] = useState(false);
+    const [bklist, setBklist] = useState(false);
+    const fileInputRef = useRef();
 
-const Setup = () => {
-  const fileInputRef = useRef(null);
-  const [avatar_img, setavatar_img] = useState(av_img);
-  const [username_, setusername] = useState("");
-  const [up, setup] = useState(false);
-  const handleButtonClick = () => {
-    fileInputRef.current.click();
-    setup(true);
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setavatar_img (URL.createObjectURL(file));
-  };
- 
-  const handleInputChange = (e) => {
-    if(e.target.value === "Enter your Username")
-      setusername("dasda");
-      setusername(e.target.value);
-  }
-
-  const nav = useNavigate();
-
-  return (
-    <div className="setup">
-      <div className="upload">
-          <input
-            type="file"
-            style={{ display: 'none' }}
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            />
-          <button className="upload-img" onClick={handleButtonClick}>
-            { !up &&
-              <div className="h-[4vw] w-[4vw] upl-icon">
-                  <ReactSVG className="icon_" src={upload_icon}/>
-              </div>
-            }
-            <Avatar src={avatar_img} wd_="4vw"/>
-          </button>
-      </div>
-      <div className="username w-[60%] h-[8%]">
-        <input
-            type="text"
-            placeholder="Enter your name"
-            className="username_input w-[100%]"
-            value={username_}
-            onChange={handleInputChange}
-            onClick={handleInputChange}
-            />
+    return(
+        <div className="h-[100%] w-[100%] flex justify-center items-center">
+            <div className="w-[40%] h-[90%] flex justify-center items-center flex-col">
+                <div className="h-[5%] w-[100%]">
+                    <h3 className="text-[1.3vw] text-[#A8DADC]">Settings</h3>
+                </div>
+                <div className="h-[90%] w-[100%] flex flex-col pt-[7%] items-center">
+                    <div className="h-[10%] w-[30%] flex justify-evenly items-center">
+                        <button onClick={() => {
+                            setProfile(true);
+                            setBklist(false);
+                            setTwofa(false);
+                        }} className="flex justify-center items-center h-[2vw] w-[2vw] rounded-[2vw] bg-[#457B9D] hover:bg-[#A8DADC]">
+                            <ReactSVG style={{fill: "#1D3557"}} className="w-[0.9vw] " src={icon2}/>
+                        </button>
+                        <button onClick={() => {
+                            setProfile(false);
+                            setBklist(false);
+                            setTwofa(true);
+                        }} className="flex justify-center items-center h-[2vw] w-[2vw] rounded-[2vw] bg-[#457B9D] hover:bg-[#A8DADC]">
+                            <ReactSVG className="w-[0.9vw] " src={icon3}/>
+                        </button>
+                        <button onClick={() => {
+                            setProfile(false);
+                            setBklist(true);
+                            setTwofa(false);
+                        }} className="flex justify-center items-center h-[2vw] w-[2vw] rounded-[2vw] bg-[#457B9D] hover:bg-[#A8DADC]">
+                            <ReactSVG className="w-[1vw] " src={icon1}/>
+                        </button>
+                    </div>
+                    <div className=" h-[70%] rounded-[1.5vw] w-[70%] st-container">
+                        {profile && <ProfileSt/>}
+                        {Twofa && <TfaContainer/>}
+                        {bklist && < BlockList/>}
+                    </div>
+                </div>
+            </div>
         </div>
-      <div>
-        <button onClick={() =>{nav('/home')}}>
-          <Button_ option="coninue"/>
-        </button>
-      </div>
-    </div>
-  );
+    )
 };
 
-
-export default Setup;
+export default Setting

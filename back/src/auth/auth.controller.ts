@@ -23,9 +23,9 @@ export class AuthController {
     async handleAuth(@Req() req: Request, @Res() res: Response){
         const check = await this.authservice.signIn(res, req);
         if (check == 1)
-            return res.redirect('http://localhost:8000/home');
+            return res.redirect('http://localhost/home');
         else
-            return res.redirect('http://localhost:8000/setup');
+            return res.redirect('http://localhost/setup');
     }
 
     @Get('/refresh')
@@ -65,4 +65,12 @@ export class AuthController {
         else
             return false
     }
+
+    @Get('/disable')
+    @UseGuards(AuthGuard('jwt'))
+    async DisableTFA(@Req() req: Request){
+        const user : User = req.user as User;
+        await this.authservice.disableTFA(user.id);
+    }
+    
 }

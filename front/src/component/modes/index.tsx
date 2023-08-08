@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {motion} from "framer-motion"
 import { useState } from "react";
 import Button_ from "../button/index";
@@ -6,7 +6,9 @@ import "./index.scss"
 import training_img from "../tools/modes/brain.png"
 import racket_img from "../tools/modes/racket.png"
 import Challenge_img from "../tools/modes/1vs1.png"
-
+import { ReactSVG } from "react-svg";
+import ModePopUp from "./popUp"
+import Modal from 'react-modal';
 const Modes = () => {
 
     const [isopen, setopen] = useState(true);
@@ -59,8 +61,10 @@ const Modes = () => {
         setBorderRd_s('1.7vw');
         setBorderRd_l('20vw');
     }
+    const [isPop, setPop] = useState(false);
 
     return(
+        <>
 
         <div className="w-[100%] h-[100%] modes-">
             <div  onClick={isFirstopen_} style={{width: wd, borderRadius: borderRd_f}} className="container-mode vs-mode">
@@ -71,9 +75,19 @@ const Modes = () => {
                             <h1 className="leading-[2.2vw] text-[#F1FAEE] text-[2vw]">Challenge <br/> Mode</h1>
                             <h6 className="text-center text-[#F1FAEE] text-[0.7vw]" >Invite Your Friends To a Game!</h6>
                         </div>
-                        <button className="relative ">
+                        <button onClick={() =>{
+                            setPop(true);
+                            console.log(isPop)
+                               
+                        }} className="relative outline-0">
                             <Button_ option="Start"/>
                         </button>
+                        <Modal className="flex justify-center items-center"
+                              isOpen={isPop}
+                              onRequestClose={() => {setPop(false)}}
+                            >
+                            {isPop && <ModePopUp whichOne={false}/>}
+                        </Modal>
                     </>
                 }
                 { !first_cp &&
@@ -109,9 +123,19 @@ const Modes = () => {
                             <h1 className="leading-[2.2vw] text-[#F1FAEE] text-[2vw]">Training <br/>  Mode</h1>
                             <h6 className="text-center text-[#F1FAEE] text-[0.7vw]" >Master Your Skills And Train to Become a Pong Pro</h6>
                         </div>
-                        <button className="relative">
+                        <button onClick={() =>{
+                            setPop(true);
+                            console.log(isPop)
+                               
+                        }} className="relative outline-0">
                             <Button_ option="Start"/>
                         </button>
+                        <Modal className="flex justify-center items-center"
+                              isOpen={isPop}
+                              onRequestClose={() => {setPop(false)}}
+                            >
+                            {isPop && <ModePopUp whichOne={true}/>}
+                        </Modal>
                     </>
                 }
                 { !isopen &&
@@ -122,6 +146,7 @@ const Modes = () => {
                 
             </div>
         </div>
+        </>
     )
 }
 

@@ -15,102 +15,132 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
+const chat_service_1 = require("../chat/chat.service");
 let UserService = exports.UserService = class UserService {
     constructor() {
         this.prisma = new client_1.PrismaClient();
+        this.chatService = new chat_service_1.ChatService;
     }
     async GetById(id) {
-        return await this.prisma.user.findUnique({ where: { id: id } });
+        const user = await this.prisma.user.findUnique({ where: { id: id } });
+        return user;
     }
     async CreateUser(user) {
-        const UserExists = await this.prisma.user.findUnique({
-            where: { id: user.id },
-        });
-        if (UserExists) {
-            console.log('User already exists');
-            return user;
-        }
-        else {
-            let rankCount = await this.prisma.user.count();
-            rankCount += 1;
-            const newUser = await this.prisma.user.create({
-                data: {
-                    id: user.id,
-                    username: user.username,
-                    fullname: user.fullname,
-                    avatar: user.avatar,
-                    isTwoFacEnabled: false,
-                    TwoFacSecret: '',
-                    XP: 0,
-                    win: 0,
-                    loss: 0,
-                    status: false,
-                    rank: rankCount,
-                    level: 0,
-                    badge: {
-                        create: [{
-                                Achievement: "x", Achieved: false,
-                            },
-                            {
-                                Achievement: "y", Achieved: false,
-                            },
-                            {
-                                Achievement: "z", Achieved: false,
-                            }
-                        ]
-                    },
-                    refreshToken: '',
-                    createdAt: new Date(),
-                }
+        if (user) {
+            const UserExists = await this.prisma.user.findUnique({
+                where: { id: user.id },
             });
-            return newUser;
+            if (UserExists) {
+                console.log('User already exists');
+                return user;
+            }
+            else {
+                let rankCount = await this.prisma.user.count();
+                rankCount += 1;
+                const newUser = await this.prisma.user.create({
+                    data: {
+                        id: user.id,
+                        username: user.username,
+                        fullname: user.fullname,
+                        avatar: user.avatar,
+                        isTwoFacEnabled: false,
+                        TwoFacSecret: '',
+                        XP: 0,
+                        win: 0,
+                        loss: 0,
+                        status: false,
+                        rank: rankCount,
+                        level: 0,
+                        badge: {
+                            create: [{
+                                    Achievement: "x", Achieved: false,
+                                },
+                                {
+                                    Achievement: "y", Achieved: false,
+                                },
+                                {
+                                    Achievement: "z", Achieved: false,
+                                }
+                            ]
+                        },
+                        refreshToken: '',
+                        createdAt: new Date(),
+                    }
+                });
+                return newUser;
+            }
+            return false;
         }
-        return false;
+        else
+            throw new common_1.UnauthorizedException('User not found');
     }
     async FindUser(user) {
-        const Exists = await this.prisma.user.findUnique({
-            where: { id: user.id },
-        });
-        if (Exists)
-            return 1;
+        if (user) {
+            const Exists = await this.prisma.user.findUnique({
+                where: { id: user.id },
+            });
+            if (Exists)
+                return 1;
+            else
+                return 2;
+        }
         else
-            return 2;
+            throw new common_1.UnauthorizedException('User not found');
     }
     async GetUser(user) {
-        const Exists = await this.prisma.user.findUnique({
-            where: { id: user.id },
-        });
-        if (Exists)
-            return Exists;
-        else {
-            const UserExists = await this.CreateUser(user);
-            return UserExists;
+        if (user) {
+            const Exists = await this.prisma.user.findUnique({
+                where: { id: user.id },
+            });
+            if (Exists)
+                return Exists;
+            else {
+                const UserExists = await this.CreateUser(user);
+                return UserExists;
+            }
         }
+        else
+            throw new common_1.UnauthorizedException('User not found');
     }
     async userSetup(id, avatar, data) {
-        const filename = "/upload/" + avatar.filename;
-        const username = data.username;
-        await this.prisma.user.update({ where: { id: id }, data: { avatar: filename } });
-        if (username) {
-            await this.prisma.user.update({ where: { id: id }, data: { username: username } });
+        if (id) {
+            let imagePath = '';
+            imagePath = "/upload/" + avatar.filename;
+            const username = data.username;
+            await this.prisma.user.update({ where: { id: id }, data: { avatar: imagePath } });
+            if (username) {
+                await this.prisma.user.update({ where: { id: id }, data: { username: username } });
+            }
         }
+        else
+            throw new common_1.UnauthorizedException('User not found');
     }
     async updateOnlineStatus(id, status) {
-        await this.prisma.user.update({ where: { id: id }, data: { status: status } });
+        if (id)
+            await this.prisma.user.update({ where: { id: id }, data: { status: status } });
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async UpdateRefreshToken(id, Rt) {
-        return this.prisma.user.update({ where: { id: id }, data: { refreshToken: Rt } });
+        if (id)
+            return this.prisma.user.update({ where: { id: id }, data: { refreshToken: Rt } });
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async GetMany() {
         return await this.prisma.user.findMany();
     }
     async deleteGroups(id) {
-        await this.prisma.groupMembership.deleteMany({
-            where: {
-                userId: id
-            }
-        });
-        await this.prisma.room.deleteMany({ where: { ownerId: id } });
+        if (id) {
+            await this.prisma.membership.deleteMany({
+                where: {
+                    userId: id
+                }
+            });
+            await this.prisma.room.deleteMany({ where: { ownerId: id } });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async DeleteUser(id, res) {
         if (id) {
@@ -128,7 +158,7 @@ let UserService = exports.UserService = class UserService {
             await this.prisma.user.delete({ where: { id: id } });
         }
         else
-            throw 'User not Found';
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async deleteGames(id) {
         await this.prisma.game.deleteMany({
@@ -146,158 +176,216 @@ let UserService = exports.UserService = class UserService {
         });
     }
     async FindbyID(id) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: id },
-        }).then((user) => {
-            if (user) {
-                if (user.avatar) {
-                    if (!user.avatar.includes('cdn.intra')) {
-                        user.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + user.avatar;
+        if (id) {
+            const user = await this.prisma.user.findUnique({
+                where: { id: id },
+            }).then((user) => {
+                if (user) {
+                    if (user.avatar) {
+                        if (!user.avatar.includes('cdn.intra')) {
+                            user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar;
+                        }
                     }
+                    return user;
                 }
-                return user;
-            }
-        });
-        return user;
+            });
+            return user;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async addFriend(id, Id) {
-        const exist = await this.FindbyID(Id);
-        if (exist) {
-            await this.prisma.friendship.create({
-                data: {
-                    sender: { connect: { id: id } },
-                    receiver: { connect: { id: Id } },
-                    status: 'pending',
-                    blockerId: '',
-                },
-            });
-            await this.addNotifications(id, Id, 'friendship', 'sent you an invite');
+        if (id) {
+            const exist = await this.FindbyID(Id);
+            if (exist) {
+                await this.prisma.friendship.create({
+                    data: {
+                        sender: { connect: { id: id } },
+                        receiver: { connect: { id: Id } },
+                        status: 'pending',
+                        blockerId: '',
+                    },
+                });
+                await this.addNotifications(id, Id, 'friendship', 'sent you an invite');
+            }
+            else
+                throw new common_1.UnauthorizedException('User Does Not Exist');
         }
         else
-            throw new common_1.UnauthorizedException('User Does Not Exist');
+            throw new common_1.UnauthorizedException('User not found');
     }
     async removeFriend(id, Id) {
-        const exist = await this.FindbyID(Id);
-        if (exist) {
-            await this.prisma.friendship.deleteMany({
-                where: {
-                    OR: [
-                        { senderId: id, receiverId: Id },
-                        { senderId: Id, receiverId: id },
-                    ],
-                },
-            });
-        }
-        else
-            throw new common_1.UnauthorizedException('User Does Not Exist');
-    }
-    async acceptFriend(id, Id) {
-        const exist = await this.FindbyID(Id);
-        if (exist) {
-            await this.prisma.friendship.updateMany({
-                where: {
-                    OR: [
-                        { senderId: id, receiverId: Id },
-                        { senderId: Id, receiverId: id },
-                    ],
-                },
-                data: {
-                    status: 'accepted',
-                },
-            });
-            await this.addNotifications(id, Id, 'friendship', 'accepted your invite');
-        }
-        else
-            throw new common_1.UnauthorizedException('User Does Not Exist');
-    }
-    async blockFriend(id, Id) {
-        const exist = await this.FindbyID(Id);
-        if (exist) {
-            await this.prisma.friendship.updateMany({
-                where: {
-                    OR: [
-                        { senderId: id, receiverId: Id },
-                        { senderId: Id, receiverId: id },
-                    ],
-                },
-                data: {
-                    status: 'blocked',
-                    blockerId: id,
-                },
-            });
-        }
-        else
-            throw new common_1.UnauthorizedException('User Does Not Exist');
-    }
-    async getFriends(id) {
-        const res = await this.prisma.friendship.findMany({ where: {
-                AND: [{
-                        OR: [
-                            { senderId: id },
-                            { receiverId: id },
-                        ],
-                    },
-                    { status: 'accepted' },
-                ],
-            }, });
-        return res;
-    }
-    async getFriend(id, Id) {
-        const res = await this.prisma.friendship.findFirst({ where: {
-                AND: [{
+        if (id) {
+            const exist = await this.FindbyID(Id);
+            if (exist) {
+                await this.prisma.friendship.deleteMany({
+                    where: {
                         OR: [
                             { senderId: id, receiverId: Id },
                             { senderId: Id, receiverId: id },
                         ],
                     },
-                    { status: 'accepted' },
-                ],
-            },
-        });
-        return res;
+                });
+            }
+            else
+                throw new common_1.UnauthorizedException('User Does Not Exist');
+        }
+        else
+            throw new common_1.UnauthorizedException('User not found');
+    }
+    async acceptFriend(id, Id) {
+        if (id) {
+            const exist = await this.FindbyID(Id);
+            if (exist) {
+                await this.prisma.friendship.updateMany({
+                    where: {
+                        OR: [
+                            { senderId: id, receiverId: Id },
+                            { senderId: Id, receiverId: id },
+                        ],
+                    },
+                    data: {
+                        status: 'accepted',
+                    },
+                });
+                await this.chatService.CreateRoom(id, Id, exist.username);
+                await this.addNotifications(id, Id, 'friendship', 'accepted your invite');
+            }
+            else
+                throw new common_1.UnauthorizedException('User Does Not Exist');
+        }
+        else
+            throw new common_1.UnauthorizedException('User Does Not Exist');
+    }
+    async blockFriend(id, Id) {
+        if (id) {
+            const exist = await this.FindbyID(Id);
+            if (exist) {
+                await this.prisma.friendship.updateMany({
+                    where: {
+                        OR: [
+                            { senderId: id, receiverId: Id },
+                            { senderId: Id, receiverId: id },
+                        ],
+                    },
+                    data: {
+                        status: 'blocked',
+                        blockerId: id,
+                    },
+                });
+            }
+            else
+                throw new common_1.UnauthorizedException('User Does Not Exist');
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
+    }
+    async getFriends(id) {
+        if (id) {
+            const res = await this.prisma.friendship.findMany({ where: {
+                    AND: [{
+                            OR: [
+                                { senderId: id },
+                                { receiverId: id },
+                            ],
+                        },
+                        { status: 'accepted' },
+                    ],
+                }, });
+            return res;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
+    }
+    async getFriend(id, Id) {
+        if (id) {
+            const res = await this.prisma.friendship.findFirst({ where: {
+                    AND: [{
+                            OR: [
+                                { senderId: id, receiverId: Id },
+                                { senderId: Id, receiverId: id },
+                            ],
+                        },
+                        { status: 'accepted' },
+                    ],
+                },
+            });
+            return res;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async getPendings(id) {
-        const res = await this.prisma.friendship.findMany({ where: {
-                AND: [{
-                        OR: [
-                            { senderId: id },
-                        ],
-                    },
-                    { status: 'pending' },
-                ],
-            },
-        });
-        return res;
+        if (id) {
+            const res = await this.prisma.friendship.findMany({ where: {
+                    AND: [{
+                            OR: [
+                                { senderId: id },
+                            ],
+                        },
+                        { status: 'pending' },
+                    ],
+                },
+            });
+            return res;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async getInvitations(id) {
-        const res = await this.prisma.friendship.findMany({ where: {
-                AND: [{
-                        OR: [
-                            { receiverId: id },
-                        ],
-                    },
-                    { status: 'pending' },
-                ],
-            },
-        });
-        return res;
+        if (id) {
+            const res = await this.prisma.friendship.findMany({ where: {
+                    AND: [{
+                            OR: [
+                                { receiverId: id },
+                            ],
+                        },
+                        { status: 'pending' },
+                    ],
+                },
+            });
+            return res;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async getBlocked(id) {
-        const res = await this.prisma.friendship.findMany({ where: {
-                AND: [{
-                        OR: [
-                            { senderId: id },
-                            { receiverId: id },
-                        ],
+        if (id) {
+            const blockedFriendships = await this.prisma.friendship.findMany({ where: {
+                    AND: [
+                        { blockerId: id },
+                        { status: 'blocked' },
+                    ]
+                },
+                select: {
+                    sender: {
+                        select: {
+                            id: true,
+                            username: true,
+                            avatar: true,
+                        }
                     },
-                    { status: 'blocked' },
-                    { blockerId: id },
-                ],
-            }, });
-        return res;
+                    receiver: {
+                        select: {
+                            id: true,
+                            username: true,
+                            avatar: true,
+                        }
+                    },
+                    blockerId: true,
+                    receiverId: true,
+                    senderId: true
+                }
+            });
+            return blockedFriendships.map((friendship) => {
+                return friendship.blockerId === friendship.senderId ? friendship.receiver : friendship.sender;
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async Players() {
-        const players = await this.prisma.user.findMany({
+        let players = await this.prisma.user.findMany({
             orderBy: {
                 XP: 'desc',
             },
@@ -310,15 +398,16 @@ let UserService = exports.UserService = class UserService {
                 topaz: true,
             }
         });
-        const modified = this.updateAvatar(players);
-        return modified;
+        if (players)
+            players = this.updateAvatar(players);
+        return players;
     }
     updateAvatar(Object) {
         const ModifiedObject = Object.map((player) => {
             if (player) {
                 if (player.avatar) {
                     if (!player.avatar.includes('cdn.intra')) {
-                        player.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + player.avatar;
+                        player.avatar = 'http://' + process.env.HOST + '/api' + player.avatar;
                     }
                 }
             }
@@ -327,10 +416,14 @@ let UserService = exports.UserService = class UserService {
         return ModifiedObject;
     }
     async GetNotifications(id) {
-        const res = await this.prisma.notification.findMany({
-            where: { receiverId: id }
-        });
-        return res;
+        if (id) {
+            const res = await this.prisma.notification.findMany({
+                where: { receiverId: id }
+            });
+            return res;
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async addNotifications(senderId, receiverId, type, context) {
         const sender = await this.prisma.user.findUnique({ where: { id: senderId } });

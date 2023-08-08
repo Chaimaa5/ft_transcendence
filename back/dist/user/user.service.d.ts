@@ -2,8 +2,10 @@
 import { PrismaClient } from '@prisma/client';
 import { UpdateUserDTO } from './dto/updatedto.dto';
 import { Response } from 'express';
+import { ChatService } from 'src/chat/chat.service';
 export declare class UserService {
     prisma: PrismaClient<import(".prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
+    chatService: ChatService;
     constructor();
     GetById(id: string): Promise<(import("@prisma/client/runtime/library").GetResult<{
         id: string;
@@ -122,15 +124,19 @@ export declare class UserService {
         blockerId: string;
         createdAt: Date;
     }, unknown> & {})[]>;
-    getBlocked(id: string): Promise<(import("@prisma/client/runtime/library").GetResult<{
-        id: number;
-        senderId: string;
-        receiverId: string;
-        status: string;
-        blockerId: string;
-        createdAt: Date;
-    }, unknown> & {})[]>;
-    Players(): Promise<any[]>;
+    getBlocked(id: string): Promise<{
+        id: string;
+        username: string;
+        avatar: string;
+    }[]>;
+    Players(): Promise<{
+        avatar: string;
+        rank: number;
+        username: string;
+        level: number | null;
+        XP: number;
+        topaz: number | null;
+    }[]>;
     updateAvatar(Object: any[]): any[];
     GetNotifications(id: string): Promise<(import("@prisma/client/runtime/library").GetResult<{
         id: number;

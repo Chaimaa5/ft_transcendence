@@ -12,6 +12,11 @@
     align-items: center;
 }
 
+.popup{
+    background: linear-gradient(135deg, #457B9D 0%, #1D3557 100%);
+
+}
+
 .container-mode{
     position: relative;
     height: 95%;
@@ -57,4 +62,22 @@
     text-transform: uppercase;
     color: var(--white);
     font-family: Myfont_r;
+}
+
+.slider-input{
+    appearance: none;
+    height: 15%;
+    width: 100%;
+    border-radius: 2vw;
+    background-color: #5286d9;
+    outline: 0;
+}
+
+.ReactModal__Overlay {
+    background-color: #457b9d85 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 100 !important;
+    outline: none !important;
 }

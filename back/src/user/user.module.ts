@@ -7,12 +7,13 @@ import { LeaderboardController } from './Leaderboard/leaderboard.controller';
 import { LeaderboardService } from './Leaderboard/leaderboard.service';
 import { HomeService } from './Home/home.service';
 import { HomeController } from './Home/home.controller';
-// import { SocketGateway } from 'src/socket/socket.gateway';
+import { ChatController } from 'src/chat/chat.controller';
+import { ChatService } from 'src/chat/chat.service';
 
 @Module({
   imports: [],
-  controllers: [UserController, ProfileController, LeaderboardController, HomeController],
-  providers: [UserService, ProfileService, LeaderboardService, HomeService],
+  controllers: [UserController, ProfileController, LeaderboardController, HomeController, ChatController],
+  providers: [UserService, ProfileService, LeaderboardService, HomeService, ChatService],
   exports: [UserService]
 })
 export class UserModule {}

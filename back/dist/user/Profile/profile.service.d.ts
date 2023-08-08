@@ -45,12 +45,12 @@ export declare class ProfileService {
         level: number | null;
     }[]>;
     MatchHistory(username: string): Promise<{
-        winner: string;
+        winner: string | null;
         player1: {
             username: string;
         };
         player2: {
             username: string;
-        };
+        } | null;
     }[]>;
 }

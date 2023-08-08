@@ -14,7 +14,7 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt'){
                 let data = request.cookies["access_token"];
                 return data
             } ]),
-            secretOrKey: process.env.JWT_REFRESH_SECRET,
+            secretOrKey: process.env.JWT_ACCESS_SECRET,
           });
     }
 
@@ -22,7 +22,7 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt'){
     async validate(payload: JwtPayload){
 
         try{
-            jwt.verify(payload.token, process.env.JWT_REFRESH_SECRET as jwt.Secret)
+            jwt.verify(payload.token, process.env.JWT_ACCESS_SECRET as jwt.Secret)
         }catch(err){
             if(err instanceof jwt.TokenExpiredError )
                 throw  new UnauthorizedException('Expired Token Exception');

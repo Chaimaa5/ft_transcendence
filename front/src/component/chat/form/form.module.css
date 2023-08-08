@@ -1,0 +1,11 @@
+
+.colorBg
+{
+    z-index: 120;
+    background-color: rgb(29, 53, 87, 0.8);
+}
+
+.icon_{
+    width: 1vw;
+    fill: var(--lightBlue);
+}

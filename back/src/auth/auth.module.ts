@@ -14,8 +14,8 @@ import { JWTStrategy } from './jwt/jwt.strategy';
 @Module({
   imports:  [ UserModule, PassportModule,
   JwtModule.register({
-      secretOrPrivateKey: process.env.JWT_REFRESH_SECRET,
-      signOptions: { expiresIn: '20s' },
+      secretOrPrivateKey: process.env.JWT_ACCESS_SECRET,
+      signOptions: { expiresIn: '1h' },
     }), ConfigModule],
   providers: [FortyTwoStrategy, AuthService, JwtModule, UserService, JWTStrategy, RefreshStrategy],
   controllers: [AuthController]

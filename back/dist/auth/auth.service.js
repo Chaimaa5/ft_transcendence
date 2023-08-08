@@ -39,27 +39,43 @@ let AuthService = exports.AuthService = class AuthService {
     signOut(res) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-        res.redirect('http://localhost:8000/login');
+        res.redirect('http://localhost/login');
     }
     encryptToken(token) {
-        const cipher = crypto.createCipher('aes-256-cbc', this.secretKey);
-        let encrypted = cipher.update(JSON.stringify(token), 'utf8', 'hex');
-        encrypted += cipher.final('hex');
-        return encrypted;
+        if (token) {
+            const cipher = crypto.createCipher('aes-256-cbc', this.secretKey);
+            let encrypted = cipher.update(JSON.stringify(token), 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            return encrypted;
+        }
+        else
+            throw new common_1.UnauthorizedException('Token Not Valid');
     }
     decryptToken(encryptedToken) {
-        const decipher = crypto.createDecipher('aes-256-cbc', this.secretKey);
-        let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        return JSON.parse(decrypted);
+        if (encryptedToken) {
+            const decipher = crypto.createDecipher('aes-256-cbc', this.secretKey);
+            let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            return JSON.parse(decrypted);
+        }
+        else
+            throw new common_1.UnauthorizedException('Token Not Valid');
     }
     generateToken(user) {
-        const payload = { id: user.id, username: user.username, isTwoFacEnabled: user.isTwoFacEnabled };
-        return this.jwtService.sign(payload, { secret: process.env.JWT_REFRESH_SECRET });
+        if (user) {
+            const payload = { id: user.id, username: user.username, isTwoFacEnabled: user.isTwoFacEnabled };
+            return this.jwtService.sign(payload, { secret: process.env.JWT_ACCESS_SECRET });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     generateRefreshToken(user) {
-        const payload = { id: user.id, username: user.username, isTwoFacEnabled: user.isTwoFacEnabled };
-        return this.jwtService.sign(payload, { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
+        if (user) {
+            const payload = { id: user.id, username: user.username, isTwoFacEnabled: user.isTwoFacEnabled };
+            return this.jwtService.sign(payload, { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async RefreshTokens(req, res) {
         const users = req.user;
@@ -83,27 +99,49 @@ let AuthService = exports.AuthService = class AuthService {
         }
     }
     async generateQRCode(id) {
-        const secret = otplib_1.authenticator.generateSecret();
-        const app = "Trans";
-        const account = "celmhan";
-        await this.prisma.user.update({
-            where: { id: id },
-            data: { TwoFacSecret: secret }
-        });
-        const authUrl = otplib_1.authenticator.keyuri(account, app, secret);
-        return (authUrl);
+        if (id) {
+            const secret = otplib_1.authenticator.generateSecret();
+            const app = "Trans";
+            const account = "celmhan";
+            await this.prisma.user.update({
+                where: { id: id },
+                data: { TwoFacSecret: secret }
+            });
+            const authUrl = otplib_1.authenticator.keyuri(account, app, secret);
+            return (authUrl);
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async verifyTFA(user, code) {
-        return await otplib_1.authenticator.verify({
-            token: code,
-            secret: user.TwoFacSecret
-        });
+        if (user) {
+            return await otplib_1.authenticator.verify({
+                token: code,
+                secret: user.TwoFacSecret
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
     async activateTFA(id) {
-        await this.prisma.user.update({
-            where: { id: id },
-            data: { isTwoFacEnabled: true }
-        });
+        if (id) {
+            await this.prisma.user.update({
+                where: { id: id },
+                data: { isTwoFacEnabled: true }
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
+    }
+    async disableTFA(id) {
+        if (id) {
+            await this.prisma.user.update({
+                where: { id: id },
+                data: { isTwoFacEnabled: false }
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('User  not found');
     }
 };
 exports.AuthService = AuthService = __decorate([

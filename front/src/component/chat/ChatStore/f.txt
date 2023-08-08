@@ -1,0 +1,26 @@
+        
+        [
+        {
+          id: number,
+          name: string,
+          image: string,,
+          isChannel: boolean,
+          password: null,
+          type: string,
+
+        }
+      ]
+      	
+
+Response body
+Download
+[
+  {
+    "id": 1,
+    "name": "room",
+    "image": "",
+    "isChannel": true,
+    "type": "",
+
+  }
+]

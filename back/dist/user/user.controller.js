@@ -35,8 +35,9 @@ let UserController = exports.UserController = class UserController {
         const user = req.user;
         return await this.userservice.DeleteUser(user.id, res);
     }
-    async UserSetup(req, avatar, data) {
+    async UserSetup(req, res, avatar, data) {
         const user = req.user;
+        console.log(data);
         await this.userservice.userSetup(user.id, avatar, data);
     }
     async addFriend(req, id) {
@@ -106,10 +107,11 @@ __decorate([
     (0, common_1.Post)('setup'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('avatar', multer_middlewear_1.Config)),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.UploadedFile)()),
-    __param(2, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.UploadedFile)()),
+    __param(3, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, updatedto_dto_1.UpdateUserDTO]),
+    __metadata("design:paramtypes", [Object, Object, Object, updatedto_dto_1.UpdateUserDTO]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "UserSetup", null);
 __decorate([

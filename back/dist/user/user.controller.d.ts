@@ -23,9 +23,16 @@ export declare class UserController {
         status: boolean;
         createdAt: Date;
     }, unknown> & {}) | undefined>;
-    Players(): Promise<any[]>;
+    Players(): Promise<{
+        avatar: string;
+        rank: number;
+        username: string;
+        level: number | null;
+        XP: number;
+        topaz: number | null;
+    }[]>;
     DeleteUser(req: Request, res: Response): Promise<void>;
-    UserSetup(req: Request, avatar: Express.Multer.File, data: UpdateUserDTO): Promise<void>;
+    UserSetup(req: Request, res: Response, avatar: Express.Multer.File, data: UpdateUserDTO): Promise<void>;
     addFriend(req: Request, id: string): Promise<{
         message: string;
     }>;
@@ -65,12 +72,9 @@ export declare class UserController {
         blockerId: string;
         createdAt: Date;
     }, unknown> & {})[]>;
-    getBlocked(req: Request): Promise<(import("@prisma/client/runtime/library").GetResult<{
-        id: number;
-        senderId: string;
-        receiverId: string;
-        status: string;
-        blockerId: string;
-        createdAt: Date;
-    }, unknown> & {})[]>;
+    getBlocked(req: Request): Promise<{
+        id: string;
+        username: string;
+        avatar: string;
+    }[]>;
 }

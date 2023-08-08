@@ -18,11 +18,11 @@ let SocketStrategy = exports.SocketStrategy = class SocketStrategy extends (0, p
     constructor() {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: process.env.JWT_REFRESH_SECRET,
+            secretOrKey: process.env.JWT_ACCESS_SECRET,
         });
     }
     async validate(token) {
-        const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         return payload;
     }
 };

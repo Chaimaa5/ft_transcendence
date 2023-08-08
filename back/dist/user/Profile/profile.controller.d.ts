@@ -27,13 +27,13 @@ export declare class ProfileController {
         }, unknown> & {})[];
     } | null>;
     MatchHistory(username: string, req: Request): Promise<{
-        winner: string;
+        winner: string | null;
         player1: {
             username: string;
         };
         player2: {
             username: string;
-        };
+        } | null;
     }[]>;
     UserStatistics(username: string, req: Request): Promise<{
         win: string;

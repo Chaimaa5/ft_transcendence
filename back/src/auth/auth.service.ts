@@ -15,6 +15,7 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
+
    
 
 
@@ -43,33 +44,50 @@ export class AuthService {
     signOut(res: Response) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-        res.redirect('http://localhost:8000/login');
+        res.redirect('http://localhost/login');
     } 
 
 
     encryptToken(token: string) {
-        const cipher = crypto.createCipher('aes-256-cbc', this.secretKey);
-        let encrypted = cipher.update(JSON.stringify(token), 'utf8', 'hex');
-        encrypted += cipher.final('hex');
-        return encrypted;
+        if(token){
+            const cipher = crypto.createCipher('aes-256-cbc', this.secretKey);
+            let encrypted = cipher.update(JSON.stringify(token), 'utf8', 'hex');
+            encrypted += cipher.final('hex');
+            return encrypted;
+        }
+        else
+            throw new UnauthorizedException('Token Not Valid')
       }
       
       // Decrypt and retrieve the original payload
     decryptToken(encryptedToken: string) {
-        const decipher = crypto.createDecipher('aes-256-cbc', this.secretKey);
-        let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
-        decrypted += decipher.final('utf8');
-        return JSON.parse(decrypted);
+        if(encryptedToken){
+            const decipher = crypto.createDecipher('aes-256-cbc', this.secretKey);
+            let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            return JSON.parse(decrypted);
+        }
+        else
+            throw new UnauthorizedException('Token Not Valid')
     }
 
     generateToken(user: any) : string {
-        const payload: JwtPayload = {id: user.id,  username: user.username, isTwoFacEnabled: user.isTwoFacEnabled }; 
-        return this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET});
+        if(user){
+            const payload: JwtPayload = {id: user.id,  username: user.username, isTwoFacEnabled: user.isTwoFacEnabled }; 
+            return this.jwtService.sign(payload, {secret: process.env.JWT_ACCESS_SECRET});
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
 
     generateRefreshToken(user: any) : string  {
-        const payload: JwtPayload = {id: user.id,  username: user.username, isTwoFacEnabled: user.isTwoFacEnabled}; 
-        return this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d'});
+        if(user){
+
+            const payload: JwtPayload = {id: user.id,  username: user.username, isTwoFacEnabled: user.isTwoFacEnabled}; 
+            return this.jwtService.sign(payload, {secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d'});
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
 
  
@@ -102,35 +120,54 @@ export class AuthService {
     //TwoFactorAuth
     
     async generateQRCode(id: string){
-        const secret = authenticator.generateSecret();
-        const app = "Trans";
-        const account = "celmhan";
-
-        //update secret in database
-        await this.prisma.user.update({
-            where: {id: id}, 
-            data: {TwoFacSecret: secret}
-    });
-        const authUrl = authenticator.keyuri(account, app, secret);
-        return (authUrl);
-        // return await toDataURL(authUrl);
+        if(id){
+            const secret = authenticator.generateSecret();
+            const app = "Trans";
+            const account = "celmhan";
+    
+            //update secret in database
+            await this.prisma.user.update({
+                where: {id: id}, 
+                data: {TwoFacSecret: secret}
+            });
+            const authUrl = authenticator.keyuri(account, app, secret);
+            return (authUrl);
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
 
     async verifyTFA(user: any, code: string) {
         // check if user exist
-
-        return await authenticator.verify({
-            token: code,
-            secret: user.TwoFacSecret
-        });
+        if(user){
+            return await authenticator.verify({
+                token: code,
+                secret: user.TwoFacSecret
+            });
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
 
     async activateTFA(id: string){
-        
-        await this.prisma.user.update({
-            where: {id: id}, 
-            data: {isTwoFacEnabled: true}
-        });
+        if(id){
+            await this.prisma.user.update({
+                where: {id: id}, 
+                data: {isTwoFacEnabled: true}
+            });
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
 
+    async disableTFA(id: string) {
+        if (id){
+            await this.prisma.user.update({
+            where: {id: id},
+            data: {isTwoFacEnabled: false}
+            })
+        }
+        else
+            throw new UnauthorizedException('User  not found')
+    }
 }

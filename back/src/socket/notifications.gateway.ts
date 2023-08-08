@@ -2,7 +2,7 @@ import { SubscribeMessage, WebSocketGateway, OnGatewayDisconnect, OnGatewayConne
 import { Server, Socket } from 'socket.io';
 import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { UserService } from 'src/user/user.service';
-@WebSocketGateway()
+@WebSocketGateway({namespace: '/socket.io/'})
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @WebSocketServer()
@@ -27,7 +27,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
             }
         });
         await this.userService.updateOnlineStatus(client.data.payload.id, false)
-        console.log('WebSocket gateway desconnected!');
+        console.log('WebSocket gateway disconnected!');
     }
     
     async handleConnection(server: Socket) {
@@ -41,9 +41,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
                 await this.userService.updateOnlineStatus(user.id, true)
                 // const notifications = await this.userService.GetNotifications(user.id)
                 // server.emit('notifications', notifications);
-                server.emit('connectionSuccess', { message: 'Connected successfully!' });
-
+                server.to(server.id).emit('connectionSuccess', { message: 'Connected successfully!' });
             }
-    }
+            console.log('WebSocket gateway connected!');
+        }
 
 }

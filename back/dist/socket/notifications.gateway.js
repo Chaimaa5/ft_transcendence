@@ -30,7 +30,7 @@ let NotificationsGateway = exports.NotificationsGateway = class NotificationsGat
             }
         });
         await this.userService.updateOnlineStatus(client.data.payload.id, false);
-        console.log('WebSocket gateway desconnected!');
+        console.log('WebSocket gateway disconnected!');
     }
     async handleConnection(server) {
         let token = server.handshake.headers['authorization'];
@@ -40,8 +40,9 @@ let NotificationsGateway = exports.NotificationsGateway = class NotificationsGat
         if (user) {
             this.clients.set(server.data.payload.id, server);
             await this.userService.updateOnlineStatus(user.id, true);
-            server.emit('connectionSuccess', { message: 'Connected successfully!' });
+            server.to(server.id).emit('connectionSuccess', { message: 'Connected successfully!' });
         }
+        console.log('WebSocket gateway connected!');
     }
 };
 __decorate([
@@ -49,6 +50,6 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], NotificationsGateway.prototype, "server", void 0);
 exports.NotificationsGateway = NotificationsGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)()
+    (0, websockets_1.WebSocketGateway)({ namespace: '/socket.io/' })
 ], NotificationsGateway);
 //# sourceMappingURL=notifications.gateway.js.map

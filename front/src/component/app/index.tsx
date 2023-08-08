@@ -11,19 +11,28 @@ import axios from "axios";
 import Leaderboord from "../leaderboord";
 import Instanse from "../api/api";
 import CrContext from "../context/context";
-import Setting from "../setting";
-
+import Setting from "../setting/index";
+import Chat from "../chat/Chat";
 
 type cntx = {
-    username: string
+    username: string,
+    avatar: string,
+    id: string,
+    XP: number,
+    level: number, 
+    topaz: number,
+    win: number ,
+    loss: number, 
+    games: number,
+    rank: number,
 }
 
 function Container(){
     const location = useLocation();
-    const context = useContext<cntx[]>(CrContext);
+    const context = useContext<cntx>(CrContext);
     const [data, setData] = useState(context);
     useEffect(() => {
-            Instanse.get("http://localhost:3000/user", {withCredentials: true})
+            Instanse.get("/user")
             .then((res) => setData(res.data))
         }
     )
@@ -42,6 +51,7 @@ function Container(){
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
                         {location.pathname == "/leaderboord" && <Leaderboord/>}
+                        {location.pathname == "/chat" && <Chat/>}
                         {location.pathname == "/setting" && <Setting/>}
                     </div>
                     <div className="status">

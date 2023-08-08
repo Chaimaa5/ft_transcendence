@@ -3,6 +3,7 @@ import avatar_img from "../tools/profile.png"
 import Avatar from "../avatar/index";
 import Button_ from "../button/index";
 import topaz_img from "../tools/home/Topaz.png"
+import Instanse from "../api/api";
 
 const TopPlayers = () => {
     return(

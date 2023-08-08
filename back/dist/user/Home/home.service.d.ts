@@ -25,7 +25,7 @@ export declare class HomeService {
         username: string;
         avatar: string;
         status: boolean;
-    } | null>;
+    } | null | undefined>;
     OnlineFriends(id: string): Promise<{
         id: string;
         username: string;

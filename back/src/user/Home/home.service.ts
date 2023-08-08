@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UserService } from '../user.service';
 
@@ -11,6 +11,8 @@ export class HomeService {
     constructor(){}
     
     async bestRanked(ownerId: string) {
+      // if(ownerId){
+
         const userBlocked = await this.prisma.friendship.findMany({
             where: {
                 AND: [
@@ -67,10 +69,15 @@ export class HomeService {
 
         const ModifiedObject = await this.userService.updateAvatar(bestRanked)
         return ModifiedObject;
+      // }
+      // else
+      //   throw new UnauthorizedException('User  not found')
 
      }
  
      async NavBar(id : string) {
+      if(id){
+
         const nav = await this.prisma.user.findFirst({
             where: {id: id},
             select: {
@@ -91,37 +98,44 @@ export class HomeService {
             if (nav.level)
               progress = parseFloat((nav?.level % 1).toFixed(2));
             if (!nav.avatar.includes('cdn.intra')){
-             nav.avatar = 'http://' + process.env.HOST + ':'+ process.env.BPORT + nav.avatar
+             nav.avatar = 'http://' + process.env.HOST + '/api' + nav.avatar
           }
         }
          return {
            ...nav,
           'progress': progress,
         };
+      }
+      else
+          throw new UnauthorizedException('User  not found')
     }
 
 
     async OnlineStatus(id : string) {
-       const user = await this.prisma.user.findUnique({
-            where: {id: id},
-            select: {
-                username: true,
-                avatar: true,
-                status: true,
+      if(id){
+        const user = await this.prisma.user.findUnique({
+             where: {id: id},
+             select: {
+                 username: true,
+                 avatar: true,
+                 status: true,
+             }
+     
+            });
+ 
+            if (user)
+            {
+               if (!user.avatar.includes('cdn.intra')){
+                 user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar
+               }
             }
-    
-           });
-
-           if (user)
-           {
-              if (!user.avatar.includes('cdn.intra')){
-                user.avatar = 'http://' + process.env.HOST + ':'+ process.env.BPORT + user.avatar
-              }
-           }
-        return user
+         return user
+      }
     }
     
     async OnlineFriends(id: string) {
+      if(id){
+
         const sentPromise = await this.prisma.user.findUnique({
             where: { id: id },
           }).sentFriendships({
@@ -171,10 +185,15 @@ export class HomeService {
 
           let combinedData = [...receiverData, ...senderData];
           return combinedData;
+      }
+      else
+            throw new UnauthorizedException('User  not found')
     }
 
 
     async Search(input: string){
+      if(input){
+
         let res = await this.prisma.user.findMany({
           where: {
             OR: [
@@ -200,5 +219,8 @@ export class HomeService {
 
         res = await this.userService.updateAvatar(res);
         return res;
+      }
+      else
+            throw new UnauthorizedException('User  not found')
     }
 }

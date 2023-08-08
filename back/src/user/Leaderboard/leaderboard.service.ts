@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UserService } from '../user.service';
 
@@ -10,68 +10,72 @@ export class LeaderboardService {
     constructor(){}
     
     async Leaderboard(ownerId: string) {
+        if(ownerId){
 
-        const userBlocked = await this.prisma.friendship.findMany({
-            where: {
-                AND: [
-                    {senderId: ownerId},
-                    {status: 'blocked'}
-                ]
-            },
-            select: {
-                receiverId: true
-            }
-        });
-
-
-        const userBlockers = await this.prisma.friendship.findMany({
-            where: {
-                AND: [
-                    {receiverId: ownerId},
-                    {status: 'blocked'}
-                ]
-            },
-            select: {
-                senderId: true
-            }
-        });
-
-
-        let res =  await this.prisma.user.findMany({
-            take: 3,
-            orderBy: {
-                XP: 'desc',
-            },
-            where:{
-                AND: [
-                    {
-                        id: {
-                          notIn: userBlocked.map(friendship => friendship.receiverId)
-                        }
-                      },
-                    {
-                        id: {
-                          notIn: userBlockers.map(friendship => friendship.senderId)
-                        }
-                    }
+          const userBlocked = await this.prisma.friendship.findMany({
+              where: {
+                  AND: [
+                      {senderId: ownerId},
+                      {status: 'blocked'}
                   ]
-            },
-            select: {
-                id: true,
-                rank: true,
-                username: true,
-                avatar: true,
-                XP: true,
-                badge: true,
-            }
-        });
-
-        res = await this.userService.updateAvatar(res);
-        return res;
+              },
+              select: {
+                  receiverId: true
+              }
+          });
+  
+  
+          const userBlockers = await this.prisma.friendship.findMany({
+              where: {
+                  AND: [
+                      {receiverId: ownerId},
+                      {status: 'blocked'}
+                  ]
+              },
+              select: {
+                  senderId: true
+              }
+          });
+  
+  
+          let res =  await this.prisma.user.findMany({
+              take: 3,
+              orderBy: {
+                  XP: 'desc',
+              },
+              where:{
+                  AND: [
+                      {
+                          id: {
+                            notIn: userBlocked.map(friendship => friendship.receiverId)
+                          }
+                        },
+                      {
+                          id: {
+                            notIn: userBlockers.map(friendship => friendship.senderId)
+                          }
+                      }
+                    ]
+              },
+              select: {
+                  id: true,
+                  rank: true,
+                  username: true,
+                  avatar: true,
+                  XP: true,
+                  badge: true,
+              }
+          });
+  
+          res = await this.userService.updateAvatar(res);
+          return res;
+        }
+        else
+            throw new UnauthorizedException('User  not found')
     }
     async Palyers(ownerId: string) {
+      if(ownerId){
 
-       
         const userBlocked = await this.prisma.friendship.findMany({
             where: {
                 AND: [
@@ -153,5 +157,8 @@ export class LeaderboardService {
        });
        players = await this.userService.updateAvatar(players);
        return players;
+      }
+      else
+            throw new UnauthorizedException('User  not found')
     }
 }

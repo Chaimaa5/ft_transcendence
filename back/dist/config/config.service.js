@@ -10,7 +10,7 @@ exports.ConfigService = void 0;
 const common_1 = require("@nestjs/common");
 let ConfigService = exports.ConfigService = class ConfigService {
     getSecretKey() {
-        const secretKey = process.env.JWT_SECRET_KEY;
+        const secretKey = process.env.JWT_ACCESS_SECRET;
         if (!secretKey) {
             throw new Error('JWT_SECRET_KEY environment variable is not set');
         }

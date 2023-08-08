@@ -33,7 +33,9 @@ const UserBtns = ({username}) => {
         <div className="flex h-[100%] w-[100%] userBtns">
             {data?.isSender &&
                 <div className="flex h-[100%] w-[48%] items-end">
-                    <button className="w-[1.8vw] mr-[1%] bg-[#E63946] h-[1.8vw] rounded-full flex justify-center items-center">
+                    <button onClick={() => {
+                        Instanse.get("/user/block/" + data?.id);
+                    }} className="w-[1.8vw] mr-[1%] bg-[#E63946] h-[1.8vw] rounded-full flex justify-center items-center">
                         <ReactSVG className="w-[0.8vw]" src={incon6}/>
                     </button>
                     <button onClick={()=> {

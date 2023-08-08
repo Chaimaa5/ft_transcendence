@@ -21,6 +21,7 @@ type friends_ = {
 const Friends = () => {
     const routProp = useParams()
     const [response, setResponse] = useState<friends_[]>([]);
+    
     const Fetch = async () => {
         await Instanse.get<friends_[]>('http://localhost:3000/profile/friends/' + routProp.username, {withCredentials: true})
         .then((res) => {
@@ -58,7 +59,7 @@ const Friends = () => {
         <div className="h-[95%] w-[100%] Friend">
         {
             response.map( (value, key) =>
-                <div className="flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">.
+                <div className="flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">
                     <Link className="h-[100%] w-[10%] av-bar" to={"/profile/" + value.username}>
                             <Avatar src={value.avatar} wd_="2.5vw"/>
                     </Link>

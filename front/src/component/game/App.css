@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+
+
+:root {
+	--blue: #457B9D;
+	--dark-blue: #1D3557;
+	--extra-light-blue: #A8DADC;
+	--white: #F1FAEE;
+}
+
+.App {
+	background: linear-gradient(225deg, var(--dark-blue) 0%, var(--blue) 100%);
+	display: flex;
+	height: 100vh;
+	width: 100vw;
+	flex-direction: column;
+}
+
+.rounds-board {
+	height: 10%;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	align-items: center;
+}
+
+.rounds-container {
+	height: 70%;
+	width : 70vw;
+	text-align: center;
+}
+
+.rounds-board span {
+	color : var(--extra-light-blue);
+	font-family: QuickSand;
+	font-style: bold;
+	font-weight: bold;
+	font-size: 3vw;
+}
+
+
+.rounds-points {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30%;
+	width: 100%;
+}
+
+.round {
+	width: 1vw;
+	height: 1vw;
+	border-radius: 50%;
+	border: 1px solid var(--dark-blue);
+	margin:  1vw;
+}
+
+.full {
+	background-color:  var(--dark-blue);
+}
+
+.empty {
+	background-color: transparent;
+}
+
+.pong-board {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 90%;
+}
+
+.pong-table {
+	/* height: 90%; */
+	height: 45vw;
+	width : 90vw;
+}
+
+.pong-canva {
+	border-radius: 30px;
+	background: linear-gradient(135deg, #162F52 0%, #091930 94%);
+	box-shadow: 34px 34px 80px 0px rgba(11, 28, 53, 0.70);
+	position: relative;
+}
