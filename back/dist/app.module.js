@@ -16,6 +16,7 @@ const schedule_1 = require("@nestjs/schedule");
 const mute_service_1 = require("./chat/mute.service");
 const game_module_1 = require("./game/game.module");
 const chat_module_1 = require("./chat/chat.module");
+const game_gateway_1 = require("./game/game.gateway");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
@@ -27,7 +28,7 @@ exports.AppModule = AppModule = __decorate([
             }), game_module_1.GameModule, chat_module_1.ChatModule
         ],
         controllers: [],
-        providers: [chat_gateway_1.ChatGateway, mute_service_1.MuteService],
+        providers: [game_gateway_1.GameGateway, chat_gateway_1.ChatGateway, mute_service_1.MuteService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

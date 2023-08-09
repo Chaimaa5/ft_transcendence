@@ -13,32 +13,32 @@ services:
       - '5432:5432'
     networks:
       - app-network
-  # backend:
-  #   container_name: backend
+  backend:
+    container_name: backend
+    build: 
+     context: ./back
+    restart: always
+    env_file:
+        - .env
+    volumes:
+      - ./back/src:/src
+    ports:
+      - '3000:3000'
+    networks:
+      - app-network
+  # reverse_proxy:
+  #   container_name: reverse_proxy
   #   build: 
-  #    context: ./back
+  #    context: ./nginx
   #   restart: always
   #   env_file:
   #       - .env
   #   volumes:
   #     - ./back/src:/src
   #   ports:
-  #     - '3000:3000'
+  #     - '80:80'
   #   networks:
   #     - app-network
-  # # reverse_proxy:
-  # #   container_name: reverse_proxy
-  # #   build: 
-  # #    context: ./nginx
-  # #   restart: always
-  # #   env_file:
-  # #       - .env
-  # #   volumes:
-  # #     - ./back/src:/src
-  # #   ports:
-  # #     - '80:80'
-  # #   networks:
-  # #     - app-network
   # frontend:
   #   build: 
   #    context: ./front
@@ -53,8 +53,8 @@ services:
 volumes:
   postgres:
    driver: local
-  # backend:
-  #  driver: local
+  backend:
+   driver: local
   # frontend:
   #  driver: local
 networks:
