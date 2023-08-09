@@ -53,7 +53,7 @@ let ProfileService = exports.ProfileService = class ProfileService {
             if (user) {
                 if (user.avatar) {
                     if (!user.avatar.includes('cdn.intra')) {
-                        user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar;
+                        user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar;
                     }
                 }
                 if (!isOwner) {
@@ -311,7 +311,7 @@ let ProfileService = exports.ProfileService = class ProfileService {
                 if (sender) {
                     if (sender.avatar) {
                         if (!sender.avatar.includes('cdn.intra')) {
-                            sender.avatar = 'http://' + process.env.HOST + '/api' + sender.avatar;
+                            sender.avatar = 'http://' + process.env.HOST + ':3000/api' + sender.avatar;
                         }
                     }
                 }
@@ -322,7 +322,7 @@ let ProfileService = exports.ProfileService = class ProfileService {
                 if (receiver) {
                     if (receiver.avatar) {
                         if (!receiver.avatar.includes('cdn.intra')) {
-                            receiver.avatar = 'http://' + process.env.HOST + '/api' + receiver.avatar;
+                            receiver.avatar = 'http://' + process.env.HOST + ':3000/api' + receiver.avatar;
                         }
                     }
                 }

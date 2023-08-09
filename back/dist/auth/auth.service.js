@@ -23,7 +23,7 @@ let AuthService = exports.AuthService = class AuthService {
         this.userService = new user_service_1.UserService;
         this.configService = new config_service_1.ConfigService;
         this.prisma = new client_1.PrismaClient();
-        this.secretKey = 'secret';
+        this.secretKey = '84 ef 9b 0e e7 06 9e 8b 04 6b 69 c4 d4 07 04 28 e2 05 ed 64 89 30 87 c9 ef 2e 8d a0 da 07 96 f2';
     }
     async signIn(res, req) {
         const find = this.userService.FindUser(req.user);
@@ -43,7 +43,9 @@ let AuthService = exports.AuthService = class AuthService {
     }
     encryptToken(token) {
         if (token) {
-            const cipher = crypto.createCipher('aes-256-cbc', this.secretKey);
+            const iv = crypto.randomBytes(16);
+            const key = crypto.randomBytes(32);
+            const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
             let encrypted = cipher.update(JSON.stringify(token), 'utf8', 'hex');
             encrypted += cipher.final('hex');
             return encrypted;
@@ -53,7 +55,8 @@ let AuthService = exports.AuthService = class AuthService {
     }
     decryptToken(encryptedToken) {
         if (encryptedToken) {
-            const decipher = crypto.createDecipher('aes-256-cbc', this.secretKey);
+            const iv = crypto.randomBytes(16);
+            const decipher = crypto.createCipheriv('aes-256-cbc', this.secretKey, iv);
             let decrypted = decipher.update(encryptedToken, 'hex', 'utf8');
             decrypted += decipher.final('utf8');
             return JSON.parse(decrypted);

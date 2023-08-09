@@ -81,8 +81,9 @@ const Profile = () => {
         Instanse.get<profile_>('profile/' + username)
         .then((res) => {
             setResponse(res.data)
+            console.log(res.data)
         });
-    },[response]);
+    },[]);
     
     if(response?.isBlocked) return
     return(

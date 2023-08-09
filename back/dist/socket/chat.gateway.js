@@ -111,6 +111,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "leaveRoom", null);
 exports.ChatGateway = ChatGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ namespace: '/socket.io/' })
+    (0, websockets_1.WebSocketGateway)({ cors: true, namespace: '/chat' })
 ], ChatGateway);
 //# sourceMappingURL=chat.gateway.js.map

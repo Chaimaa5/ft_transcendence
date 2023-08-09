@@ -16,16 +16,9 @@ type blocked =  {
     topaz: number
 }
 
-type cntx = {
-    id: string,
-    username: string,
-    avatar: string
-}
-
 
 const BlockList = () => {
 
-    const [data, setData] = useState(useContext<cntx>(CrContext))
     const [response, setResponse] = useState<blocked[]>([]);
     const GetBlocked = () => {
     return Instanse
@@ -36,7 +29,7 @@ const BlockList = () => {
     };
     useEffect(() => {
         GetBlocked();
-    },[]);
+    });
     return(
         <>
             <div className="h-[10%] w-[100%]  p-[2%]">

@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { PrismaClient } from '@prisma/client';
 import { AddMember, CreateChannel, UpdateChannel } from './dto/Chat.dto';
 export declare class ChatService {
@@ -37,9 +36,9 @@ export declare class ChatService {
     deleteMembership(id: number): Promise<void>;
     deleteRoom(id: number): Promise<void>;
     deleteMessages(roomId: number, memberId: string): Promise<void>;
-    muteMember(membershipId: number, muteDuration: number): Promise<void>;
-    banMember(membershipId: number): Promise<void>;
-    fetchDms(): Promise<void>;
+    muteMember(id: string, membershipId: number, muteDuration: string): Promise<void>;
+    UnmuteMember(id: string, membershipId: number): Promise<void>;
+    BanUpdate(id: string, membershipId: number, bool: boolean): Promise<void>;
     GetChannels(id: string): Promise<{
         id: number;
         name: string;
@@ -58,6 +57,27 @@ export declare class ChatService {
     }[]>;
     DeleteChannel(id: string, roomId: number): Promise<void>;
     storeMessage(roomId: number, userId: string, content: string): Promise<void>;
-    GetMessages(id: string, roomId: number): Promise<void>;
+    GetMessages(id: string, roomId: number): Promise<{
+        messages: {
+            id: string;
+            username: string;
+            avatar: string;
+            content: string;
+        }[];
+        role?: string | undefined;
+        name?: string | undefined;
+        image?: string | undefined;
+        type?: string | undefined;
+        isChannel?: boolean | undefined;
+    }>;
     checkMute(roomId: number, userId: string): Promise<boolean | undefined>;
+    GetRoomMembers(roomId: number): Promise<{
+        membershipId: number;
+        userId: string;
+        username: string;
+        avatar: string;
+        role: string;
+        isBanned: boolean;
+        isMuted: boolean;
+    }[]>;
 }

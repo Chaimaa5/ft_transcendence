@@ -12,12 +12,18 @@ export class GameService {
 
 
     async postChallengeSettings(user: User, body: any) {
+        console.log(body)
+        let difficulty = ""
+        if(body.isFlashy)
+            difficulty = "Flashy"
+        else if(body.PaddleSize)
+            difficulty = "smallPaddle"
         const game = await this.prisma.game.create({data : {
             mode : 'OneVsOne',
             playerId1 : user.id,
-            rounds : body.rounds,
-            pointsToWin : body.pointsToWin,
-            difficulty : body.difficulty,
+            rounds : body.Rounds,
+            pointsToWin : body.Points,
+            difficulty : difficulty,
             status: 'pending'
         }})
         return game.id
@@ -42,7 +48,5 @@ export class GameService {
             }
         })
         return(game);
-    }
-
-    
+    } 
 }

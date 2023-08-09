@@ -81,6 +81,11 @@ let UserController = exports.UserController = class UserController {
         const user = req.user;
         return await this.userservice.getBlocked(user.id);
     }
+    async DeleteAvatar(req) {
+        console.log('here');
+        const user = req.user;
+        await this.userservice.DeleteAvatar(user.id);
+    }
 };
 __decorate([
     (0, common_1.Get)(),
@@ -183,6 +188,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getBlocked", null);
+__decorate([
+    (0, common_1.Delete)('avatar'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "DeleteAvatar", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     (0, swagger_1.ApiTags)('user'),

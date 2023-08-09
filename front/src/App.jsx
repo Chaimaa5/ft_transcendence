@@ -10,8 +10,8 @@ import Leaderboord from './component/leaderboord/index';
 import axios from 'axios';
 import { useEffect } from 'react';
 import Setting from './component/setting/index';
-import MultipPlayerGame from "./component/game/MultiPlayerGame";
-import TrainingGame  from './component/game/TrainingGame';
+// import MultipPlayerGame from "./component/game/MultiPlayerGame";
+// import TrainingGame  from './component/game/TrainingGame';
 function App() {
   return (
      <div className="app-">
@@ -24,8 +24,8 @@ function App() {
           <Route path="/leaderboord" element={<Container />} />
           <Route path="/chat" element={<Container />} />
           <Route path='/setting' element={<Container/>}/>
-          <Route path="/game" element={<MultipPlayerGame />} />
-		      <Route path="/training" element={<TrainingGame />} />
+          {/* <Route path="/game" element={<MultipPlayerGame />} />
+		      <Route path="/training" element={<TrainingGame />} /> */}
         </Routes>
     </Router>
     </div>

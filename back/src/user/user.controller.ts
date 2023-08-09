@@ -97,7 +97,12 @@ export class UserController{
         return await this.userservice.getBlocked(user.id);
     }
 
-
+    @Delete('avatar')
+    async DeleteAvatar(@Req() req: Request){
+        console.log('here')
+        const user : User = req.user as User;
+        await this.userservice.DeleteAvatar(user.id);
+    }
 
 
     // async onApplicationShutdown(signal?: string): Promise<void>{

@@ -20,10 +20,17 @@ const Setup = () => {
     setup(true);
   };
 
+  const nav = useNavigate();
+
   const handleFileChange = (event) => {
     const avatar = event.target.files[0];
-    setavatar_img (URL.createObjectURL(avatar));
-    setimage(avatar);
+    if (avatar && (avatar.type === 'image/jpeg' || avatar.type === 'image/png')) {
+      setavatar_img (URL.createObjectURL(avatar));
+      setimage(avatar);
+    } else {
+      setavatar_img(null);
+      alert('Please select a valid JPEG or PNG image.');
+    }
   };
 
   const handleInputChange = (e) => {
@@ -44,13 +51,19 @@ const Setup = () => {
     UpdateUserDTO.append('avatar', avatar);
 
      axios.post('http://localhost:3000/api/user/setup', UpdateUserDTO, header).then(res => {console.log(res.data);})
-  }
+      nav('/home')
+
+
+      
+      
+    }
   
 
   return (
     <div className="setup" >
       <div className="upload">
           <input
+            // accept="image/jpeg, image/png"
             type="file"
             style={{ display: 'none' }}
             ref={fileInputRef}
@@ -76,10 +89,11 @@ const Setup = () => {
             />
         </div>
       <div>
-        <button onClick={() =>{
-            handleSubmit
-            nav('/home')
-          }}>
+        <button onClick={ 
+
+          handleSubmit
+       
+          }>
           <Button_ option="coninue" />
         </button>
       </div>

@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { Request } from 'express';
 import { ChatService } from './chat.service';
 import { AddMember, CreateChannel } from './dto/Chat.dto';
@@ -44,5 +43,30 @@ export declare class ChatController {
     }[]>;
     SetAdmin(req: Request, Id: any): Promise<void>;
     DeleteChannel(req: Request, Id: any): Promise<void>;
-    GetMessages(req: Request, Id: any): Promise<void>;
+    GetMessages(req: Request, Id: any): Promise<{
+        messages: {
+            id: string;
+            username: string;
+            avatar: string;
+            content: string;
+        }[];
+        role?: string | undefined;
+        name?: string | undefined;
+        image?: string | undefined;
+        type?: string | undefined;
+        isChannel?: boolean | undefined;
+    }>;
+    BanMember(req: Request, Id: any): Promise<void>;
+    MuteMember(req: Request, Id: any, duration: string): Promise<void>;
+    UnbanMember(req: Request, Id: any): Promise<void>;
+    UnmuteMember(req: Request, Id: any): Promise<void>;
+    GetRoomMembers(id: string): Promise<{
+        membershipId: number;
+        userId: string;
+        username: string;
+        avatar: string;
+        role: string;
+        isBanned: boolean;
+        isMuted: boolean;
+    }[]>;
 }

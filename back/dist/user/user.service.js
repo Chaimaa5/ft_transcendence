@@ -105,7 +105,10 @@ let UserService = exports.UserService = class UserService {
     async userSetup(id, avatar, data) {
         if (id) {
             let imagePath = '';
-            imagePath = "/upload/" + avatar.filename;
+            if (avatar)
+                imagePath = "/upload/" + avatar.filename;
+            else
+                imagePath = "/upload/avatar.png";
             const username = data.username;
             await this.prisma.user.update({ where: { id: id }, data: { avatar: imagePath } });
             if (username) {
@@ -183,7 +186,7 @@ let UserService = exports.UserService = class UserService {
                 if (user) {
                     if (user.avatar) {
                         if (!user.avatar.includes('cdn.intra')) {
-                            user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar;
+                            user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar;
                         }
                     }
                     return user;
@@ -407,7 +410,7 @@ let UserService = exports.UserService = class UserService {
             if (player) {
                 if (player.avatar) {
                     if (!player.avatar.includes('cdn.intra')) {
-                        player.avatar = 'http://' + process.env.HOST + '/api' + player.avatar;
+                        player.avatar = 'http://' + process.env.HOST + ':3000/api' + player.avatar;
                     }
                 }
             }
@@ -441,6 +444,12 @@ let UserService = exports.UserService = class UserService {
     }
     async deleteNotification(id) {
         await this.prisma.notification.delete({ where: { id: id } });
+    }
+    async DeleteAvatar(id) {
+        await this.prisma.user.update({
+            where: { id: id },
+            data: { avatar: '' }
+        });
     }
 };
 __decorate([

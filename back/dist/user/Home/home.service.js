@@ -92,7 +92,7 @@ let HomeService = exports.HomeService = class HomeService {
                 if (nav.level)
                     progress = parseFloat(((nav === null || nav === void 0 ? void 0 : nav.level) % 1).toFixed(2));
                 if (!nav.avatar.includes('cdn.intra')) {
-                    nav.avatar = 'http://' + process.env.HOST + '/api' + nav.avatar;
+                    nav.avatar = 'http://' + process.env.HOST + ':3000/api' + nav.avatar;
                 }
             }
             return Object.assign(Object.assign({}, nav), { 'progress': progress });
@@ -112,7 +112,7 @@ let HomeService = exports.HomeService = class HomeService {
             });
             if (user) {
                 if (!user.avatar.includes('cdn.intra')) {
-                    user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar;
+                    user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar;
                 }
             }
             return user;

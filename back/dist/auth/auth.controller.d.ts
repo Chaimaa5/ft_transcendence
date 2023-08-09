@@ -11,4 +11,5 @@ export declare class AuthController {
     HandleTFA(req: Request, res: Response): Promise<void>;
     EnableTFA(req: Request, authTFA: TFA): Promise<boolean>;
     DisableTFA(req: Request): Promise<void>;
+    GetAccess(req: Request): Promise<string>;
 }

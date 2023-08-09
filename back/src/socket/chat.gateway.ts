@@ -1,11 +1,12 @@
 import { SubscribeMessage, WebSocketGateway, OnGatewayDisconnect, OnGatewayConnection, WebSocketServer} from '@nestjs/websockets';
+import { CorsOptions } from 'cors';
 import { Server, Socket } from 'socket.io';
 import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { ChatService } from 'src/chat/chat.service';
 import { UserService } from 'src/user/user.service';
-@WebSocketGateway({namespace: '/socket.io/'})
+@WebSocketGateway({cors: true, namespace: '/chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
-
+   
     @WebSocketServer()
     server: Server;
 
@@ -22,8 +23,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
         console.log('WebSocket gateway initialized!');
     }
     
-    async handleDisconnect(client: Socket){
-        
+    async handleDisconnect(client: Socket){ 
         console.log('WebSocket gateway disconnected!');
         this.clients.forEach((socket, key) =>{
             if(socket === socket){

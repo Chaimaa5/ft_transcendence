@@ -7,7 +7,7 @@ import { ChatService } from 'src/chat/chat.service';
 
 @Injectable()
 export class UserService {
-    
+   
     
     
     
@@ -113,10 +113,10 @@ export class UserService {
         if (id)
         {
             let  imagePath = '';
-            // if(avatar)
+            if(avatar)
                imagePath = "/upload/" + avatar.filename;
-            // else
-            //     imagePath = "/upload/avatar.png";
+            else
+                imagePath = "/upload/avatar.png";
             const username = data.username as string
             await this.prisma.user.update({where: {id: id}, data: {avatar: imagePath}});
             if (username){
@@ -203,7 +203,7 @@ export class UserService {
                     if (user.avatar)
                     {
                         if (!user.avatar.includes('cdn.intra')){
-                            user.avatar = 'http://' + process.env.HOST + '/api' + user.avatar
+                            user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar
                         }
                     }
                 return user
@@ -461,7 +461,7 @@ export class UserService {
                 if (player.avatar)
                 {
                     if (!player.avatar.includes('cdn.intra')){
-                        player.avatar = 'http://' + process.env.HOST + '/api' + player.avatar
+                        player.avatar = 'http://' + process.env.HOST + ':3000/api' + player.avatar
                     }
                 }
             }
@@ -503,6 +503,14 @@ export class UserService {
     {
         await this.prisma.notification.delete({where: {id : id}})
     }
+
+    async DeleteAvatar(id: string) {
+        await this.prisma.user.update({
+            where: {id: id},
+            data:{avatar: ''}
+        })
+    }
+    
 }
 
 

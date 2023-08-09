@@ -23,7 +23,7 @@ const Friends = () => {
     const [response, setResponse] = useState<friends_[]>([]);
     
     const Fetch = async () => {
-        await Instanse.get<friends_[]>('http://localhost:3000/profile/friends/' + routProp.username, {withCredentials: true})
+        await Instanse.get<friends_[]>('/profile/friends/' + routProp.username, {withCredentials: true})
         .then((res) => {
             setResponse(res.data)
         });

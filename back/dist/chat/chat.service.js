@@ -33,7 +33,7 @@ let ChatService = exports.ChatService = class ChatService {
             if (member) {
                 if (member.image) {
                     if (member.image) {
-                        member.image = 'http://' + process.env.HOST + '/api' + member.image;
+                        member.image = 'http://' + process.env.HOST + ':3000/api' + member.image;
                     }
                 }
             }
@@ -43,7 +43,12 @@ let ChatService = exports.ChatService = class ChatService {
     }
     async GetJoinedRooms(id) {
         const rooms = await this.prisma.room.findMany({
-            where: { isChannel: true },
+            where: {
+                AND: [
+                    { isChannel: false },
+                    { type: 'private' }
+                ]
+            },
             include: {
                 membership: {
                     where: { userId: id },
@@ -252,26 +257,80 @@ let ChatService = exports.ChatService = class ChatService {
             }
         });
     }
-    async muteMember(membershipId, muteDuration) {
-        const muteExpiration = new Date();
-        muteExpiration.setMinutes(muteExpiration.getMinutes() + muteDuration);
-        await this.prisma.membership.update({
-            where: { id: membershipId },
-            data: {
-                isMuted: true,
-                muteExpiration: muteExpiration.toISOString()
-            }
-        });
+    async muteMember(id, membershipId, muteDuration) {
+        const membership = await this.prisma.membership.findUnique({ where: { id: membershipId } });
+        if (membership) {
+            const user = await this.prisma.membership.findFirst({
+                where: {
+                    AND: [
+                        { roomId: membership === null || membership === void 0 ? void 0 : membership.roomId },
+                        { userId: id }
+                    ]
+                }
+            });
+            if ((user === null || user === void 0 ? void 0 : user.role) === 'member')
+                throw new common_1.UnauthorizedException('Permission Denied');
+            const muteExpiration = new Date();
+            if (muteDuration === '4 h')
+                muteExpiration.setMinutes(muteExpiration.getMinutes() + (4 * 60));
+            await this.prisma.membership.update({
+                where: { id: membershipId },
+                data: {
+                    isMuted: true,
+                    muteExpiration: muteExpiration.toISOString()
+                }
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('Permission Denied');
     }
-    async banMember(membershipId) {
-        await this.prisma.membership.update({
-            where: { id: membershipId },
-            data: {
-                isBanned: true,
-            }
-        });
+    async UnmuteMember(id, membershipId) {
+        const membership = await this.prisma.membership.findUnique({ where: { id: membershipId } });
+        if (membership) {
+            const user = await this.prisma.membership.findFirst({
+                where: {
+                    AND: [
+                        { roomId: membership === null || membership === void 0 ? void 0 : membership.roomId },
+                        { userId: id }
+                    ]
+                }
+            });
+            if ((user === null || user === void 0 ? void 0 : user.role) === 'member')
+                throw new common_1.UnauthorizedException('Permission Denied');
+            const muteExpiration = new Date();
+            await this.prisma.membership.update({
+                where: { id: membershipId },
+                data: {
+                    isMuted: false,
+                    muteExpiration: ''
+                }
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('Permission Denied');
     }
-    async fetchDms() {
+    async BanUpdate(id, membershipId, bool) {
+        const membership = await this.prisma.membership.findUnique({ where: { id: membershipId } });
+        if (membership) {
+            const user = await this.prisma.membership.findFirst({
+                where: {
+                    AND: [
+                        { roomId: membership === null || membership === void 0 ? void 0 : membership.roomId },
+                        { userId: id }
+                    ]
+                }
+            });
+            if ((user === null || user === void 0 ? void 0 : user.role) === 'member')
+                throw new common_1.UnauthorizedException('Permission Denied');
+            await this.prisma.membership.update({
+                where: { id: membershipId },
+                data: {
+                    isBanned: bool,
+                }
+            });
+        }
+        else
+            throw new common_1.UnauthorizedException('Permission Denied');
     }
     async GetChannels(id) {
         let channels = await this.prisma.room.findMany({
@@ -301,7 +360,7 @@ let ChatService = exports.ChatService = class ChatService {
         });
         let channelsModified = await Promise.all(channels.map(async (channel) => {
             if (channel.image) {
-                channel.image = 'http://' + process.env.HOST + '/api' + channel.image;
+                channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image;
             }
             let count = await this.prisma.membership.count({
                 where: { roomId: channel.id }
@@ -335,7 +394,7 @@ let ChatService = exports.ChatService = class ChatService {
         });
         const channelss = await Promise.all(channels.map(async (channel) => {
             if (channel.image) {
-                channel.image = 'http://' + process.env.HOST + '/api' + channel.image;
+                channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image;
             }
             let count = await this.prisma.membership.count({
                 where: { roomId: channel.id }
@@ -374,17 +433,54 @@ let ChatService = exports.ChatService = class ChatService {
         }
     }
     async GetMessages(id, roomId) {
-        await this.prisma.message.findMany({
+        const roomData = await this.prisma.room.findUnique({ where: { id: roomId },
+            select: {
+                name: true,
+                image: true,
+                type: true,
+                isChannel: true
+            }
+        });
+        if (roomData === null || roomData === void 0 ? void 0 : roomData.image) {
+            roomData.image = 'http://' + process.env.HOST + ':3000/api' + roomData.image;
+        }
+        let message = await this.prisma.message.findMany({
             where: { roomId: roomId },
             orderBy: {
                 createdAt: 'desc',
             },
             select: {
-                roomId: true,
-                userId: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        avatar: true,
+                    }
+                },
                 content: true,
             }
         });
+        let messages = await Promise.all(message.map(async (message) => {
+            if (message.user.avatar) {
+                message.user.avatar = 'http://' + process.env.HOST + ':3000/api' + message.user.avatar;
+            }
+            return { 'id': message.user.id,
+                'username': message.user.username,
+                'avatar': message.user.avatar,
+                'content': message.content };
+        }));
+        const membership = await this.prisma.membership.findFirst({
+            where: {
+                AND: [
+                    { roomId: roomId },
+                    { userId: id }
+                ]
+            },
+            select: {
+                role: true
+            }
+        });
+        return Object.assign(Object.assign(Object.assign({}, roomData), membership), { messages });
     }
     async checkMute(roomId, userId) {
         const membership = await this.prisma.membership.findFirst({
@@ -400,6 +496,39 @@ let ChatService = exports.ChatService = class ChatService {
                 return true;
             return false;
         }
+    }
+    async GetRoomMembers(roomId) {
+        const member = await this.prisma.membership.findMany({
+            where: { roomId: roomId },
+            select: {
+                id: true,
+                role: true,
+                isBanned: true,
+                isMuted: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        avatar: true
+                    }
+                }
+            }
+        });
+        let members = await Promise.all(member.map(async (member) => {
+            if (member.user.avatar) {
+                member.user.avatar = 'http://' + process.env.HOST + ':3000/api' + member.user.avatar;
+            }
+            return {
+                'membershipId': member.id,
+                'userId': member.user.id,
+                'username': member.user.username,
+                'avatar': member.user.avatar,
+                'role': member.role,
+                'isBanned': member.isBanned,
+                'isMuted': member.isMuted,
+            };
+        }));
+        return members;
     }
 };
 exports.ChatService = ChatService = __decorate([

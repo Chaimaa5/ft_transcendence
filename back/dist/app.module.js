@@ -15,6 +15,7 @@ const chat_gateway_1 = require("./socket/chat.gateway");
 const schedule_1 = require("@nestjs/schedule");
 const mute_service_1 = require("./chat/mute.service");
 const game_module_1 = require("./game/game.module");
+const chat_module_1 = require("./chat/chat.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
@@ -22,8 +23,8 @@ exports.AppModule = AppModule = __decorate([
         imports: [schedule_1.ScheduleModule.forRoot(),
             auth_module_1.AuthModule, serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', 'upload'),
-                serveRoot: '/upload'
-            }), game_module_1.GameModule
+                serveRoot: '/api/upload'
+            }), game_module_1.GameModule, chat_module_1.ChatModule
         ],
         controllers: [],
         providers: [chat_gateway_1.ChatGateway, mute_service_1.MuteService],

@@ -151,12 +151,14 @@ const ModePopUp = ({whichOne}) => {
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Flashy Mode</h1>
                             <input onChange={(e) => {
                                 SetFlashy(e.isTrusted)
+                                SetSize(false)
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[100%]">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">paddle size decreasing</h1>
                             <input onChange={(e) => {
                                 SetSize(e.isTrusted)
+                                SetFlashy(false)
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div onClick={() => { Instanse.post('/game/challenge', {Rounds, Points, isFlashy, PaddleSize})

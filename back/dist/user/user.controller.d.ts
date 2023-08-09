@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/updatedto.dto';
 import { Request, Response } from 'express';
@@ -77,4 +76,5 @@ export declare class UserController {
         username: string;
         avatar: string;
     }[]>;
+    DeleteAvatar(req: Request): Promise<void>;
 }

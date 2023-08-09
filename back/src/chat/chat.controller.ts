@@ -58,6 +58,7 @@ export class ChatController{
         return await this.chatService.GetJoinedChannels(user.id)
     }
 
+   
       //working
       @Post(':membershipId/setAdmin')
       async SetAdmin(@Req() req: Request, @Param('membershipId') Id: any){
@@ -77,7 +78,41 @@ export class ChatController{
     async GetMessages(@Req() req: Request, @Param('roomId') Id: any){
         const user = req.user as User
         const roomId = parseInt(Id, 10)
-        return await this.chatService.GetMessages(user.id, roomId)
+        return await this.chatService.GetMessages(user.id, 1)
+    }
+
+    @Post('/ban/:membershpiId')
+    async BanMember(@Req() req: Request, @Param('membershipId') Id: any){
+        const user = req.user as User
+        const membershipId = parseInt(Id, 10)
+        return await this.chatService.BanUpdate(user.id, membershipId, true)
+    }
+
+    @Post('/mute/:membershipId')
+    async MuteMember(@Req() req: Request, @Param('membershipId') Id: any, @Body() duration: string){
+        const user = req.user as User
+        const membershipId = parseInt(Id, 10)
+        return await this.chatService.muteMember(user.id, membershipId, duration)
+    }
+    @Post('/unban/:membershipId')
+    async UnbanMember(@Req() req: Request, @Param('membershipId') Id: any){
+        const user = req.user as User
+        const membershipId = parseInt(Id, 10)
+        return await this.chatService.BanUpdate(user.id, membershipId, false)
+    }
+
+    @Post('/unmute/:membershipId')
+    async UnmuteMember(@Req() req: Request, @Param('membershipId') Id: any){
+        const user = req.user as User
+        const membershipId = parseInt(Id, 10)
+        return await this.chatService.UnmuteMember(user.id, membershipId)
+    }
+
+    @Get('/roomMembers/:roomId')
+    async GetRoomMembers(@Param('roomId') id: string){
+
+        const roomId = parseInt(id)
+        return await this.chatService.GetRoomMembers(roomId)
     }
 }
 

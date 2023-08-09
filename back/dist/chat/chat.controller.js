@@ -57,7 +57,31 @@ let ChatController = exports.ChatController = class ChatController {
     async GetMessages(req, Id) {
         const user = req.user;
         const roomId = parseInt(Id, 10);
-        return await this.chatService.GetMessages(user.id, roomId);
+        return await this.chatService.GetMessages(user.id, 1);
+    }
+    async BanMember(req, Id) {
+        const user = req.user;
+        const membershipId = parseInt(Id, 10);
+        return await this.chatService.BanUpdate(user.id, membershipId, true);
+    }
+    async MuteMember(req, Id, duration) {
+        const user = req.user;
+        const membershipId = parseInt(Id, 10);
+        return await this.chatService.muteMember(user.id, membershipId, duration);
+    }
+    async UnbanMember(req, Id) {
+        const user = req.user;
+        const membershipId = parseInt(Id, 10);
+        return await this.chatService.BanUpdate(user.id, membershipId, false);
+    }
+    async UnmuteMember(req, Id) {
+        const user = req.user;
+        const membershipId = parseInt(Id, 10);
+        return await this.chatService.UnmuteMember(user.id, membershipId);
+    }
+    async GetRoomMembers(id) {
+        const roomId = parseInt(id);
+        return await this.chatService.GetRoomMembers(roomId);
     }
 };
 __decorate([
@@ -123,6 +147,46 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "GetMessages", null);
+__decorate([
+    (0, common_1.Post)('/ban/:membershpiId'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('membershipId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "BanMember", null);
+__decorate([
+    (0, common_1.Post)('/mute/:membershipId'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('membershipId')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, String]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "MuteMember", null);
+__decorate([
+    (0, common_1.Post)('/unban/:membershipId'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('membershipId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "UnbanMember", null);
+__decorate([
+    (0, common_1.Post)('/unmute/:membershipId'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('membershipId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "UnmuteMember", null);
+__decorate([
+    (0, common_1.Get)('/roomMembers/:roomId'),
+    __param(0, (0, common_1.Param)('roomId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "GetRoomMembers", null);
 exports.ChatController = ChatController = __decorate([
     (0, common_1.Controller)('chat'),
     (0, swagger_1.ApiTags)('chat'),

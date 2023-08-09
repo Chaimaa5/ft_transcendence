@@ -9,14 +9,15 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { MuteService } from './chat/mute.service';
 import { GameModule } from './game/game.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [ScheduleModule.forRoot(),
     AuthModule, ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'upload'),
-      serveRoot: '/upload' 
+      serveRoot: '/api/upload' 
 
-    }), GameModule
+    }), GameModule, ChatModule
   ],
   controllers: [],
   providers: [ChatGateway, MuteService],

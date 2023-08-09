@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 import { PrismaClient } from '@prisma/client';
 import { UpdateUserDTO } from './dto/updatedto.dto';
 import { Response } from 'express';
@@ -149,4 +148,5 @@ export declare class UserService {
     }, unknown> & {})[]>;
     addNotifications(senderId: string, receiverId: string, type: string, context: string): Promise<void>;
     deleteNotification(id: number): Promise<void>;
+    DeleteAvatar(id: string): Promise<void>;
 }
