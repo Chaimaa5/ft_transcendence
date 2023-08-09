@@ -116,6 +116,7 @@ export class Ball {
 			{
 				if(this.ballPosX < paddle.paddlePosX) {
 					const diff = this.ballPosY - paddle.paddlePosY;
+					console.log("diff : " + diff);
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, this.table.p.radians(225), this.table.p.radians(135));
 						this.speedX = this.speedX *  Math.cos(angle);
@@ -128,6 +129,7 @@ export class Ball {
 			{
 				if(this.ballPosX > paddle.paddlePosX){
 					const diff = this.ballPosY - paddle.paddlePosY;
+					console.log("diff : " + diff);
 					if(this.table.p) {
 						angle = this.table.p.map(diff, 0, paddle.paddleHeight, -this.table.p.radians(45), this.table.p.radians(45));
 						this.speedX = this.speedX *  Math.cos(angle);
