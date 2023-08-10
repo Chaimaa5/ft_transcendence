@@ -11,6 +11,7 @@ export enum PaddleSide {
 export class Paddle {
 	paddlePosX : number;
 	paddlePosY : number;
+	prevPaddlePosY : number;
 	paddleWidth : number;
 	paddleHeight : number;
 	borderRadius : number;
@@ -46,14 +47,9 @@ export class Paddle {
 	) {
 		this.gradientColor1 = gradientColor1;
 		this.gradientColor2 = gradientColor2;
-		if(this.side === PaddleSide.Left) {
-			this.paddlePosX = this.table.tableWidth/100;
-			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
-		}
-		else if(this.side === PaddleSide.Right) {
-			this.paddlePosX = this.table.tableWidth - this.table.tableWidth*0.02 - (this.table.tableWidth/100);
-			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
-		}
+		this.paddlePosX = this.table.mapValue(this.paddlePosX, this.table.serverTableWidth, this.table.tableWidth);
+		this.paddlePosY = this.table.mapValue(this.paddlePosY, this.table.serverTableHeight, this.table.tableHeight);
+		this.prevPaddlePosY = this.paddlePosY;
 		this.paddleWidth = this.table.tableWidth*0.02;
 		this.paddleHeight = this.table.tableHeight*0.3;
 		this.stepsY = this.table.tableWidth/this.speedRatio;
@@ -65,13 +61,9 @@ export class Paddle {
 		}
 	}
 
-	updateOpponentPaddle() {
+	updateOpponentPaddle(paddlePosY : number) {
 		if(this.table.p) {
-			this.paddlePosY += this.stepsY * this.direction;
-			this.paddlePosY = this.table.p.constrain(
-				this.paddlePosY,
-				0,
-				this.table.tableHeight - this.paddleHeight);
+			this.paddlePosY = this.table.mapValue(paddlePosY, this.table.serverTableHeight, this.table.tableHeight);
 		}
 	}
 
@@ -82,9 +74,9 @@ export class Paddle {
 				this.paddlePosY,
 				0,
 				this.table.tableHeight - this.paddleHeight);
-			if(this.direction != this.prevDirection) {
-				this.prevDirection = this.direction;
-				this.table.socket.emit('newPaddlePosition', {roomId: this.table.roomId, direction: this.direction});
+			if(	this.prevPaddlePosY != this.paddlePosY ) {
+				this.prevPaddlePosY = this.paddlePosY
+				this.table.socket.emit('newPaddlePosition', {roomId: this.table.roomId, paddlePosY : this.table.mapValue(this.paddlePosY, this.table.tableHeight, this.table.serverTableHeight)});
 			}
 		}
 	}

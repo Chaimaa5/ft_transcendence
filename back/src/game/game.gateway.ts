@@ -5,6 +5,7 @@ import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { UserService } from 'src/user/user.service';
 import { Logger } from '@nestjs/common';
 import { PaddleSide } from './gameState.interface';
+import { GameService, VIRTUAL_TABLE_HEIGHT, VIRTUAL_TABLE_WIDTH } from './game.service';
 
 @WebSocketGateway({
 	namespace:'/game',
@@ -17,23 +18,24 @@ import { PaddleSide } from './gameState.interface';
 export class GameGateway implements OnGatewayConnection{
 	@WebSocketServer()
 	server: Server;
-
-	roomIdCounter = 1;
-
-	// map to store the game state for each room 
-	private readonly rooms : Map<RoomState['roomId'], RoomState> = new Map<RoomState['roomId'], RoomState> ();
 	
+	constructor(private readonly gameService : GameService) {}
 
 	private logger : Logger = new Logger('gameGateway');
 
-	// queue to hold players waiting for a game
-	// playersQueue : Socket[] = [];
 	clients = new Map<string, Socket>();
 	
 
 
 	afterInit() {
 		this.logger.log('game server initialized');
+		this.gameService.eventsEmitter.on('handleUpdateScore', (side : PaddleSide) => {
+			this.server.emit('updateScore', side);
+		})
+
+		this.gameService.eventsEmitter.on('handleUpdateBallPosition', (ball : {x : number, y : number}) => {
+			this.server.emit('updateBallPosition', {x: ball.x, y: ball.y});
+		})
 	}
 
 	
@@ -52,31 +54,24 @@ export class GameGateway implements OnGatewayConnection{
 
 	private joinPlayerToRoom(client : Socket) {
 		let roomId : string;
-		const availableRoom = [...this.rooms.values()].find(room => room.playersNumber === 1);
+		const availableRoom = [...this.gameService.roomsMap.values()].find(room => room.playersNumber === 1);
 		if (availableRoom) {
 			roomId = availableRoom.roomId;
-			availableRoom.players.push({playerId: client.id, side: PaddleSide.Right, y: 0});
-			availableRoom.playersNumber++;
+			this.gameService.addPlayer(roomId, client.id, PaddleSide.Right);
 			client.join(availableRoom.roomId);
 			this.logger.log("joined an already created game");
-			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Right});
+			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
 		} else {
-			roomId = this.createRoom();
-			this.rooms.set(
-				roomId,
-				{
-					roomId : roomId,
-					playersNumber : 1, 
-					ball : {x : 0, y : 0}, 
-					players : [{playerId : client.id, side : PaddleSide.Left, y : 0}],
-				})
+			roomId = this.gameService.createRoom(client.id);
 			client.join(roomId);
 			this.logger.log("waiting for another player")
-			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Left});
+			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
 		}
-		if(this.rooms.get(roomId)?.playersNumber === 2) {
+		const room = this.gameService.roomsMap.get(roomId);
+		if(room && room.playersNumber === 2) {
 			this.logger.log("game is starting now...");
-			this.server.emit('startGame', this.randomInitialDirection());
+			this.server.emit('startGame', {initialBallAngle : this.randomInitialDirection(), leftPlayerObj :  room.players[0], rightPlayerObj: room.players[1], ballPosX : room.ball.x , ballPosY : room.ball.y, ballSpeedX: room.ball.ballSpeedX, ballSpeedY : room.ball.ballSpeedY});
+			this.gameService.startGameLoop(roomId);
 		}
 	}
 	
@@ -92,19 +87,15 @@ export class GameGateway implements OnGatewayConnection{
 		return(randomValueInRange);
 	}
 
-	private createRoom() : string{
-		const roomId = `room_${this.roomIdCounter}`;
-		this.roomIdCounter++;
-		return roomId;
-	}
 
 	handleDisconnection(client : Socket) {
 		console.log("client id  : " + client.id + "disconnected");
 	}
 
 	@SubscribeMessage('newPaddlePosition')
-	handleNewPaddlePosition(client : Socket, payload : {roomId: string, direction:number}) : void {
-		client.to(payload.roomId).emit('updatePositions', { playerId : client.id ,direction : payload.direction});
+	handleNewPaddlePosition(client : Socket, payload : {roomId: string, paddlePosY:number}) : void {
+		this.gameService.updatePaddlePosition(payload.roomId, client.id, payload.paddlePosY);
+		client.to(payload.roomId).emit('updatePaddlePosition', { playerId : client.id ,paddlePosY : payload.paddlePosY});
 	}
 
 	@SubscribeMessage('resetRound') 

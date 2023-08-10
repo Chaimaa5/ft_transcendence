@@ -55,13 +55,8 @@ const PongBoard: React.FC = () => {
 				gameRef.current.myPaddle.show();
 				gameRef.current.myPaddle.updateMyPaddle();
 				gameRef.current.opponentPaddle.show();
-				gameRef.current.opponentPaddle.updateOpponentPaddle();
-				gameRef.current.ball.show();
-				gameRef.current.ball.move();
-				gameRef.current.ball.edges(gameRef.current);
-				gameRef.current.ball.checkPaddleHits(gameRef.current.myPaddle);
-				gameRef.current.ball.checkPaddleHits(gameRef.current.opponentPaddle);
 				gameRef.current.table.displayScore(gameRef.current.leftPlayer, gameRef.current.rightPlayer, gameRef.current.round);
+				gameRef.current.ball.show();
 			}
 	
 			p.windowResized = () => {
@@ -97,9 +92,16 @@ const PongBoard: React.FC = () => {
 
 		socket.connect();
 
-		socket.on('updatePositions', (payload) => {
-			console.log("my socket id : " + socket.id + " the other id : " + payload.playerId);
-			gameRef.current.opponentPaddle.move(payload.direction);
+		socket.on('updateBallPosition', (payload) => {
+			gameRef.current.ball.ballPosX = gameRef.current.table.mapValue(payload.x, gameRef.current.table.serverTableWidth, gameRef.current.table.tableWidth);
+			gameRef.current.ball.ballPosY = gameRef.current.table.mapValue(payload.y, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
+		})
+		 socket.on('updateScore', (payload) => {
+			gameRef.current.updateScore(payload.side);
+		 })
+
+		socket.on('updatePaddlePosition', (payload) => {
+			gameRef.current.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
 		})
 
 		socket.on('joinedRoom', (payload) =>{
@@ -107,10 +109,23 @@ const PongBoard: React.FC = () => {
 			gameRef.current.table.roomId = payload.roomId;
 			gameRef.current.myPaddle.side = payload.side;
 			gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
+			gameRef.current.table.serverTableWidth = payload.serverTableWidth;
+			gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 		});
 
-		socket.on('startGame', (randomInitialBallDirection) => {
-			gameRef.current.ball.randomInitialBallDirection = randomInitialBallDirection;
+		socket.on('startGame', (payload) => {
+			const myPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
+			const opponentPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
+			gameRef.current.myPaddle.paddlePosX = myPaddleObj.x;
+			gameRef.current.myPaddle.paddlePosY = myPaddleObj.y;
+			gameRef.current.opponentPaddle.paddlePosX = opponentPaddleObj.x;
+			gameRef.current.opponentPaddle.paddlePosY = opponentPaddleObj.y;
+			gameRef.current.ball.ballPosX = payload.ballPosX;
+			gameRef.current.ball.ballPosY = payload.ballPosY;
+			gameRef.current.ball.speedX = payload.ballSpeedX;
+			gameRef.current.ball.speedY = payload.ballSpeedY;
+			gameRef.current.ball.randomInitialBallDirection = payload.initialBallAngle;
+			// console.log("my paddle : -x- " + gameRef.current.myPaddle.paddlePosX + " -y- " + gameRef.current.myPaddle.paddlePosY + " opponent padddle  : -x- " +  gameRef.current.opponentPaddle.paddlePosX + " -y- " + gameRef.current.opponentPaddle.paddlePosY + " ball : -x- " + gameRef.current.ball.ballPosX + " -y- " + gameRef.current.ball.ballPosY + " - speed x - " + gameRef.current.ball.speedX + " - y - " + gameRef.current.ball.speedY + " angle " + gameRef.current.ball.randomInitialBallDirection);
 			setDataIsLoaded(true);
 		})
 
@@ -118,15 +133,6 @@ const PongBoard: React.FC = () => {
 			console.log('client side : client connected to the server');
 			setIsConnected(true);
 		});
-
-		socket.on('ballInitialDirection', (randomInitialBallDirection) => {
-			gameRef.current.ball.randomInitialBallDirection = randomInitialBallDirection;
-			gameRef.current.ball.reset();
-		})
-
-		socket.on('updateBall', (payload) => {
-			gameRef.current.ball.move(payload.speedX, payload.speedY);
-		})
 
 		return() => {
 			socket.off('connect', () => {
@@ -145,7 +151,4 @@ const PongBoard: React.FC = () => {
 	);
 }
 
-
-
 export default PongBoard;
-

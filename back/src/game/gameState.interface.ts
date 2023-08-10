@@ -7,17 +7,21 @@ export enum PaddleSide {
 export interface PaddleState {
 	playerId : string;
 	side : PaddleSide;
+	x : number;
 	y : number;
 }
 
-interface BallState {
+export interface BallState {
 	x : number;
 	y : number;
+	ballSpeedX : number;
+	ballSpeedY : number;
 }
 
 export interface RoomState {
 	roomId : string;
 	playersNumber : number;
 	ball : BallState;
+	ballspeedRatio : number;
 	players : PaddleState[]
 }

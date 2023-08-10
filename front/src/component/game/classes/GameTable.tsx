@@ -13,6 +13,8 @@ export class GameTable {
 	p?: P5;
 	socket: Socket;
 	roomId : string
+	serverTableWidth : number;
+	serverTableHeight : number;
 	constructor(tableWidth: number, tableHeight: number){
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;
@@ -84,7 +86,7 @@ export class GameTable {
 		if(this.p){
 			return(this.p.map(value, 0, firstRangeEnd, 0, secondRangeEnd));
 		}
-		return(value)
+		return(value);
 	}
 }
 
