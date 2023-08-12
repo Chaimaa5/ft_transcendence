@@ -4,6 +4,7 @@ import { UpdateUserDTO } from './dto/updatedto.dto'
 import { Response } from 'express';
 import { NOTFOUND } from 'dns';
 import { ChatService } from 'src/chat/chat.service';
+// import { NotificationsGateway } from 'src/socket/notifications.gateway';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
     prisma = new PrismaClient();
     chatService = new ChatService;
     constructor(){}
-
+    // notificationsGateway = new NotificationsGateway
     async GetById(id: string){
         const user = await this.prisma.user.findUnique({where : {id:id}})
         // if(!user)
@@ -225,16 +226,24 @@ export class UserService {
         if (id){
                 const exist = await this.FindbyID(Id)
                 if (exist){
-                    await this.prisma.friendship.create({
-                        data: {
-                            sender: {connect: {id: id}},
-                            receiver: {connect: {id: Id}},
-                            status: 'pending',
-                            blockerId: '',
-                        },
-                    });
-            
-                    await this.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
+                    const friendshipRequest = await this.prisma.friendship.findFirst({where:{
+                        OR:[
+                            {senderId : id, receiverId: Id},
+                            {receiverId : id, senderId: Id}
+                        ]
+                    }})
+                    if(!friendshipRequest){
+                        await this.prisma.friendship.create({
+                            data: {
+                                sender: {connect: {id: id}},
+                                receiver: {connect: {id: Id}},
+                                status: 'pending',
+                                blockerId: '',
+                            },
+                        });
+                
+                        await this.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
+                    }
                     //emit notification
                 }
                 else
@@ -436,6 +445,41 @@ export class UserService {
     }
 
 
+    async getBlockedUsers(id : string){
+        if (id){
+            const blockedFriendships = await this.prisma.friendship.findMany({where: {
+                AND:[
+                    {blockerId: id},
+                    {status: 'blocked'},
+                ]},
+                select:{
+                    sender: {
+                        select: {
+                            id: true,
+                            username: true,
+                            avatar: true,
+                        }
+                    },
+                    receiver: {
+                        select: {
+                            id: true,
+                            username: true,
+                            avatar: true,
+                        }
+                    },
+                    blockerId: true,
+                    receiverId: true,
+                    senderId: true
+                }
+            });
+            return blockedFriendships.map((friendship) => {
+                    return friendship.senderId === id ? friendship.receiver : friendship.sender;
+              });
+        }   
+        else
+            throw new UnauthorizedException('User  not found')
+    }
+
     async Players() {
             let players = await this.prisma.user.findMany({
                orderBy: {
@@ -461,7 +505,7 @@ export class UserService {
                 if (player.avatar)
                 {
                     if (!player.avatar.includes('cdn.intra')){
-                        player.avatar = 'http://' + process.env.HOST + ':3000/api' + player.avatar
+                        player.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' +  player.avatar
                     }
                 }
             }
@@ -473,8 +517,32 @@ export class UserService {
    async GetNotifications(id : string){
     if(id){
         const res = await this.prisma.notification.findMany({
-            where: {receiverId: id }
+            where: {receiverId: id },
+            select:{
+                id: true,
+                type: true,
+                status: true,
+                sender:{
+                    select:{
+                        id: true,
+                        username: true,
+                        avatar: true
+                    }
+                }
+            }
         });
+
+        const notifications = res.map((notification) =>{
+            if (notification){
+                if (notification.sender.avatar)
+                {
+                    if (!notification.sender.avatar.includes('cdn.intra')){
+                        notification.sender.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' + notification.sender.avatar
+                    }
+                }
+            }
+            return notification
+        })
 
         return res;
     }
@@ -482,21 +550,38 @@ export class UserService {
         throw new UnauthorizedException('User  not found')
    }
 
+
+   //friend add request should not be duplicated
+   //invite to room
+   //message received
    async addNotifications(senderId : string, receiverId: string, type: string, context: string){
         const sender = await this.prisma.user.findUnique({where: {id: senderId}})
         const receiver = await this.prisma.user.findUnique({where: {id: receiverId}})
 
-        const content = sender?.username + context + receiver?.username
+        const content = sender?.username + ' ' + context + ' ' +receiver?.username
 
-        await this.prisma.notification.create({
-            data: {
-                sender: {connect: {id: senderId}},
-                receiver: {connect: {id: receiverId}},
-                status: 'not seen',
-                type: type,
-                content: content
-            },
-        });
+        const exist = await this.prisma.notification.findFirst({
+            where: {content: content}
+        })
+        if(exist){
+            const notification = await this.prisma.notification.update({
+                where:{id: exist.id},
+                data:{createdAt: new Date()}
+            })
+            // this.notificationsGateway.emitNotification(receiverId, notification)
+        }
+        else{
+            const notification = await this.prisma.notification.create({
+                data: {
+                    sender: {connect: {id: senderId}},
+                    receiver: {connect: {id: receiverId}},
+                    status: false,
+                    type: type,
+                    content: content
+                },
+            });
+            // this.notificationsGateway.emitNotification(receiverId, notification)
+        }
     }
 
     async deleteNotification(id: number)
@@ -507,7 +592,7 @@ export class UserService {
     async DeleteAvatar(id: string) {
         await this.prisma.user.update({
             where: {id: id},
-            data:{avatar: ''}
+            data:{avatar: '/upload/avatar.png'}
         })
     }
     

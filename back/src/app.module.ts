@@ -12,7 +12,7 @@ import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
 import { GameGateway } from './game/game.gateway';
 import { GameService } from './game/game.service';
-
+import {NotificationsGateway} from './socket/notifications.gateway'
 @Module({
   imports: [ScheduleModule.forRoot(),
     AuthModule, ServeStaticModule.forRoot({
@@ -22,7 +22,7 @@ import { GameService } from './game/game.service';
     }), GameModule, ChatModule
   ],
   controllers: [],
-  providers: [ChatGateway, MuteService],
+  providers: [ChatGateway, NotificationsGateway, MuteService],
 
   })
 export class AppModule {}

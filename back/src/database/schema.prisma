@@ -62,6 +62,8 @@ model Membership {
   user        User                    @relation("UserMembership", fields: [userId], references: [id])
   userId      String       
   role        String
+  roomImage   String?
+  roomName    String?
   isBanned    Boolean
   isMuted     Boolean
   muteExpiration DateTime?         
@@ -112,17 +114,19 @@ model  Game {
   lossLimit Int?
   ballSpeed  String?
   decreasingpaddleSize Boolean?
+  // to change difficulty(flashy, smallPaddle)
   difficulty  String?
   map         String?
   ball        String?
   winner      String?
-  status      String 
+  status      String //pending/ playing
+
 }
 
 model Notification {
   id          Int @default(autoincrement()) @id 
   type        String
-  status      String
+  status      Boolean
   sender      User        @relation("NotifationSender", fields:  [senderId], references:  [id])
   senderId    String
   receiver    User        @relation("NotifationReceiver", fields:  [receiverId], references:  [id])

@@ -269,6 +269,7 @@ export class ProfileService {
                  select: {
                    receiver: {
                      select: {
+                        createdAt: true,
                          id: true,
                          username: true,
                          avatar: true,
@@ -303,6 +304,7 @@ export class ProfileService {
                  select: {
                    sender: {
                      select: {
+                        createdAt: true,
                        id: true,
                        username: true,
                        avatar: true,
@@ -342,7 +344,7 @@ export class ProfileService {
                const combinedData = [...senderDataModified, ...receiverDataModified];
     
     
-                const valuesOnlyWithoutKeys = combinedData.map(({ username, ...rest }) => rest);
+                const valuesOnlyWithoutKeys = combinedData.map(({ createdAt, ...rest }) => rest);
                         
                 return valuesOnlyWithoutKeys;
         }
