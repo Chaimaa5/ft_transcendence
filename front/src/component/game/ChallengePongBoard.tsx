@@ -8,7 +8,7 @@ import { Player } from "./classes/Player";
 import { Ball } from "./classes/Ball";
 import { socket } from "./socket";
 
-const PongBoard = (gameMode, gameId) => {
+const ChallengePongBoard = (gameId) => {
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
 		width: 0,
 		height: 0
@@ -16,7 +16,6 @@ const PongBoard = (gameMode, gameId) => {
 
 
 	const [dataIsLoaded, setDataIsLoaded] = useState(false);
-	const [isConnected, setIsConnected] = useState(socket.connected);
 	
 
 	const gameRef = useRef(new Game(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height));
@@ -127,7 +126,7 @@ const PongBoard = (gameMode, gameId) => {
 
 		socket.on('connect', () => {
 			console.log('client side : client connected to the server');
-			setIsConnected(true);
+			socket.emit('joinRoom', ("room_" + gameId));
 		});
 
 		return() => {
@@ -138,8 +137,6 @@ const PongBoard = (gameMode, gameId) => {
 		}
 	}, []);
 
-	const sketchComponent = (gameMode)
-
 	return (
 		<div className="pong-board">
 			<div className="pong-table">
@@ -149,4 +146,4 @@ const PongBoard = (gameMode, gameId) => {
 	);
 }
 
-export default PongBoard;
+export default ChallengePongBoard;

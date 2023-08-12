@@ -49,9 +49,11 @@ export class GameGateway implements OnGatewayConnection{
 		 
 		// storing a refrerence to the client 
 		this.clients.set(client.id, client);
-		this.joinPlayerToRoom(client);
 	}
 
+	// join player to room function to be deleted later
+
+	/*
 	private joinPlayerToRoom(client : Socket) {
 		let roomId : string;
 		const availableRoom = [...this.gameService.roomsMap.values()].find(room => room.playersNumber === 1);
@@ -62,7 +64,8 @@ export class GameGateway implements OnGatewayConnection{
 			this.logger.log("joined an already created game");
 			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
 		} else {
-			roomId = this.gameService.createRoom(client.id);
+			roomId = this.gameService.createRoom();
+			this.gameService.addPlayer(roomId, client.id, PaddleSide.Left);
 			client.join(roomId);
 			this.logger.log("waiting for another player")
 			client.emit('joinedRoom', {roomId : roomId, side : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
@@ -74,6 +77,7 @@ export class GameGateway implements OnGatewayConnection{
 			this.gameService.startGameLoop(roomId);
 		}
 	}
+	*/
 	
 	private randomInitialDirection = () : number => {
 		const minValue = -Math.PI/4;
@@ -91,6 +95,12 @@ export class GameGateway implements OnGatewayConnection{
 	handleDisconnection(client : Socket) {
 		console.log("client id  : " + client.id + "disconnected");
 	}
+
+	@SubscribeMessage('joinRoom')
+	handleJoinRoom(client : Socket, payload : {roomdId : string}) {
+		const side = this.gameService.addPlayer(payload.roomdId, client.id)
+	}
+
 
 	@SubscribeMessage('newPaddlePosition')
 	handleNewPaddlePosition(client : Socket, payload : {roomId: string, paddlePosY:number}) : void {

@@ -104,21 +104,19 @@ model  Game {
   playerXp1  Int?
   playerXp2  Int?
   mode       String
-  rounds     Int
+  rounds     Int?
   draw        Boolean?
   minScore   Int?
   pointsToWin    Int?
   paddleSize String?
   lossLimit Int?
-  ballSpeed  Int?
+  ballSpeed  String?
   decreasingpaddleSize Boolean?
-  // to change difficulty(flashy, smallPaddle)
   difficulty  String?
   map         String?
   ball        String?
   winner      String?
-  status      String //pending/ playing
-
+  status      String 
 }
 
 model Notification {

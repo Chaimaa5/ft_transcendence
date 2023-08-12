@@ -22,7 +22,7 @@ import { GameService } from './game/game.service';
     }), GameModule, ChatModule
   ],
   controllers: [],
-  providers: [GameGateway, ChatGateway, MuteService, GameService],
+  providers: [ChatGateway, MuteService],
 
   })
 export class AppModule {}

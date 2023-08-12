@@ -15,20 +15,45 @@ export class GameController{
     authService = new AuthService;
     constructor(private readonly gameService: GameService){}
     
-    @Post('Challenge')
-    async postChallengeSettings(@Req() settings : Request, @Body() body : any) {
-        const user : User = settings.user as User;
-        return await this.gameService.postChallengeSettings(user, body);
-    }
+	@Get('/auth')
+	async GetAuthAccess(@Req() req: Request){
+		const user : User = req.user as User;
+		return await this.authService.generateToken(user);
+	}
 
-    @Get('/auth')
-    async GetAuthAccess(@Req() req: Request){
-        const user : User = req.user as User;
-        return await this.authService.generateToken(user);
-    }
-    @Get('challenge/:id')
-    async getChallengeSettings(@Param('id') id : string) {
-        const idNum : number = parseInt(id);
-        return await  this.gameService.getChallengeSettings(idNum);
-    }
+	@Get('two-players-game/:id')
+	async getMultiplayerGame(@Param('id') id : string) {
+		const gameId : number = parseInt(id);
+		return await this.gameService.getTwoPlayersGame(gameId);
+	}
+
+	@Post('create-challenge-game')
+	async postChallengeGame(@Req() settings : Request, @Body() body : any) {
+		const user : User = settings.user as User;
+		return await this.gameService.postChallengeGame(user, body)
+	}
+
+	@Get('challenge-game/:id')
+	async getChallengeGame(@Param('id') id : string) {
+		const gameId : number = parseInt(id);
+		return await this.gameService.getChallengeGame(gameId);
+	}
+
+
+	@Post('training-settings')
+	async postTrainingSettings(@Req() settings : Request, @Body() body : any) {
+		const user : User = settings.user as User;
+		return await this.gameService.postTrainingSettings(user, body);
+	}
+
+	@Get('training-settings/:id')
+	async getTrainingSettings(@Param('id') id : string) {
+
+	}
+
+	@Get('training-game/:id')
+	async getTrainingGame(@Param('id') id : string) {
+		const gameId : number = parseInt(id);
+		return await this.gameService.getTrainingGame(gameId);
+	}
 }

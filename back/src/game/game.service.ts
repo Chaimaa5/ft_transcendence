@@ -27,7 +27,8 @@ export class GameService {
 		return(this.rooms);
 	}
 
-	
+	// game logic implementation 
+
 	startGameLoop(roomId : string) {
 		const room = this.rooms.get(roomId);
 		if(room) {
@@ -120,8 +121,8 @@ export class GameService {
 		return roomId;
 	}
 
-	createRoom(playerId : string) : string {
-		const roomId = this.newRoomId();
+	createRoom(gameId : number) : string {
+		const roomId = "room_" + gameId;
 		this.rooms.set(
 			roomId,
 			{
@@ -132,17 +133,18 @@ export class GameService {
 				players : [],
 			}
 		)
-		this.addPlayer(roomId, playerId, PaddleSide.Left);
 		return(roomId);
 	}
 
-	addPlayer(roomId : string, playerId : string, side : PaddleSide) {
-		const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
-		const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
+	addPlayer(roomId : string, playerId : string) {
 		const room = this.rooms.get(roomId);
-		if(room){ 
-			room.players.push({playerId : playerId, side: side, x : x, y : y});
-			room.playersNumber++;
+		if(room){
+			const side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
+			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
+			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
+				room.players.push({playerId : playerId, side: side, x : x, y : y});
+				room.playersNumber++;
+			return(side);
 		}
 	}
 
@@ -150,19 +152,22 @@ export class GameService {
 		return(this.events)
 	}
 
-    async postChallengeSettings(user: User, body: any) {
+	// game endpoints methods
+
+    async postChallengeGame(user: User, body: any) {
         const game = await this.prisma.game.create({data : {
-            mode : 'OneVsOne',
+            mode : 'challenge',
             playerId1 : user.id,
             rounds : body.rounds,
             pointsToWin : body.pointsToWin,
             difficulty : body.difficulty,
             status: 'pending'
         }})
+		this.createRoom(game.id);
         return game.id
     }
 
-    async getChallengeSettings(id : number) {
+    async getChallengeGame(id : number) {
         const game = await this.prisma.game.findUnique({where : {id : id},
             select:{
                 player1: {
@@ -175,11 +180,57 @@ export class GameService {
                         username: true,
                     }
                 },
-                rounds : true,
-                pointsToWin : true,
                 difficulty : true,
             }
         })
         return(game);
-    } 
+    }
+
+	async postTrainingSettings(user : User, body : any) {
+		const game = await this.prisma.game.create({ data : {
+			mode : 'training',
+			playerId1 : user.id,
+			lossLimit : body.lossLimit,
+			paddleSize : body.paddleSize,
+			ballSpeed : body.ballSpeed,
+			status : 'playing',
+		}
+		})
+		return game.id
+	}
+
+	async getTrainingSettings(id : number) {
+		const game = await this.prisma.game.findUnique({where : {id : id},
+			select : {
+				player1 : {
+					select : {
+						username: true,
+					}
+				},
+				paddleSize : true,
+				ballSpeed : true,
+			}
+		})
+		return (game);
+	}
+
+	async getTrainingGame(id : number) {
+		const game = await this.prisma.game.findUnique({where : {id : id},
+			select : {
+				lossLimit : true,
+			}
+		})
+	}
+
+	async getTwoPlayersGame(id : number) {
+		const game = await this.prisma.game.findUnique({where : {id : id},
+			select : {
+				rounds : true, 
+				pointsToWin  : true,
+			}
+		})
+	}
+
+
+
 }

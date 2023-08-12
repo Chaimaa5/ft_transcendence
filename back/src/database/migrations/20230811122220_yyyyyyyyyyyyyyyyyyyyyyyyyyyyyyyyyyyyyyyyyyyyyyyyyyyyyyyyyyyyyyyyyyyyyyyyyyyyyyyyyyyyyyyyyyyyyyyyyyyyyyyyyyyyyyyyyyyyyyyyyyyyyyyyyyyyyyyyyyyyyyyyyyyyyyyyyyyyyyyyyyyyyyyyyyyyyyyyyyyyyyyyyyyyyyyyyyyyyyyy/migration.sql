@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Game" ALTER COLUMN "rounds" DROP NOT NULL,
+ALTER COLUMN "ballSpeed" SET DATA TYPE TEXT;

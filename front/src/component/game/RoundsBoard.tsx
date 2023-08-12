@@ -1,30 +1,70 @@
-import React, { ChangeEvent, useState, useTransition } from 'react'
+import React, { ChangeEvent, useEffect, useState, useTransition } from 'react'
+import Instanse from '../api/api';
+import { socket } from './socket';
 
-class Game {
-	playedRounds : number;
-	requiredRounds: number;
+export const TrainingRoundsBoard = (gameId) => {
 
-	constructor() {
-		this.playedRounds = 2;
-		this.requiredRounds = 5;
-	}
+	const [lossLimit, setLossLimit] = useState(0);
+	const losses = Array.from(Array(lossLimit).keys());
+	const [lostRounds, setLostRounds] = useState(0);
 
+	useEffect(() => {
+		Instanse.get(`training-game/${gameId}`)
+		.then(response => {
+			setLossLimit(response.data.lossLimit);
+		})
+
+		socket.on('updateLoss', () => {
+			setLostRounds(prevLossRounds => prevLossRounds + 1);
+		})
+	})
+
+	return(
+		<div className="rounds-board">
+		<span>LOSS LIMITS</span>
+		<div className="rounds-points">
+			{losses.map((roundNumber) => (
+				<div
+					key={roundNumber}
+					className={`round ${roundNumber < lostRounds ? 'full' : 'empty'}`}
+				>
+				</div>
+			))
+			}
+		</div>
+</div>
+	)
 }
 
  
-const RoundsBoard: React.FC = () => {
-	const game = new Game();
-	const roundNumbers = Array.from(Array(game.requiredRounds).keys());
+export const TwoPlayersRoundsBoard = (gameMode, gameId) => {
+
+	const [roundsNumber, setRoundsNumber] = useState(0);
+	const [pointsToWin, setPointsToWin] = useState(0);
+	const [playedRounds, setPlayedRounds] = useState(0);
 	
- 
+	const rounds = Array.from(Array(roundsNumber).keys());
+
+	useEffect(() => {
+		Instanse.get(`two-players-game/${gameId}`)
+		.then(response => {
+			setRoundsNumber(response.data.rounds);
+			setPointsToWin(response.data.pointsToWin);
+		});
+
+		socket.on('updateRound', () => {
+			setPlayedRounds(prevPlayedRounds => prevPlayedRounds + 1);
+		});
+	})
+
 	return (
 		<div className="rounds-board">
 				<span>ROUND</span>
 				<div className="rounds-points">
-					{roundNumbers.map((roundNumber) => (
+					{rounds.map((roundNumber) => (
 						<div
 							key={roundNumber}
-							className={`round ${roundNumber < game.playedRounds ? 'full' : 'empty'}`}
+							className={`round ${roundNumber < playedRounds ? 'full' : 'empty'}`}
 						>
 						</div>
 					))
@@ -34,4 +74,3 @@ const RoundsBoard: React.FC = () => {
 	)
 }
 
-export default RoundsBoard;
