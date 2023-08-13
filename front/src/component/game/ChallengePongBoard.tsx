@@ -7,6 +7,7 @@ import { GameTable } from "./classes/GameTable";
 import { Player } from "./classes/Player";
 import { Ball } from "./classes/Ball";
 import { socket } from "./socket";
+import Instanse from "../api/api";
 
 const ChallengePongBoard = (gameId) => {
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
@@ -92,9 +93,20 @@ const ChallengePongBoard = (gameId) => {
 			gameRef.current.ball.ballPosX = gameRef.current.table.mapValue(payload.x, gameRef.current.table.serverTableWidth, gameRef.current.table.tableWidth);
 			gameRef.current.ball.ballPosY = gameRef.current.table.mapValue(payload.y, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
 		})
-		 socket.on('updateScore', (payload) => {
-			gameRef.current.updateScore(payload.side);
-		 })
+
+		socket.on('updateScore', (payload) => {
+			gameRef.current.leftPlayer.roundScore = payload.leftPlayerRoundScore;
+			gameRef.current.rightPlayer.roundScore = payload.rightPlayerRoundScore;
+			gameRef.current.round.roundNumber = payload.playeRounds;
+			gameRef.current.round.leftPlayerScore = payload.leftScore;
+			gameRef.current.round.rightPlayerScore = payload.rightScore;
+			gameRef.current.myPaddle.paddleHeight = gameRef.current.table.mapValue(payload.paddleHeight, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
+			gameRef.current.opponentPaddle.paddleHeight = gameRef.current.table.mapValue(payload.paddleHeight, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
+		})
+
+		socket.on('endGame', () => {
+			gameRef.current.endGame();
+		}) 
 
 		socket.on('updatePaddlePosition', (payload) => {
 			gameRef.current.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
@@ -107,6 +119,7 @@ const ChallengePongBoard = (gameId) => {
 			gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 			gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 			gameRef.current.table.serverTableHeight = payload.serverTableHeight;
+
 		});
 
 		socket.on('startGame', (payload) => {
@@ -121,6 +134,11 @@ const ChallengePongBoard = (gameId) => {
 			gameRef.current.ball.speedX = payload.ballSpeedX;
 			gameRef.current.ball.speedY = payload.ballSpeedY;
 			gameRef.current.ball.randomInitialBallDirection = payload.initialBallAngle;
+			Instanse.get('challenge-game/' + gameId).
+			then(response => {
+				gameRef.current.rightPlayer.userName = response.data.player2.username;
+				gameRef.current.leftPlayer.userName = response.data.player1.username;
+			})
 			setDataIsLoaded(true);
 		})
 

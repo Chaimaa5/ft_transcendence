@@ -41,6 +41,7 @@ model User {
   Player2   Game[]   @relation("Player2InGame")
   receivedNot Notification[] @relation("NotifationSender")
   sentNot     Notification[] @relation("NotifationReceiver")
+  // need to add a game status (idle , waiting, playing)
 }
 
 model Friendship {

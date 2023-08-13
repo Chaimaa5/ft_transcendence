@@ -2,11 +2,11 @@ import { Body, Controller, Delete, Get, OnApplicationShutdown, Param, Patch, Pos
 import { Request, Response} from 'express';
 // import { SocketGateway } from 'src/socket/socket.gateway';
 import { AuthGuard } from '@nestjs/passport';
+import { Cron } from '@nestjs/schedule';
 import { User } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
-import { GameService } from './game.service';
+import { GameService, Player } from './game.service';
 import { AuthService } from 'src/auth/auth.service';
-
 
 @Controller('game')
 @ApiTags('game')
@@ -39,6 +39,22 @@ export class GameController{
 		return await this.gameService.getChallengeGame(gameId);
 	}
 
+	@Post('join')
+	joinGame(@Req() Data : Request) {
+		const player = new Player();
+		player.id = Data.user.id;
+		player.username = Data.user.username;
+		player.status = 'waiting';
+		this.gameService.createPlayer(player);
+	}
+
+	@Cron('*/3 * * * * *')
+	async matchPlayers() {
+		const matchedPlayers = this.gameService.getMatchedPlayers();
+		if(matchedPlayers && matchedPlayers.length === 2) {
+			const gameId = this.gameService.createGame(matchedPlayers);
+		}
+	}
 
 	@Post('training-settings')
 	async postTrainingSettings(@Req() settings : Request, @Body() body : any) {

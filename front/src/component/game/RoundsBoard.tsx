@@ -52,8 +52,8 @@ export const TwoPlayersRoundsBoard = (gameMode, gameId) => {
 			setPointsToWin(response.data.pointsToWin);
 		});
 
-		socket.on('updateRound', () => {
-			setPlayedRounds(prevPlayedRounds => prevPlayedRounds + 1);
+		socket.on('updateScore', (payload) => {
+			setPlayedRounds(payload.playedRounds);
 		});
 	})
 
