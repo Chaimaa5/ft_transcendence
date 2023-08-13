@@ -1,13 +1,14 @@
 import { Injectable, Res, UnauthorizedException } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { Game, PrismaClient, User } from '@prisma/client';
 import { Response } from 'express';
 import { NOTFOUND } from 'dns';
 import { use } from 'passport';
 import { BallState, PaddleSide, PaddleState, RoomState } from './gameState.interface';
 import { EventEmitter } from 'events' 
+import { UserService } from 'src/user/user.service';
 
 export class Player {
-	id : number;
+	id : string;
 	username : string;
 	status : 'waiting' | 'matched';
 }
@@ -21,7 +22,7 @@ const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
 @Injectable()
 export class GameService {
-    
+    userService = new UserService
     prisma = new PrismaClient();
 	roomIdCounter = 1;
 	
@@ -196,7 +197,7 @@ export class GameService {
 		return roomId;
 	}
 
-	createChallengeRoom(gameId : number, rounds : number, pointsToWin : number, difficulty : string) : string {
+	createRoom(gameId : number, rounds : number, pointsToWin : number, difficulty : string) : string {
 		const roomId = "room_" + gameId;
 		const speedIncrement = this.calculateSpeedIncrement(rounds, difficulty);
 		const paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds, difficulty);
@@ -241,7 +242,7 @@ export class GameService {
 	// game endpoints methods
 	private players : Player[] = [];
 
-	updateStatus(playerId : number, status : 'waiting' | 'matched') {
+	updateStatus(playerId : string, status : 'waiting' | 'matched') {
 		const player = this.players.find(p => p.id === playerId);
 		if(player) {
 			player.status = status;
@@ -269,26 +270,44 @@ export class GameService {
 			playerId1 : matchedPlayers[0].id,
 			playerId2 : matchedPlayers[0].id,
 			rounds : 3,
-			pointToWin : 5,
+			pointsToWin : 5,
 			status : 'playing'
 		}})
-		this.createMutiplayerRoom(game.id, )
+		if(game.rounds && game.pointsToWin) {
+			this.createRoom(game.id, game.rounds, game.pointsToWin, 'multiplayer');
+		}
 		return(game.id)
 	}
 
     async postChallengeGame(user: User, body: any) {
-        const game = await this.prisma.game.create({data : {
-            mode : 'challenge',
-            playerId1 : user.id,
-            rounds : body.rounds,
-            pointsToWin : body.pointsToWin,
-            difficulty : body.difficulty,
-            status: 'pending'
-        }})
-		if(game.rounds && game.pointsToWin && game.difficulty) {
-			this.createChallengeRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
+		let game : Game;
+		if(body.player2Id)
+		{
+			game = await this.prisma.game.create({data : {
+				mode : 'challenge',
+				playerId1 : user.id,
+				playerId2 : body.player2Id,
+				rounds : body.rounds,
+				pointsToWin : body.pointsToWin,
+				difficulty : body.difficulty,
+				status: 'pending'
+			}})
+			this.userService.addNotifications(user.id, body.player2Id, "game", "")
 		}
-        return game.id
+		else  {
+			game = await this.prisma.game.create({data : {
+				mode : 'challenge',
+				playerId1 : user.id,
+				rounds : body.rounds,
+				pointsToWin : body.pointsToWin,
+				difficulty : body.difficulty,
+				status: 'pending'
+			}})
+		}
+		if(game.rounds && game.pointsToWin && game.difficulty) {
+			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
+		}
+		return game.id
     }
 
     async getChallengeGame(id : number) {

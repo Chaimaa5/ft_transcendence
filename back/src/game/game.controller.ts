@@ -42,8 +42,9 @@ export class GameController{
 	@Post('join')
 	joinGame(@Req() Data : Request) {
 		const player = new Player();
-		player.id = Data.user.id;
-		player.username = Data.user.username;
+		const user : User = Data.user as User
+		player.id = user.id;
+		player.username = user.username;
 		player.status = 'waiting';
 		this.gameService.createPlayer(player);
 	}
