@@ -23,18 +23,36 @@
 
 
 
-.frame::-webkit-scrollbar {
+.frame::-webkit-scrollbar:vertical {
     
-    width: 0.4vw;
+    width: 0.1vw;
     
     
 
 }
 
-.frame::-webkit-scrollbar-thumb:hover{
+.frame::-webkit-scrollbar-thumb:vertical:hover{
+   
     background: #a8dadc71;
     border-radius: 1.5vw;
     height: 80%;
+    
+}
+
+.frame2::-webkit-scrollbar:horizontal {
+    
+    height: 0.3vw;
+    
+    
+
+}
+
+.frame2::-webkit-scrollbar-thumb:horizontal:hover{
+   
+    background:  #a8dadc71;
+    border-radius: 2vw;
+    
+    
     
 }
 

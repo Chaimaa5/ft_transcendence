@@ -39,7 +39,6 @@ const TfaContainer = () => {
     useEffect(() => {
         Instanse.get("/isEnabled")
             .then((res) => {
-                console.log(res.data)
                 if(res.data)
                     setIsActv(true);
             })

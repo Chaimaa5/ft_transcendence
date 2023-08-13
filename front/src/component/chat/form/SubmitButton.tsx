@@ -8,14 +8,14 @@ export const SubmitButton = () => {
     const {channelAvatar, channelName, channelType, channelPwd,updateChannelName,  updateChannelPwd, updateChannelType, updateChannelAvatar } = useChannelData();
     const sendData = () =>{
          const CreateChannel =  new FormData();
-         CreateChannel.append('name', channelName);
-        CreateChannel.append('image', channelAvatar);
-         CreateChannel.append('type', channelType);
-         CreateChannel.append('password', channelPwd);
+            CreateChannel.append('name', channelName);
+            CreateChannel.append('image', channelAvatar);
+            CreateChannel.append('type', channelType);
+            CreateChannel.append('password', channelPwd);
          const header = {   
             headers: { 'content-type': 'multipart/form-data' }
           }
-        Instanse.post("api/chat/create", CreateChannel, header);
+        Instanse.post("/chat/create", CreateChannel, header);
         updateChannelName("");
         updateChannelPwd("");
         updateChannelType("");

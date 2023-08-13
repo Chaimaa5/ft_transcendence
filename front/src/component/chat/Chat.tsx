@@ -15,7 +15,9 @@ import { DefaultChatContent } from './DefaultChatContent';
 import axios from 'axios';
 import useAllRooms from './ChatStore/useAllRooms';
 import { RoomObj } from './ChatStore/useAllRooms';
-import Instanse from '../api/api';
+import Instanse, { socket_ } from '../api/api';
+import { useParams } from 'react-router-dom';
+import useSocket from './ChatStore/useSocket';
 
 
 
@@ -24,18 +26,27 @@ export const Chat = () => {
   const [error, setError] = useState(" ");
   const {On} = useDisplayRoomSettings();
   const {addNewChannel} = useNewchannelCreate();
-  const {myRooms, otherRooms, setJoinedRooms, setUnjoinedRooms} = useAllRooms();
+  const {myRooms, setJoinedRooms, setUnjoinedRooms} = useAllRooms();
+  const chatId = useParams().roomId;
+  const {setChatsocket} = useSocket();
 
   const style1: string = "bg-[#457B9D] text-[white]";
   const style2: string = "text-[#457B9D]  bg-[#A8DADC]";
   let style3: string =  "w-[50%] h-[80%]  text-[0.7vw] rounded-[2vw]  ";
   let style4: string = "w-[50%] h-[80%]  text-[0.7vw] rounded-[2vw]  ";
-  console.log(joinedRooms)
   
+  
+  console.log("CHAT.tsx  reeendeeered")
+  useEffect(()=>{
+    console.log("connection")
+      socket_("chat")
+      .then(s => {setChatsocket(s); console.log(s)})
+  },[])
+
   useEffect(()=>{
     if (joinedRooms)
     {
-      Instanse.get<RoomObj[]>("/chat/joinedChannels")
+      Instanse.get<RoomObj[]>("/chat/joinedChannels" , {withCredentials: true})
       .then(res => {
         setJoinedRooms(res.data);
         console.log(res.data)
@@ -44,10 +55,10 @@ export const Chat = () => {
     }
     else
     {
-      Instanse.get<RoomObj[]>("/chat/channels")
+      Instanse.get<RoomObj[]>("/chat/channels" , {withCredentials: true})
       .then(res => {
         setUnjoinedRooms(res.data);
-        console.log(res.data)
+        console.log("chaaaaanneeels")
       })
       .catch(err => setError(err.message));     
     }
@@ -98,9 +109,10 @@ export const Chat = () => {
         </div>
 
         <div className={"w-[60%] h-[100%] p-[2vw] flex flex-col  "}>
-            <UserContent/>
-            <ChatContent/>
-            {/* <DefaultChatContent/> */}
+            {/* {chatId ?  <UserContent/>  <ChatContent/> : <DefaultChatContent/>}  */}
+            {chatId && <UserContent/>}
+            {chatId && <ChatContent/>}
+           { !chatId && <DefaultChatContent/>}
         </div>
         
         {addNewChannel && <ChannelForm/> }

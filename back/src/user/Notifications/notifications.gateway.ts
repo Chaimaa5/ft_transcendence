@@ -2,12 +2,14 @@ import { SubscribeMessage, WebSocketGateway, OnGatewayDisconnect, OnGatewayConne
 import { Server, Socket } from 'socket.io';
 import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { UserService } from 'src/user/user.service';
+import { NotificationService } from './notification.service';
 @WebSocketGateway({cors: true, namespace: '/notification'})
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect{
    
 
     @WebSocketServer()
     server: Server;
+    constructor(private notificationService: NotificationService){}
 
   
     clients: Map<string, Socket> = new Map<string, Socket>()

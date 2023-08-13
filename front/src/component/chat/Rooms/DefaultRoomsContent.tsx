@@ -2,6 +2,8 @@ import React from 'react'
 
 import Style from "./styleRoom.module.css"
 import useNewchannelCreate from '../ChatStore/useNewChannelCreate'
+import { ReactSVG } from 'react-svg';
+import icon from "../../tools/btnsIcons/test.svg"
 
 export const DefaultRoomsContent = () => {
     const {updateAddNewChannel} = useNewchannelCreate();
@@ -20,7 +22,8 @@ export const DefaultRoomsContent = () => {
             
             <button onClick={() => updateAddNewChannel(true) } 
                     className="  w-[1.8vw] rounded-full bg-[#457B9D] h-[1.8vw]  flex justify-center items-center ">
-              <img src="./src/component/tools/btnsIcons/test.svg" className={" w-[1vw] "}/>
+              
+              <ReactSVG  src={icon} className={" w-[1vw] "}/>
             </button>
         
       </div>

@@ -22,7 +22,7 @@ import { NotificationsGateway } from './user/Notifications/notifications.gateway
     }), ChatModule
   ],
   controllers: [],
-  providers: [ChatGateway, NotificationsGateway, MuteService],
+  providers: [ChatGateway, MuteService],
 
   })
 export class AppModule {}

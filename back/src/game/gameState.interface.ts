@@ -35,8 +35,5 @@ export interface RoomState {
 	}
 	rounds : number;
 	pointsToWin : number;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 209d6ab530f3ab3411822d316d863eeaa28f2ad5
+

@@ -8,7 +8,7 @@ import { Player } from "./classes/Player";
 import { Ball } from "./classes/Ball";
 import { socket } from "./socket";
 
-const PongBoard = (gameMode, gameId) => {
+const PongBoard: React.FC = () => {
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
 		width: 0,
 		height: 0
@@ -89,6 +89,9 @@ const PongBoard = (gameMode, gameId) => {
 	}
 
 	useEffect(() => {
+
+		socket.connect();
+
 		socket.on('updateBallPosition', (payload) => {
 			gameRef.current.ball.ballPosX = gameRef.current.table.mapValue(payload.x, gameRef.current.table.serverTableWidth, gameRef.current.table.tableWidth);
 			gameRef.current.ball.ballPosY = gameRef.current.table.mapValue(payload.y, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
@@ -122,6 +125,7 @@ const PongBoard = (gameMode, gameId) => {
 			gameRef.current.ball.speedX = payload.ballSpeedX;
 			gameRef.current.ball.speedY = payload.ballSpeedY;
 			gameRef.current.ball.randomInitialBallDirection = payload.initialBallAngle;
+			// console.log("my paddle : -x- " + gameRef.current.myPaddle.paddlePosX + " -y- " + gameRef.current.myPaddle.paddlePosY + " opponent padddle  : -x- " +  gameRef.current.opponentPaddle.paddlePosX + " -y- " + gameRef.current.opponentPaddle.paddlePosY + " ball : -x- " + gameRef.current.ball.ballPosX + " -y- " + gameRef.current.ball.ballPosY + " - speed x - " + gameRef.current.ball.speedX + " - y - " + gameRef.current.ball.speedY + " angle " + gameRef.current.ball.randomInitialBallDirection);
 			setDataIsLoaded(true);
 		})
 
@@ -137,8 +141,6 @@ const PongBoard = (gameMode, gameId) => {
 			socket.disconnect();
 		}
 	}, []);
-
-	const sketchComponent = (gameMode)
 
 	return (
 		<div className="pong-board">

@@ -7,6 +7,7 @@ import useAllRooms from '../ChatStore/useAllRooms'
 
 export default function OtherRooms() {
   const {otherRooms: rooms} = useAllRooms();
+  // console.log("reeendeeered")
 
   return (
     <div className={"flex flex-col w-[100%] h-[90%] justify-center items-center   "}>

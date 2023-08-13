@@ -27,7 +27,6 @@ model User {
   win           Int
   loss          Int
   games         Int?
-  gameStatus    String?
   rank          Int
   refreshToken  String?
   status        Boolean

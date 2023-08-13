@@ -32,10 +32,9 @@ function Container(){
     const context = useContext<cntx>(CrContext);
     const [data, setData] = useState(context);
     useEffect(() => {
-            Instanse.get("/user")
-            .then((res) => setData(res.data))
-        }
-    )
+        Instanse.get("/user")
+        .then((res) => setData(res.data))
+    }, [])
     return(
         <CrContext.Provider value={data}>
             <div className="background">
@@ -51,7 +50,7 @@ function Container(){
                         {location.pathname == "/home" && <Home/>}
                         {location.pathname.startsWith("/profile/") && <Profile/>}
                         {location.pathname == "/leaderboord" && <Leaderboord/>}
-                        {location.pathname == "/chat" && <Chat/>}
+                        {location.pathname.startsWith("/chat") && <Chat/> }
                         {location.pathname == "/setting" && <Setting/>}
                     </div>
                     <div className="status">

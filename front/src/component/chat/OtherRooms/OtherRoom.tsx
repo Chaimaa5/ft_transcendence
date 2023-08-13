@@ -2,7 +2,7 @@ import React from 'react'
 import Avatar from '../../avatar'
 import avatar_img from '../../tools/sign/avatar.png'
 import { ReactSVG } from "react-svg";
-import incon9 from "../../tools/btnsIcons/7.svg"
+import icon9 from "../../tools/btnsIcons/9.svg"
 import Style from "../Rooms/styleRoom.module.css"
 
 interface Props
@@ -28,7 +28,7 @@ export const OtherRoom = ({id, name, image, count, type}: Props) => {
           <h3 className="text-[0.8vw] text-[#A8DADC]">{count}</h3>
           <h3 className="text-[0.8vw] text-[#A8DADC]">{type + " room"}</h3>
           <button className="w-[1.8vw]  bg-[#A8DADC] h-[1.8vw] rounded-full flex justify-center items-center">
-          <img src="./src/component/tools/btnsIcons/9.svg" className={" w-[1vw] "}/>
+          <ReactSVG src={icon9} className={" w-[1vw] "}/>
           </button>
       </div>
     )

@@ -10,11 +10,12 @@ import { HomeController } from './Home/home.controller';
 import { ChatController } from 'src/chat/chat.controller';
 import { ChatService } from 'src/chat/chat.service';
 import { NotificationService } from './Notifications/notification.service';
+import { NotificationsGateway } from './Notifications/notifications.gateway';
 
 @Module({
   imports: [],
   controllers: [UserController, ProfileController, LeaderboardController, HomeController, ChatController],
-  providers: [UserService, ProfileService, LeaderboardService, HomeService, ChatService, NotificationService],
+  providers: [UserService, ProfileService, LeaderboardService, HomeService, ChatService, NotificationService, NotificationsGateway],
   exports: [UserService]
 })
 export class UserModule {}

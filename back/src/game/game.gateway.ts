@@ -45,6 +45,19 @@ export class GameGateway implements OnGatewayConnection{
 		}) 
 	}
 
+	
+	async handleConnection(client : Socket) {
+		this.logger.log(`server side : client connected : ${client.id}`);
+		// gotta add some verification of the validity of the authentication
+		// let token : any =  client.handshake.headers['authorization'];
+        // token = token.split(' ')[1]
+        //  client.data.payload = await this.socketStrategy.validate(token);
+		//  let user = await this.userService.GetById(client.data.payload.id)
+		 
+		// storing a refrerence to the client 
+		this.clients.set(client.id, client);
+	}
+
 	handleDisconnection(client : Socket) {
 		console.log("client id  : " + client.id + "disconnected");
 	}

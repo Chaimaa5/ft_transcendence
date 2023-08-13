@@ -7,6 +7,7 @@ import { use } from 'passport';
 import { BallState, PaddleSide, PaddleState, RoomState } from './gameState.interface';
 import { EventEmitter } from 'events' 
 import { UserService } from 'src/user/user.service';
+import { NotificationService } from 'src/user/Notifications/notification.service';
 
 export class Player {
 	id : string;
@@ -23,10 +24,9 @@ const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
 @Injectable()
 export class GameService {
-    userService = new UserService
     prisma = new PrismaClient();
 	roomIdCounter = 1;
-	
+	notification = new NotificationService
     constructor(){}
 
 	private readonly rooms : Map<RoomState['roomId'], RoomState> = new Map<RoomState['roomId'], RoomState> ();
@@ -293,7 +293,7 @@ export class GameService {
 				difficulty : body.difficulty,
 				status: 'pending'
 			}})
-			this.userService.addNotifications(user.id, body.player2Id, "game", "")
+			this.notification.addGameInvite(user.id, body.player2Id, game.id)
 		}
 		else  {
 			game = await this.prisma.game.create({data : {

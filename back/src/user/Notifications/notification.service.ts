@@ -1,12 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { NotificationsGateway } from './notifications.gateway';
+import { EventEmitter } from 'events';
 @Injectable()
 export class NotificationService {
   
     prisma = new PrismaClient();
+    private Emitter = new EventEmitter();
     constructor(){}
-    notificationsGateway = new NotificationsGateway
    //invite to room
    //message received
    async addNotifications(senderId : string, receiverId: string, type: string, context: string){
@@ -56,8 +56,12 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
             },
         });
 
-        this.notificationsGateway.emitNotification(receiverId, notification)
+        this.Emitter.emit('notifications', notification)
     }
 }
    
+get  eventsEmitter() {
+    return(this.Emitter)
+}
+
 }

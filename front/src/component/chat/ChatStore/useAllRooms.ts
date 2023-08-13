@@ -12,15 +12,19 @@ export  interface RoomObj
   
 interface AllRooms
 {
+   
     myRooms: RoomObj[],
     otherRooms: RoomObj[],
-    setJoinedRooms: (state: RoomObj[]) => void
+   
+    setJoinedRooms: (state: RoomObj[]) => void,
     setUnjoinedRooms: (state: RoomObj[]) => void
 }
 
 const useAllRooms =  create<AllRooms>(set  => ({
+   
     myRooms: [],
     otherRooms: [],
+   
     setJoinedRooms: (state) => set(()=> ({myRooms: state})),
     setUnjoinedRooms: (state) => set(()=> ({otherRooms: state}))
 }))

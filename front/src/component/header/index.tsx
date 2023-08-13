@@ -7,7 +7,7 @@ import { ReactSVG } from "react-svg";
 import SearchIcon from "../tools/Search.svg"
 import axios from "axios";
 import Avatar from "../avatar/index";
-import Instanse from "../api/api";
+import Instanse, {socket_} from "../api/api";
 import { Link } from "react-router-dom";
 import Av from "../tools/profile.png"
 import incon6 from "../tools/btnsIcons/6.svg"
@@ -16,11 +16,24 @@ import incon4 from "../tools/btnsIcons/4.svg"
 
 
 
-
 type search_ = {
     username: string,
     avatar: string
 }
+
+
+type not = [
+    {
+         id: number,
+         type: string,
+         status: boolean,
+         sender: {
+           id: string,
+           username: string,
+           avatar: string
+         }
+    }
+]
 
 
 const Search = () => {
@@ -72,7 +85,20 @@ const Search = () => {
 
 
 const Notification = () => {
+
+    const [Data, SetData] = useState<not>();
+    function test () {
+            socket_('notification').then((sk) => {
+            sk.connect()
+            sk.on("notifications", (data) => {
+               SetData(data);
+            });
+        })
+    }
     
+    useEffect(() => {
+        test()
+    },[])
     const GameNtf = () => {
         return(
             <div className=" p-[1%] flex m-[1%] h-[2.3vw] w-[95%] justify-between items-center hover:bg-[#A8DADC] rounded-[2vw]"> 
@@ -90,11 +116,11 @@ const Notification = () => {
         )
     }
 
-    const FriendNtf = () => {
+    const FriendNtf = ({name, avatar}) => {
         return(
             <div className="p-[1%] flex m-[1%] h-[2.3vw] w-[95%] justify-between items-center bg-[#A8DADC] rounded-[2vw]">
-                    <Avatar src={Av} wd_="2vw"/>
-                <h2 className="text-[#1D3557] text-[0.5vw]">mmoutawa: "Let's become friends!" </h2>
+                    <Avatar src={avatar} wd_="2vw"/>
+                <h2 className="text-[#1D3557] text-[0.5vw]">{name}: "Let's become friends!" </h2>
                 <div className="h-[100%] w-[20%] flex justify-between items-center">
                     <button className="flex justify-center items-center h-[1vw] w-[1vw] rounded-[50%] bg-[#1D3557]">
                         <ReactSVG src={incon4} className="w-[70%]"/>
@@ -111,8 +137,16 @@ const Notification = () => {
     
     return(
         <div className="notfication-box">
-            <GameNtf/>
-            <FriendNtf/>
+            {Data?.map((value, key) => {
+                return(
+                    <>
+                        <FriendNtf name={value.sender.username} avatar={value.sender.avatar}/>
+                    </>
+                )
+            })}
+
+            {/* <GameNtf/>
+            <FriendNtf/> */}
         </div>
     )
 }
@@ -137,9 +171,11 @@ const Header = () => {
                         <Notification/>
                     }
                 </button>
-                <button className="w-[50%] pl-[10%]">
+                <Link to="/login" onClick={() => {
+                    Instanse.get("/logout")
+                }} className="w-[50%] pl-[10%]">
                     <img className="icon h-[1vw]" src={logout}/>
-                </button>
+                </Link>
             </div>
         </div>
     )
