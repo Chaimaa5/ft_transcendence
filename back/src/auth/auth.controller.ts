@@ -22,10 +22,15 @@ export class AuthController {
     @UseGuards(AuthGuard('42'))
     async handleAuth(@Req() req: Request, @Res() res: Response){
         const check = await this.authservice.signIn(res, req);
-        if (check == 1)
-            return res.redirect('http://localhost/home');
+        if (check == 1){
+            const user = req.user as User
+            const isTwoFA = await this.authservice.isEnabled(user.id)
+            if(isTwoFA)
+                return res.redirect('http://localhost:8000/tfa');
+            return res.redirect('http://localhost:8000/home');
+        }
         else
-            return res.redirect('http://localhost/setup');
+            return res.redirect('http://localhost:8000/setup');
     }
 
     @Get('/refresh')
@@ -57,7 +62,7 @@ export class AuthController {
     async EnableTFA(@Req() req: Request, @Body(ValidationPipe) authTFA: TFA){
         const user : User = req.user as User;
         const isCodeValid  = await this.authservice.verifyTFA(user, authTFA.code);
-        if(!isCodeValid)
+        if(isCodeValid)
         {
             await this.authservice.activateTFA(user.id);
             return true
@@ -75,9 +80,29 @@ export class AuthController {
 
     @Get('/access')
     @UseGuards(AuthGuard('jwt'))
-    async GetAccess(@Req() req: Request){
+    async GetAccess(@Req() req: Request, @Res() res: Response){
         const user : User = req.user as User;
-        return await this.authservice.generateToken(user)
+
+        const access = await this.authservice.generateToken(user)
+        res.json(access)
+        console.log(res.json)
+        return res;
     }
     
+    @Get('/isEnabled')
+    @UseGuards(AuthGuard('jwt'))
+    async isEnabled(@Req() req: Request){
+        const user : User = req.user as User;
+        await this.authservice.isEnabled(user.id);
+    }
+    
+    @Post('/VerifyTwoFA')
+    @UseGuards(AuthGuard('jwt'))
+    async VerifyTwoFA(@Req() req: Request, @Body('code') code: string){
+        const user : User = req.user as User;
+        const isCodeValid  = await this.authservice.verifyTFA(user, code);
+        if(isCodeValid)
+            return true
+        return false
+    }
 }

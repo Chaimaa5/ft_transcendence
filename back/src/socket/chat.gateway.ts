@@ -12,7 +12,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
   
     clients: Map<string, Socket> = new Map<string, Socket>()
-    rooms: Map<string, Socket[]> = new Map<string, Socket[]>()
+    rooms = new Map<string, Socket[]>()
     chatService = new ChatService;
     socketStrategy = new SocketStrategy;
     userService = new UserService;
@@ -32,36 +32,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
         });
     }
     
-    async handleConnection(server: Socket) {
-        let token : any =  server.handshake.headers['authorization'];
-        token = token.split(' ')[1]
-        server.data.payload = await this.socketStrategy.validate(token);
-        console.log('WebSocket gateway connected!');
-        console.log(server.data.payload.id)
-        if(server.data.payload.id){
-
-            let user = await this.userService.GetById(server.data.payload.id)
-            if (user)
-            {
-                this.clients.set(server.data.payload.id , server);
-                server.to(server.id).emit('connectionSuccess', { message: 'Connected successfully!' });
+    async handleConnection(client: Socket) {
+        let token : any =  client.handshake.headers['authorization'];
+        if(token){
+            token = token.split(' ')[1]
+            client.data.payload = await this.socketStrategy.validate(token);
+            // console.log('WebSocket gateway connected!');
+            // console.log(client.data.payload.id)
+            if(client.data.payload.id){
+                let user = await this.userService.GetById(client.data.payload.id)
+                if (user)
+                {
+                    this.clients.set(client.data.payload.id , client);
+                    // this.server.to(client.id).emit('connectionSuccess', { message: 'Connected successfully!' });
+                }
             }
         }
-        }
+    }
 
 
     addToRoom(roomId: string, client: Socket){
         if(!this.rooms.has(roomId)){
-            this.rooms.set(roomId, [])
+            this.rooms.set(roomId, [client])
         }
-
         const sockets = this.rooms.get(roomId)
         sockets?.push(client)
     }
+
     deleteFromRoom(roomId: string, client: Socket){
         if(this.rooms.has(roomId)){
             let sockets = this.rooms.get(roomId)
-
+            
             const index = sockets?.indexOf(client)
 
             const deletCount = 1;
@@ -71,30 +72,87 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
                     sockets.splice(index, deletCount);
             }
         }
-       
     }
-    @SubscribeMessage('join')
-    joinRoom(client: Socket, roomId: string){
+
+    @SubscribeMessage('joinChat')
+    joinChat(client: Socket, roomId: string){
         console.log('WebSocket gateway joined!');
         this.addToRoom(roomId, client);
         client.join(roomId);
     }
 
-    @SubscribeMessage('message')
+    // @SubscribeMessage('sendMessage')
+    // async handleMessage(client: Socket, body : {roomId: string, message: string}){
+    //     const {roomId, message} = body;
+    //     const room = parseInt(roomId);
+    //     const userId = client.data.payload.id;
+    //     const isMuted = await this.chatService.checkMute(room, userId)
+    //     const isBanned = await this.chatService.checkBan(room, userId)
+    //     if(!isMuted && !isBanned){
+    //         const rcvData : any = await this.chatService.storeMessage(room, userId, message);
+    //         const Blocked = new Set(await this.userService.getBlockedUsers(userId));
+    //         const ChatRoom = this.rooms.get(roomId)
+    //         if(ChatRoom ){
+    //             console.log('room: ', ChatRoom)
+    //             // ChatRoom = ChatRoom.filter(ChatRoom => {
+    //             //     const id = ChatRoom.data.payload.id;
+    //             //     return !Blocked.has(id) 
+    //             // })
+    //             ChatRoom.forEach(socket =>{
+    //                 // console.log('id:', socket.data.payload.id)
+    //                 this.server.to(socket.id).emit('receiveMessage', rcvData)
+    //             })
+    //         }
+    //     }
+    // }
+
+
+
+    @SubscribeMessage('joinChat')
+    joinRoom(client: Socket, roomId: string){
+        console.log('Joined ', roomId)
+        this.addToRoom(roomId, client);
+        client.join(roomId);
+    }
+
+    @SubscribeMessage('sendMessage')
     async handleMessage(client: Socket, body : {roomId: string, message: string}){
         const {roomId, message} = body;
         const room = parseInt(roomId);
+        console.log(message)
         const userId = client.data.payload.id;
-        console.log(userId);
-        console.log(message);
-        const isMuted = await this.chatService.checkMute(room, userId)
-        if(!isMuted ){
-            this.chatService.storeMessage(room, userId, message);
-            // const Blocked = this.userService.getBlocked(userId);
-            // this.server.to(roomId).except(client.id).emit('message', message);
+        if(message){
+            const rcvData = await this.chatService.storeMessage(room, userId, message);
+            const isMuted = await this.chatService.checkMute(room, userId)
+            if(!isMuted ){
+                // const Blocked = this.userService.getBlocked(userId);
+                // this.server.to(roomId).except(client.id).emit('message', message);
+                // console.log(this.rooms)
+                console.log("Keys in the map:", [...this.rooms.keys()]);
 
-            this.server.to(roomId).emit('message', message);
+                let ChatRoom = this.rooms.get(roomId)
+                console.log(ChatRoom)
+                if(rcvData){
+                    this.emitMessage(rcvData, roomId)
+                    // this.server.to(client.id).emit('receiveMessage',rcvData);
+                }
+            }
         }
+    }
+    
+    emitMessage(rcvData: any, roomId: string) {
+        const ChatRoom = this.rooms.get(roomId)
+            if(ChatRoom ){
+                console.log('room: ', ChatRoom)
+                // ChatRoom = ChatRoom.filter(ChatRoom => {
+                //     const id = ChatRoom.data.payload.id;
+                //     return !Blocked.has(id) 
+                // })
+                ChatRoom.forEach(socket =>{
+                    // console.log('id:', socket.data.payload.id)
+                    this.server.to(socket.id).emit('receiveMessage', rcvData)
+                })
+            }
     }
 
     @SubscribeMessage('leave')
