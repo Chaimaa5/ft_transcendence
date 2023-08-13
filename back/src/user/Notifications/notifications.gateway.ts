@@ -24,7 +24,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
             const socket = this.clients.get(notification.receiverId)
             if(socket){
                 console.log(socket,"  " ,socket.data.payload.id)
-                this.server.to(socket.id).emit('notification', notification)
+                this.server.to(socket.id).emit('notifications', notification)
             }
         })
     }

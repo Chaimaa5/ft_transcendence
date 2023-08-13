@@ -306,9 +306,12 @@ export class GameService {
 			difficulty : body.difficulty,
 			status: 'pending'
 		}})
-		if(body.player2Id)
+		if(body.Player)
 		{
-			this.notification.addGameInvite(user.id, body.player2Id, game.id)
+			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
+			if(player) {
+				this.notification.addGameInvite(user.id, player.id, game.id)
+			}
 		}
 		if(game.rounds && game.pointsToWin && game.difficulty) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
