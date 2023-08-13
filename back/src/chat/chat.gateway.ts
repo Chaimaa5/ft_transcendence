@@ -17,7 +17,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     socketStrategy = new SocketStrategy;
     userService = new UserService;
 
-
+    // room {[roomId: string], Socket[]} = {}
 
     async afterInit(client: Socket) {
         console.log('WebSocket gateway initialized!');

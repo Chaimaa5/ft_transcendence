@@ -4,7 +4,7 @@ import { UpdateUserDTO } from './dto/updatedto.dto'
 import { Response } from 'express';
 import { NOTFOUND } from 'dns';
 import { ChatService } from 'src/chat/chat.service';
-// import { NotificationsGateway } from 'src/socket/notifications.gateway';
+import { NotificationService } from './Notifications/notification.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +15,7 @@ export class UserService {
     prisma = new PrismaClient();
     chatService = new ChatService;
     constructor(){}
-    // notificationsGateway = new NotificationsGateway
+    notifications = new NotificationService
     async GetById(id: string){
         const user = await this.prisma.user.findUnique({where : {id:id}})
         // if(!user)
@@ -242,7 +242,7 @@ export class UserService {
                             },
                         });
                 
-                        await this.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
+                        await this.notifications.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
                     }
                     //emit notification
                 }
@@ -293,7 +293,7 @@ export class UserService {
                     },
                 });
                 await this.chatService.CreateRoom(id, Id, exist.username);
-                await this.addNotifications(id, Id, 'friendship', 'accepted your invite')
+                await this.notifications.addNotifications(id, Id, 'friendship', 'accepted your invite')
             }
             else
                 throw new UnauthorizedException('User Does Not Exist')
@@ -551,38 +551,7 @@ export class UserService {
    }
 
 
-   //friend add request should not be duplicated
-   //invite to room
-   //message received
-   async addNotifications(senderId : string, receiverId: string, type: string, context: string){
-        const sender = await this.prisma.user.findUnique({where: {id: senderId}})
-        const receiver = await this.prisma.user.findUnique({where: {id: receiverId}})
-
-        const content = sender?.username + ' ' + context + ' ' +receiver?.username
-
-        const exist = await this.prisma.notification.findFirst({
-            where: {content: content}
-        })
-        if(exist){
-            const notification = await this.prisma.notification.update({
-                where:{id: exist.id},
-                data:{createdAt: new Date()}
-            })
-            // this.notificationsGateway.emitNotification(receiverId, notification)
-        }
-        else{
-            const notification = await this.prisma.notification.create({
-                data: {
-                    sender: {connect: {id: senderId}},
-                    receiver: {connect: {id: receiverId}},
-                    status: false,
-                    type: type,
-                    content: content
-                },
-            });
-            // this.notificationsGateway.emitNotification(receiverId, notification)
-        }
-    }
+   
 
     async deleteNotification(id: number)
     {
