@@ -6,7 +6,6 @@ import { NOTFOUND } from 'dns';
 import { use } from 'passport';
 import { BallState, PaddleSide, PaddleState, RoomState } from './gameState.interface';
 import { EventEmitter } from 'events' 
-import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/user/Notifications/notification.service';
 
 export class Player {
@@ -25,7 +24,6 @@ const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 @Injectable()
 export class GameService {
 	
-    userService = new UserService
     prisma = new PrismaClient();
 	roomIdCounter = 1;
 	notification = new NotificationService
@@ -272,7 +270,7 @@ export class GameService {
 		const game = await this.prisma.game.findUnique({where : {id: gameId}, select : {
 			status : true,
 		}})
-		if(game.status == 'pending') {
+		if(game?.status == 'pending') {
 			await this.prisma.game.update({where :  {id : gameId}, data : {
 				playerId2 : user.id,
 				status : 'created'
@@ -300,23 +298,6 @@ export class GameService {
 
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
-		if(body.player2Id)
-		{
-<<<<<<< HEAD
-			game = await this.prisma.game.create({data : {
-				mode : 'challenge',
-				playerId1 : user.id,
-				playerId2 : body.player2Id,
-				rounds : body.rounds,
-				pointsToWin : body.pointsToWin,
-				difficulty : body.difficulty,
-				status: 'pending'
-			}})
-			this.notification.addGameInvite(user.id, body.player2Id, game.id)
-=======
-			this.userService.addNotifications(user.id, body.player2Id, "game", "")
->>>>>>> a030eb81ba4455c885edb8de56fb565c2b0c0cc6
-		}
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
@@ -325,6 +306,10 @@ export class GameService {
 			difficulty : body.difficulty,
 			status: 'pending'
 		}})
+		if(body.player2Id)
+		{
+			this.notification.addGameInvite(user.id, body.player2Id, game.id)
+		}
 		if(game.rounds && game.pointsToWin && game.difficulty) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
 		}
