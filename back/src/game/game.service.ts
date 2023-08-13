@@ -24,6 +24,8 @@ const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
 @Injectable()
 export class GameService {
+	
+    userService = new UserService
     prisma = new PrismaClient();
 	roomIdCounter = 1;
 	notification = new NotificationService
@@ -265,6 +267,22 @@ export class GameService {
 		}
 	}
 
+	async joinGame(user: User, body: any) {
+		const gameId = parseInt(body.id);
+		const game = await this.prisma.game.findUnique({where : {id: gameId}, select : {
+			status : true,
+		}})
+		if(game.status == 'pending') {
+			await this.prisma.game.update({where :  {id : gameId}, data : {
+				playerId2 : user.id,
+				status : 'created'
+			}})
+		}
+		else {
+			throw('game already created');
+		}
+	}
+
 	async createGame(matchedPlayers : Player[]) {
 		const game = await this.prisma.game.create({data : {
 			mode : 'multiplayer',
@@ -272,7 +290,7 @@ export class GameService {
 			playerId2 : matchedPlayers[0].id,
 			rounds : 3,
 			pointsToWin : 5,
-			status : 'playing'
+			status : 'created'
 		}})
 		if(game.rounds && game.pointsToWin) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, 'multiplayer');
@@ -284,6 +302,7 @@ export class GameService {
 		let game : Game;
 		if(body.player2Id)
 		{
+<<<<<<< HEAD
 			game = await this.prisma.game.create({data : {
 				mode : 'challenge',
 				playerId1 : user.id,
@@ -294,17 +313,18 @@ export class GameService {
 				status: 'pending'
 			}})
 			this.notification.addGameInvite(user.id, body.player2Id, game.id)
+=======
+			this.userService.addNotifications(user.id, body.player2Id, "game", "")
+>>>>>>> a030eb81ba4455c885edb8de56fb565c2b0c0cc6
 		}
-		else  {
-			game = await this.prisma.game.create({data : {
-				mode : 'challenge',
-				playerId1 : user.id,
-				rounds : body.rounds,
-				pointsToWin : body.pointsToWin,
-				difficulty : body.difficulty,
-				status: 'pending'
-			}})
-		}
+		game = await this.prisma.game.create({data : {
+			mode : 'challenge',
+			playerId1 : user.id,
+			rounds : body.rounds,
+			pointsToWin : body.pointsToWin,
+			difficulty : body.difficulty,
+			status: 'pending'
+		}})
 		if(game.rounds && game.pointsToWin && game.difficulty) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
 		}
