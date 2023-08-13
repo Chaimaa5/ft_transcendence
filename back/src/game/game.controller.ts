@@ -57,6 +57,12 @@ export class GameController{
 		}
 	}
 
+	@Post('join-game')
+	async handleJoingGame(@Req() req : Request, @Body() body : any){
+		const user : User = req.user as User;
+		return await this.gameService.joinGame(user,body);
+	}
+
 	@Post('training-settings')
 	async postTrainingSettings(@Req() settings : Request, @Body() body : any) {
 		const user : User = settings.user as User;
