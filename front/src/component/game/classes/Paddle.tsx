@@ -24,6 +24,7 @@ export class Paddle {
 	prevDirection : number;
 	prevWindowHeight : number;
 	speedRatio : number;
+	score : number;
 
 	constructor (table : GameTable) {
 		this.paddlePosX = NaN;
@@ -39,6 +40,7 @@ export class Paddle {
 		this.prevDirection = 0;
 		this.prevWindowHeight = 0;
 		this.speedRatio = 200;
+		this.score = 0;
 	}
 
 	initPaddle(
