@@ -49,7 +49,7 @@ export const Room = ({id, name, image, count, type}: Props) => {
       if (chatSocket)
       {
         
-        chatSocket.emit('joinChat', {roomId: chatId})
+        chatSocket.emit('joinChat', {roomId: id})
       }
   }
 

@@ -304,21 +304,41 @@ export class UserService {
 
     async blockFriend(id : string, Id: string){
         if (id){
+            console.log('block')
             const exist = await this.FindbyID(Id)
             if (exist){
-                await this.prisma.friendship.updateMany({
-                    where: {
-                        OR: [
-                            {senderId: id, receiverId: Id},
-                            {senderId: Id, receiverId: id},
-                        ],
-    
-                    },
-                    data: {
-                        status: 'blocked',
-                        blockerId: id,
-                    },
-                });
+                const friendship = await this.prisma.friendship.findFirst({where:{
+                    OR: [
+                        {senderId: id, receiverId: Id},
+                        {senderId: Id, receiverId: id},
+                    ],
+                }})
+                if(friendship){
+                    await this.prisma.friendship.updateMany({
+                        where: {
+                            OR: [
+                                {senderId: id, receiverId: Id},
+                                {senderId: Id, receiverId: id},
+                            ],
+        
+                        },
+                        data: {
+                            status: 'blocked',
+                            blockerId: id,
+                        },
+                    });
+                }
+                else{
+                    console.log('here')
+                    await this.prisma.friendship.create({
+                        data: {
+                            senderId: id,
+                            receiverId: Id,
+                            status: 'blocked',
+                            blockerId: id,
+                        },
+                    });
+                }
             }
             else
                 throw new UnauthorizedException('User Does Not Exist')

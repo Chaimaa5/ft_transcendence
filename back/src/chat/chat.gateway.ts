@@ -16,7 +16,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     socketStrategy = new SocketStrategy;
     userService = new UserService;
     
-    rooms = new Map<string, Socket[]>()
+    rooms = new Map<number, Socket[]>()
 
     async afterInit(client: Socket) {
         console.log('WebSocket gateway initialized!');
@@ -46,16 +46,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
 
     addToRoom(roomId: string, client: Socket){
-        if(!this.rooms.has(roomId)){
-            this.rooms.set(roomId, [client])
+        const room = parseInt(roomId)
+        if(!this.rooms.has(room)){
+            this.rooms.set(room, [client])
         }
-        const sockets = this.rooms.get(roomId)
+        const sockets = this.rooms.get(room)
         sockets?.push(client)
     }
 
     deleteFromRoom(roomId: string, client: Socket){
-        if(this.rooms.has(roomId)){
-            let sockets = this.rooms.get(roomId)
+        const room = parseInt(roomId)
+        if(this.rooms.has(room)){
+            let sockets = this.rooms.get(room)
             
             const index = sockets?.indexOf(client)
 
@@ -104,7 +106,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('joinChat')
     joinRoom(client: Socket, roomId: string){
-        console.log('Joined ', roomId)
         this.addToRoom(roomId, client);
         client.join(roomId);
     }
@@ -123,16 +124,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
                 // this.server.to(roomId).except(client.id).emit('message', message);
                 // console.log(this.rooms)
                 if(rcvData){
-                    this.emitMessage(rcvData, roomId)
+                    this.emitMessage(rcvData, room)
                     // this.server.to(client.id).emit('receiveMessage',rcvData);
                 }
             }
         }
     }
     
-    emitMessage(rcvData: any, roomId: string) {
+    emitMessage(rcvData: any, roomId: number) {
         const ChatRoom = this.rooms.get(roomId)
-            if(ChatRoom ){
+        if(ChatRoom ){
                 // ChatRoom = ChatRoom.filter(ChatRoom => {
                 //     const id = ChatRoom.data.payload.id;
                 //     return !Blocked.has(id) 
