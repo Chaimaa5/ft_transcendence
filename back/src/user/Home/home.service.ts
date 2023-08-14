@@ -92,11 +92,14 @@ export class HomeService {
             }
            });
 
-           let progress = 0;
+          let progress = "";
           if (nav)
           {
-            if (nav.level)
-              progress = parseFloat((nav?.level % 1).toFixed(2));
+            if (nav.level){
+              let percentage = parseFloat((nav?.level % 1).toFixed(2));
+              progress = percentage.toString()
+              progress = progress.split('.')[1] + "%"
+            }
             if (!nav.avatar.includes('cdn.intra')){
              nav.avatar = 'http://' + process.env.HOST + ':3000/api' + nav.avatar
           }

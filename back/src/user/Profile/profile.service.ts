@@ -33,8 +33,15 @@ export class ProfileService {
             });
             if (user?.id != owner?.id)
                 isOwner = false;
+                let progress = "";
                 if (user){
-    
+                    if(user.level){
+                        let percentage = parseFloat((user.level % 1).toFixed(2));
+                        progress = percentage.toString()
+                        progress = progress.split('.')[1] + "%"
+                    }
+                    else
+                        progress = "0%";
                     if (user.avatar)
                     {
                         if (!user.avatar.includes('cdn.intra')){
@@ -74,6 +81,7 @@ export class ProfileService {
                 'losses': user?.loss,
                 'wins' :user?.win,
                 'level':user?.level,
+                'progress': progress,
                 'xp': user?.XP,
                 'rank': user?.rank,
                 'avatar': user?.avatar,

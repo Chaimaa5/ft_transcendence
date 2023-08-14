@@ -119,44 +119,47 @@ export class ChatService {
                         }
                     }
                 },
-                isChannel: true
+                isChannel: false
             }
         })
-        const room = await this.prisma.room.create({
-            data: {
-                name: name ,
-                image: 'imagePath',
-                type: 'private',
-                ownerId: ownerId,
-                isChannel: false,
-
-            }
-        })
-        const member1 = await this.prisma.user.findUnique({where: {id: ownerId}})
-        const member2 = await this.prisma.user.findUnique({where: {id: memberId}})
-        if(member1 && member2){
-            await this.prisma.membership.createMany({
-                data: [
-                    {
-                        roomId: room.id,
-                        userId: ownerId,
-                        role: 'owner',
-                        isBanned: false,
-                        roomImage: member2.avatar,
-                        roomName: member2.username,
-                        isMuted: false
-                    },
-                    {
-                        roomId: room.id,
-                        userId: memberId,
-                        role: 'owner',
-                        roomImage: member1.avatar,
-                        roomName: member1.username,
-                        isBanned: false,
-                        isMuted: false
-                    }
-                 ]
+        if(!roomCheck){
+            console.log('here')
+            const room = await this.prisma.room.create({
+                data: {
+                    name: name ,
+                    image: 'imagePath',
+                    type: 'private',
+                    ownerId: ownerId,
+                    isChannel: false,
+    
+                }
             })
+            const member1 = await this.prisma.user.findUnique({where: {id: ownerId}})
+            const member2 = await this.prisma.user.findUnique({where: {id: memberId}})
+            if(member1 && member2){
+                await this.prisma.membership.createMany({
+                    data: [
+                        {
+                            roomId: room.id,
+                            userId: ownerId,
+                            role: 'owner',
+                            isBanned: false,
+                            roomImage: member2.avatar,
+                            roomName: member2.username,
+                            isMuted: false
+                        },
+                        {
+                            roomId: room.id,
+                            userId: memberId,
+                            role: 'owner',
+                            roomImage: member1.avatar,
+                            roomName: member1.username,
+                            isBanned: false,
+                            isMuted: false
+                        }
+                     ]
+                })
+            }
         }
     }
 

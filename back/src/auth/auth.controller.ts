@@ -85,7 +85,6 @@ export class AuthController {
 
         const access = await this.authservice.generateToken(user)
         res.json(access)
-        console.log(res.json)
         return res;
     }
     

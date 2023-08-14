@@ -55,7 +55,7 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
                 gameId: gameId
             },
         });
-
+        console.log(notification)
         this.Emitter.emit('notifications', notification)
     }
 }

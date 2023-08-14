@@ -65,7 +65,8 @@ type profile_ = {
     isFriend: boolean,
     isSender: boolean,
     isReceiver: boolean,
-    isBlocked: boolean
+    isBlocked: boolean,
+    progress: string
 }
 
 type cntx = {
@@ -111,7 +112,7 @@ const Profile = () => {
                 <div className="lv-profile">
                     <h4 className="text-[#A8DADC]">Lv {response?.level}</h4>
                     <div className="w-[80%] h-[23%] sp-lv">
-                        <div className="w-[60%] h-[100%] main-lv"></div>
+                        <div style={{width: response?.progress}} className=" h-[100%] main-lv"></div>
                     </div>
                     <h4 className="text-[#A8DADC]">{response?.xp} Xp</h4>
                 </div>

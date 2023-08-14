@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { SocketStrategy } from 'src/auth/jwt/websocket.strategy';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from './notification.service';
-@WebSocketGateway({cors: true, namespace: '/notification'})
+@WebSocketGateway({cors: true, namespace: '/notifications'})
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect{
    
 
@@ -23,7 +23,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
         this.notificationService.eventsEmitter.on('notifications', notification =>{
             const socket = this.clients.get(notification.receiverId)
             if(socket){
-                console.log(socket,"  " ,socket.data.payload.id)
+                console.log(socket,"  " ,notification)
                 this.server.to(socket.id).emit('notifications', notification)
             }
         })

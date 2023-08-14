@@ -37,8 +37,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
         if(token){
             token = token.split(' ')[1]
             client.data.payload = await this.socketStrategy.validate(token);
-            // console.log('WebSocket gateway connected!');
-            // console.log(client.data.payload.id)
             if(client.data.payload.id){
                 let user = await this.userService.GetById(client.data.payload.id)
                 if (user)
@@ -119,7 +117,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     async handleMessage(client: Socket, body : {roomId: string, message: string}){
         const {roomId, message} = body;
         const room = parseInt(roomId);
-        console.log(message)
         const userId = client.data.payload.id;
         if(message){
             const rcvData = await this.chatService.storeMessage(room, userId, message);

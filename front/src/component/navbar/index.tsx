@@ -58,7 +58,7 @@ const Navbar = () => {
             SetHome_ic({fill: "#E63946"})
         else if(location.pathname == "/leaderboord")
             SetLeader_ic({fill: "#E63946"})
-        else if(location.pathname == "/chat")
+        else if(location.pathname.startsWith("/chat"))
             SetChat_ic({fill: "#E63946"})
         else if(location.pathname == "/setting")
             SetStt_ic({fill: "#E63946"})
@@ -105,7 +105,9 @@ const Navbar = () => {
                 <Link to={"/leaderboord"}>
                     <ReactSVG style={Leader_ic} className="icon-svg w-[1.5vw]" src={leader_icon}/>
                 </Link>
+                <Link to="/chat">
                     <ReactSVG style={Chat_ic} className="icon-svg w-[1.5vw]" src={chat_icon}/>
+                </Link>
                 <Link to="/setting">
                     <ReactSVG style={Stt_ic} className="icon-svg w-[1.5vw]" src={setting_icon}/>
                 </Link>
