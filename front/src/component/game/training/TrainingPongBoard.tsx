@@ -1,11 +1,11 @@
 import React, { TrackHTMLAttributes, useEffect, useRef, useState } from "react";
 import P5 from 'p5'
 import { ReactP5Wrapper } from "react-p5-wrapper";
-import { Game } from "./classes/Game"
-import { Paddle, PaddleSide } from "./classes/Paddle";
-import { GameTable } from "./classes/GameTable";
+import { Game } from "../classes/Game"
+import { Paddle, PaddleSide } from "../classes/Paddle";
+import { GameTable } from "../classes/GameTable";
 import { Player } from "./classes/Player";
-import { Ball } from "./classes/Ball";
+import { Ball } from "../classes/Ball";
 
 
 const PongBoard: React.FC = () => {
@@ -119,4 +119,3 @@ function BOT(game : Game) {
 
 
 export default PongBoard;
-

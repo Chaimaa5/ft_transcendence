@@ -1,4 +1,3 @@
-import {Player} from "./Player";
 import {Ball} from "./Ball";
 import {GameTable} from "./GameTable";
 import {Paddle, PaddleSide} from "./Paddle";
@@ -9,10 +8,14 @@ export interface Round {
 	rightPlayerScore : number;
 }
 
-export class Game{
-	rightPlayer : Player;
+export interface Player {
+	userName : string;
+	roundScore : string;
+}
+
+export class Game {
 	leftPlayer : Player;
-	
+	rightPlayer : Player;
 	myPaddle : Paddle;
 	opponentPaddle : Paddle;
 	ball : Ball;
@@ -24,8 +27,6 @@ export class Game{
 
 	constructor(tableWidth: number, tableHeight: number) {
 		this.table = new GameTable(tableWidth, tableHeight);
-		this.rightPlayer = new Player("shrooma");
-		this.leftPlayer = new Player("cel-mhan");
 		this.ball = new Ball(this.table);
 
 		this.myPaddle = new Paddle(this.table);
@@ -49,11 +50,11 @@ export class Game{
 
 	setPaddlesDimensions(width : number, height : number){
 		// left Paddle dimensions
-		this.myPaddle.paddleWidth = width*0.02;
-		this.myPaddle.paddleHeight = height*0.3;
+		this.myPaddle.paddleWidth = this.table.p.map(this.myPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.prevTableWidth);
+		this.myPaddle.paddleHeight = this.table.p.map(this.myPaddle.paddleHeight, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
 		// right Paddle dimensions
-		this.opponentPaddle.paddleWidth = width*0.02;
-		this.opponentPaddle.paddleHeight = height*0.3;
+		this.opponentPaddle.paddleWidth = this.table.p.map(this.opponentPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.prevTableWidth);
+		this.opponentPaddle.paddleHeight = this.table.p.map(this.opponentPaddle.paddleHeight, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
 		if(this.table.p) {
 			// scale the paddles postion compared to the new canvas dimensions so the position remains the same
 			this.myPaddle.paddlePosX = this.table.p.map(this.myPaddle.paddlePosX, 0, this.table.prevTableWidth, 0, this.table.tableWidth);
@@ -96,9 +97,6 @@ export class Game{
 	}
 
 	endGame() {
-		this.ball.setInitialBallPosition(this.table.tableWidth, this.table.tableHeight);
-		this.ball.speedX = 0;
-		this.ball.speedY = 0;
 		if(this.table.p) {
 			this.table.p.clear();
 			this.table.p.noLoop();
