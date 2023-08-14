@@ -1,4 +1,3 @@
-
 import { Injectable, Res, UnauthorizedException } from '@nestjs/common';
 import { Game, PrismaClient, User } from '@prisma/client';
 import { Response } from 'express';
@@ -27,6 +26,7 @@ export class GameService {
     prisma = new PrismaClient();
 	roomIdCounter = 1;
 	notification = new NotificationService
+	
     constructor(){}
 
 	private readonly rooms : Map<RoomState['roomId'], RoomState> = new Map<RoomState['roomId'], RoomState> ();
@@ -386,7 +386,4 @@ export class GameService {
 		})
 		return(game);
 	}
-
-
-
 }

@@ -1,8 +1,8 @@
 import P5 from 'p5'
-import {Player} from './Player'
 import {Round} from './Game'
 import { Socket } from "socket.io-client";
-
+import { Player } from './Game';
+import { Round } from './Game';
 
 export class GameTable {
 	tableWidth: number;
@@ -30,7 +30,7 @@ export class GameTable {
 		this.socket = socket;
 	}
 	
-	displayScore(leftPlayer : Player, rightPlayer : Player, round : Round) {
+	displayScore(leftPlayer : Player, rightPlayer: Player, round : Round) {
 		if(this.p) {
 			// define colors i'll be using to display the score
 			const blue = this.p.color(69, 123, 157, 80);
@@ -57,7 +57,7 @@ export class GameTable {
 			this.p.text(addLetterSpacing(leftPlayer.userName, 1), this.tableWidth/2 - (pongNetW*7), pongNetY + 5);
 			// display the left player rounds score
 			this.p.fill(transExtraLightBlue);
-			this.p.text(leftPlayer.score, this.tableWidth/2 - (pongNetW*2), pongNetY + 5 );
+			this.p.text(leftPlayer.roundScore, this.tableWidth/2 - (pongNetW*2), pongNetY + 5 );
 			// display the current round's score of the left player
 			this.p.fill(blue);
 			this.p.textSize(this.tableWidth/7);
@@ -73,7 +73,7 @@ export class GameTable {
 			this.p.text(addLetterSpacing(rightPlayer.userName, 1), this.tableWidth/2 + (pongNetW*7), pongNetY + 5);
 			// display the right player score
 			this.p.fill(transExtraLightBlue);
-			this.p.text(rightPlayer.score, this.tableWidth/2 + (pongNetW*2), pongNetY + 5 );
+			this.p.text(rightPlayer.roundScore, this.tableWidth/2 + (pongNetW*2), pongNetY + 5 );
 			// display the current round's score of the right player 
 			this.p.fill(blue);
 			this.p.textSize(this.tableWidth/7);

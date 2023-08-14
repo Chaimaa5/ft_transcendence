@@ -1,30 +1,36 @@
-import React, { ChangeEvent, useState, useTransition } from 'react'
-
-class Game {
-	playedRounds : number;
-	requiredRounds: number;
-
-	constructor() {
-		this.playedRounds = 2;
-		this.requiredRounds = 5;
-	}
-
-}
+import React, { ChangeEvent, useEffect, useState, useTransition } from 'react'
+import Instanse from '../api/api';
+import { socket } from './socket';
 
  
-const RoundsBoard: React.FC = () => {
-	const game = new Game();
-	const roundNumbers = Array.from(Array(game.requiredRounds).keys());
+export const TwoPlayersRoundsBoard = (gameMode, gameId) => {
+
+	const [roundsNumber, setRoundsNumber] = useState(0);
+	const [pointsToWin, setPointsToWin] = useState(0);
+	const [playedRounds, setPlayedRounds] = useState(0);
 	
- 
+	const rounds = Array.from(Array(roundsNumber).keys());
+
+	useEffect(() => {
+		Instanse.get(`two-players-game/${gameId}`)
+		.then(response => {
+			setRoundsNumber(response.data.rounds);
+			setPointsToWin(response.data.pointsToWin);
+		});
+
+		socket.on('updateScore', (payload) => {
+			setPlayedRounds(payload.playedRounds);
+		});
+	})
+
 	return (
 		<div className="rounds-board">
 				<span>ROUND</span>
 				<div className="rounds-points">
-					{roundNumbers.map((roundNumber) => (
+					{rounds.map((roundNumber) => (
 						<div
 							key={roundNumber}
-							className={`round ${roundNumber < game.playedRounds ? 'full' : 'empty'}`}
+							className={`round ${roundNumber < playedRounds ? 'full' : 'empty'}`}
 						>
 						</div>
 					))
@@ -33,5 +39,3 @@ const RoundsBoard: React.FC = () => {
 		</div>
 	)
 }
-
-export default RoundsBoard;
