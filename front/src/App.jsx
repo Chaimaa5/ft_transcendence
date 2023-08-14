@@ -7,7 +7,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TfaPage from "./component/tfa"
 import Waiting from './component/modes/waiting';
 import { socket_ } from './component/api/api';
-
 function App() {
   
   return (
@@ -24,8 +23,8 @@ function App() {
           <Route path='/waiting' element={<Container/>}/>
           <Route path="/chat" element={<Container />} />
           <Route path="/chat/:roomId?" element={<Container />} />
-          {/* <Route path="/game" element={<MultipPlayerGame />} /> */}
-          {/* <Route path="/training" element={<TrainingGame />} /> */}
+          <Route path="/game" element={<Container/>} />
+         
         </Routes>
     </Router>
     </div>

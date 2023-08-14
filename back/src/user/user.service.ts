@@ -242,7 +242,7 @@ export class UserService {
                             },
                         });
                 
-                        await this.notifications.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
+                        await this.notifications.addNotifications(id, Id as string, 'Friendship invite', 'sent you an invite')
                     }
                     //emit notification
                 }
@@ -293,7 +293,7 @@ export class UserService {
                     },
                 });
                 await this.chatService.CreateRoom(id, Id, exist.username);
-                await this.notifications.addNotifications(id, Id, 'friendship', 'accepted your invite')
+                await this.notifications.addNotifications(id, Id, 'Friendship acceptance', 'accepted your invite')
             }
             else
                 throw new UnauthorizedException('User Does Not Exist')

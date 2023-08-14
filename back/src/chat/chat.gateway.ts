@@ -12,12 +12,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
   
     clients: Map<string, Socket> = new Map<string, Socket>()
-    rooms = new Map<string, Socket[]>()
     chatService = new ChatService;
     socketStrategy = new SocketStrategy;
     userService = new UserService;
-
-    // room {[roomId: string], Socket[]} = {}
+    
+    rooms = new Map<string, Socket[]>()
 
     async afterInit(client: Socket) {
         console.log('WebSocket gateway initialized!');
@@ -40,10 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
             if(client.data.payload.id){
                 let user = await this.userService.GetById(client.data.payload.id)
                 if (user)
-                {
                     this.clients.set(client.data.payload.id , client);
-                    // this.server.to(client.id).emit('connectionSuccess', { message: 'Connected successfully!' });
-                }
             }
         }
     }
@@ -115,7 +111,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('sendMessage')
     async handleMessage(client: Socket, body : {roomId: string, message: string}){
-        const {roomId, message} = body;
+
+        const { roomId, message } = body;
         const room = parseInt(roomId);
         const userId = client.data.payload.id;
         if(message){
@@ -125,10 +122,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
                 // const Blocked = this.userService.getBlocked(userId);
                 // this.server.to(roomId).except(client.id).emit('message', message);
                 // console.log(this.rooms)
-                console.log("Keys in the map:", [...this.rooms.keys()]);
-
-                let ChatRoom = this.rooms.get(roomId)
-                console.log(ChatRoom)
                 if(rcvData){
                     this.emitMessage(rcvData, roomId)
                     // this.server.to(client.id).emit('receiveMessage',rcvData);
@@ -140,13 +133,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     emitMessage(rcvData: any, roomId: string) {
         const ChatRoom = this.rooms.get(roomId)
             if(ChatRoom ){
-                console.log('room: ', ChatRoom)
                 // ChatRoom = ChatRoom.filter(ChatRoom => {
                 //     const id = ChatRoom.data.payload.id;
                 //     return !Blocked.has(id) 
                 // })
                 ChatRoom.forEach(socket =>{
-                    // console.log('id:', socket.data.payload.id)
+                    console.log('id:', socket.data.payload.id)
                     this.server.to(socket.id).emit('receiveMessage', rcvData)
                 })
             }
