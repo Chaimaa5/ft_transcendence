@@ -38,7 +38,7 @@ export const Room = ({id, name, image, count, type}: Props) => {
   const chatId = useParams().roomId;
   // const userdata: cntx = useContext(CrContext);
   useEffect(()=>{
-    Instanse.get<memberObj[]>("/chat/roomMembers/" + chatId)
+    Instanse.get<memberObj[]>("/chat/roomMembers/" + id)
     .then(res => setMembers(res?.data))
   }, [])
 
@@ -49,7 +49,7 @@ export const Room = ({id, name, image, count, type}: Props) => {
       if (chatSocket)
       {
         
-        chatSocket.emit('joinChat', {roomId: id})
+        chatSocket.emit('joinChat', id)
       }
   }
 

@@ -78,7 +78,7 @@ export class ChatController{
     async GetMessages(@Req() req: Request, @Param('roomId') Id: any){
         const user = req.user as User
         const roomId = parseInt(Id, 10)
-        return await this.chat.GetMessages(user.id, 1)
+        return await this.chat.GetMessages(user.id, roomId)
     }
 
     @Post('/ban/:membershpiId')

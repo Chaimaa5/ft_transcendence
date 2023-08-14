@@ -85,24 +85,32 @@ export class ChatService {
             }
         })
 
+
         let modifiedRooms =  rooms.map((room) =>{
-            let message = ''
             if (room){
-                for (const member of room.membership) {
-                    room.image = 'http://' + process.env.HOST + ':3000/api' + member.roomImage;
-                    room.name = member.roomName as string;
-                  }
-                  if(room.message[0])
+                let message = ''
+                if(room.message[0])
                     message = room.message[0].content;
+                for (const member of room.membership) {
+                        if(!member.roomImage?.includes('cdn.intra'))
+                            room.image = 'http://' + process.env.HOST + ':3000/api' + member.roomImage;
+                        else
+                            room.image = member.roomImage
+                        room.name = member.roomName as string;
+                        return room
+                }
+                return  {
+                    'id': room.id,
+                    'name': room.name,
+                    'type': room.type,
+                    'image': room.image,
+                    'ownerId': room.ownerId,
+                    'message': message
+                }
             }
-            return  {'id': room.id,
-            'name': room.name,
-            'type': room.type,
-            'image': room.image,
-            'ownerId': room.ownerId,
-            'message': message
-           }
-        })
+                
+        });
+        
         return modifiedRooms
 
     }
@@ -112,13 +120,7 @@ export class ChatService {
     
         const roomCheck = await this.prisma.room.findFirst({
             where: {
-                membership: {
-                    some: {
-                        userId: {
-                            in: [ownerId, memberId]
-                        }
-                    }
-                },
+                name : ownerId + memberId,
                 isChannel: false
             }
         })
@@ -126,8 +128,8 @@ export class ChatService {
             console.log('here')
             const room = await this.prisma.room.create({
                 data: {
-                    name: name ,
-                    image: 'imagePath',
+                    name: ownerId + memberId,
+                    image: '',
                     type: 'private',
                     ownerId: ownerId,
                     isChannel: false,
@@ -205,7 +207,6 @@ export class ChatService {
             imagePath = "/upload/avatar.png";
         let EncryptedPaswword = ''
 
-        console.log(imagePath)
         if(data.type === 'protected')
             EncryptedPaswword = this.encryptPassword(data.password as string)
         const room = await this.prisma.room.create({
@@ -484,7 +485,8 @@ export class ChatService {
         let  channelsModified = await Promise.all(
         channels.map(async(channel) => {
             if (channel.image){
-                channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image
+                if(!channel.image.includes('cdn.intra'))
+                    channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image
             }
                 let count = await this.prisma.membership.count({
                     where: {roomId: channel.id}
@@ -526,7 +528,8 @@ export class ChatService {
         const channelss = await Promise.all(
         channels.map(async(channel) => {
             if (channel.image){
-                channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image
+                if(!channel.image.includes('cdn.intra'))
+                    channel.image = 'http://' + process.env.HOST + ':3000/api' + channel.image
             }
                 let count = await this.prisma.membership.count({
                     where: {roomId: channel.id}
@@ -571,7 +574,8 @@ export class ChatService {
 
             let user = await this.prisma.user.findUnique({where: {id: userId}})
             if (user?.avatar){
-                user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar
+                if(!user.avatar.includes('cdn.intra'))
+                    user.avatar = 'http://' + process.env.HOST + ':3000/api' + user.avatar
             }
             return {
                 'roomId': message.roomId,
@@ -595,7 +599,8 @@ export class ChatService {
         }) 
 
         if (roomData?.image){
-            roomData.image = 'http://' + process.env.HOST + ':3000/api' + roomData.image
+            if(!roomData.image.includes('cdn.intra'))
+                roomData.image = 'http://' + process.env.HOST + ':3000/api' + roomData.image
         }
         let message = await this.prisma.message.findMany({
             where: {roomId: roomId},
@@ -613,11 +618,13 @@ export class ChatService {
                 content: true,
             }
        })
+      
 
         let messages = await Promise.all(
         message.map(async(message) => {
             if (message.user.avatar){
-                message.user.avatar = 'http://' + process.env.HOST + ':3000/api' + message.user.avatar
+                if(!message.user.avatar.includes('cdn.intra'))
+                    message.user.avatar = 'http://' + process.env.HOST + ':3000/api' + message.user.avatar
             }
                
                 return {'id': message.user.id,
@@ -639,6 +646,7 @@ export class ChatService {
                 role: true
             }
        })
+
        return {...roomData, ...membership, messages}
 
     }
