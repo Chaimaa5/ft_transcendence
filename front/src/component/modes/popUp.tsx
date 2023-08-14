@@ -8,8 +8,7 @@ import training_img from "../tools/modes/brain.png"
 import { SliderMarks } from "antd/es/slider";
 import Instanse from "../api/api";
 import Avatar from "../avatar";
-import { useNavigate } from "react-router-dom";
-
+import incon1 from "../tools/btnsIcons/1.svg"
 
 
 
@@ -79,7 +78,6 @@ const ModePopUp = ({whichOne}) => {
     const [input, setValue] = useState("");
     const [response, setResponse] = useState<{username: string, avatar: string}[]>([]);
     const [Player, SetPlayer] = useState("");
-	const nav  = useNavigate();
     useEffect(() => {
             if(input){
                 SetPlayer("");
@@ -154,14 +152,11 @@ const ModePopUp = ({whichOne}) => {
                 </div>
 
                 <div onClick={() => {
-                    if(Join)
-                        return
-                    else if(Create)
                         GoToNext(true);
                 }} className="flex justify-center h-[20%] w-[80%]">
                     <Button_ option="continue"/>
                 </div> </>}
-                {Next && !Invite &&
+                {Next && !Invite && Create &&
                     <form className="h-[100%] w-[90%] flex flex-col  justify-evenly items-center">
                         <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
@@ -194,8 +189,8 @@ const ModePopUp = ({whichOne}) => {
                             <button onClick={() => {SetInvite(true)}} className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="Invite"/>
                             </button>
-                            <button onClick={() => { Instanse.post('/game/create-challenge-game', {Rounds, Pointes, isFlashy, PaddleSize, Player});nav("/home")}}
-							className="flex justify-center h-[10%] w-[80%]">
+                            <button onClick={() => { Instanse.post('/game/challenge', {Rounds, Pointes, isFlashy, PaddleSize})
+                                }}className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="continue"/>
                             </button>
                         </div>
@@ -239,6 +234,22 @@ const ModePopUp = ({whichOne}) => {
                             <Button_ option="Back"/>
                         </button>
                     </div>
+                }
+                {Next && Join && 
+                    <div className="flex flex-col  items-center justify-evenly h-[100%] w-[100%]">
+                        <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
+                        <h5 className="text-[0.8vw] text-[#A8DADC]">Games List</h5>
+                        <div className="flex flex-col h-[80%] w-[100%] justify-bteween items-center overflow-y-scroll">
+                            <div className="flex justify-between items-center h-[20%] p-[5%] border-LightBlue border-[0.15vw] w-[80%] rounded-[2vw] m-[1%]">
+                                <Avatar src="" wd_="2.3vw"/>
+                                <h1 className="text-[0.6vw] w-[60%] text-LightBlue">Challenge<br/>mmoutawa</h1>
+                                <button className="h-[2vw] w-[2vw] flex justify-center items-center relative rounded-[50%] bg-DarkBlue hover:bg-LightBlue">
+                                    <ReactSVG className="w-[0.8vw] fill-White absolute left-[35%] hover:fill-DarkBlue" src={incon1}/>   
+                                </button>
+                            </div>
+                       
+                        </div>
+                </div>
                 }
             </div>
         </>

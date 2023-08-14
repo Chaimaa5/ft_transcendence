@@ -1,13 +1,6 @@
 @import "../tools/fonts.scss";
 
-.navbar_{
-    display: grid;
-    width: 10vh;
-    grid-template-rows: repeat(2, 23vw);
-    grid-template-columns: 10vw;
-    grid-template-areas: "level_" "nav_";
-    justify-items: center;
-}
+
 
 .value{
     font-size: Myfont_l;
@@ -15,28 +8,10 @@
     color: var(--lightBlue);
 }
 
-.level-bar{
-    grid-area: level_;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.nav-bar{
-    width: 10vh;
-    grid-area: nav_;
-    display: flex;
-    justify-self: center;
-    align-items: center;
-    justify-content: space-between;
-    flex-direction: column;
-}
-
 .icon-svg{
-    width: 1.6vw;
+    // width: 1.6vw;
     margin: 0;
-    fill: var(--lightBlue);
+    // fill: var(--lightBlue);
 }
 
 .lv{
@@ -63,8 +38,8 @@
 }
 
 .container-lv{
-    height: 90%;
-    width: 30%;
+    height: 95%;
+    width: 40%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -72,9 +47,9 @@
     border-radius: 5vw;
 }
 
-.icon-svg:hover{
-    fill: var(--red);
-}
+// .icon-svg:hover{
+//     fill: var(--red);
+// }
 
 .profil_{
     position: relative;

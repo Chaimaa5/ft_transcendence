@@ -9,12 +9,31 @@
 .modes-{
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .popup{
     background: linear-gradient(135deg, #457B9D 0%, #1D3557 100%);
 
+}
+
+.search-box-invite::placeholder{
+    font-family: Myfont_r;
+    color: var(--lightBlue);
+    font-size: 0.6vw;
+    position: relative;
+    // top: 5%;
+}
+
+.search-box-invite{
+    background-color: var(--blue);
+    border-radius: 3vw;
+    color: var(--lightBlue);
+    padding: 0.5%;
+    padding-left: 4%;
+    font-family: Myfont_r;
+    font-size: 0.6vw;
+    outline: none;
+    box-shadow: 0.3vw 0.3vw 0.2vw 0 rgba(0, 0, 0, 0.25) inset;
 }
 
 .container-mode{
@@ -81,3 +100,9 @@
     z-index: 100 !important;
     outline: none !important;
 }
+
+.ReactModal__content {
+    
+    outline: none !important;
+}
+

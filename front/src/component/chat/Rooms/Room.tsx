@@ -2,13 +2,17 @@ import React, { useContext, useEffect, useState } from 'react'
 import Avatar from '../../avatar'
 import avatar_img from '../../tools/sign/avatar.png'
 import { ReactSVG } from "react-svg";
-import icon7 from "../../tools/btnsIcons/7.svg"
+import icon7 from "../../tools/btnsIcons/arrow.svg"
 import Style from "./styleRoom.module.css"
 import { Link, useParams } from 'react-router-dom';
 import { memberObj } from '../ChatStore/useRoomMembers';
 import Instanse from '../../api/api';
 import useSocket from '../ChatStore/useSocket';
 import CrContext, { cntx } from '../../context/context';
+import icon3 from "../../tools/btnsIcons/3.svg"
+import icon2 from "../../tools/btnsIcons/2.svg"
+import icon1 from "../../tools/btnsIcons/1.svg"
+import icon4 from "../../tools/btnsIcons/7.svg"
 
 interface Props
 {
@@ -19,39 +23,69 @@ interface Props
   type: string,
 }
 
+interface displayMmbr{
+  on: boolean,
+  username: string,
+  userId: string,
+  avatar: string,
+}
+
 export const Room = ({id, name, image, count, type}: Props) => {
-  // const [members, setMembers] = useState<memberObj[]>([]);
-  const members = [{image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}]
-  const {roomId : chatId} = useParams();
+  
+  const [displayMembers, setDisplayMembers] = useState<displayMmbr>({on: false, username: '', userId: '', avatar: ''});
+  const [members, setMembers] = useState<memberObj[]>([]);
+  // const members = [{image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}, {image: ""}]
+  const chatId = useParams().roomId;
   // const userdata: cntx = useContext(CrContext);
-  // useEffect(()=>{
-    //   Instanse.get<memberObj[]>("/chat/roomMembers/" + chatId)
-    //   .then(res => setMembers(res?.data))
-    // }, [])
-    console.log('roomId to join :' , id, "   -  ", chatId)
-  const [isIn, SetIsin] = useState(false);
+  useEffect(()=>{
+    Instanse.get<memberObj[]>("/chat/roomMembers/" + chatId)
+    .then(res => setMembers(res?.data))
+  }, [])
+
+  
   const {chatSocket} =  useSocket();
 
   const joinRoomSocket = () => {
       if (chatSocket)
       {
         
-        chatSocket.emit('joinChat', {roomId: id})
+        chatSocket.emit('joinChat', {roomId: chatId})
       }
   }
 
-  // const displayMemberClick = () => {
-  //   return (
-  //     <div  key={id} className={[Style.frame2, "  h-[3.5vw] w-[90%] pl-[-9vw] bg-gradient-to-r from-[#457B9D] to-[#1D3557]] rounded-[2vw] text-center m-[1vw] flex justify-start  overflow-x-scroll overflow-y-hidden "].join(" ")}>
+  if (displayMembers.on)
+    return (
+      <div  key={id} className={[Style.frame2, " h-[3.5vw] w-[90%] pl-[-9vw] bg-gradient-to-r from-[#457B9D] to-[#1D3557] rounded-[2vw] text-center m-[1vw] flex justify-evenly items-center  "].join(" ")}>
         
-  //     {members?.map(e => {return <div onClick={displayMemberClick}
-  //                                     className={' ml-[0.5vw] mr-[0.5vw] w-[3vw] h-[3vw] rounded-full flex-none pt-[0.3vw] '}>
-  //                                   <Avatar src={avatar_img} wd_="2.7vw"/>
-  //                                 </div>})}  
+          
+          <Avatar src={avatar_img} wd_="3.5vw"/>
+          
+          <h3 className={[Style.font2, "text-[0.8vw] text-[#F1FAEE]"].join(" ")}>{displayMembers.username}</h3>
+
+          <div className={'flex justify-evenly items-center w-[35%] h-[100%]'}>
+              <button className="w-[1.5vw]  bg-[#457B9D] h-[1.5vw] rounded-full flex justify-center items-center">
+                  <ReactSVG className="w-[0.8vw]" src={icon1}/>
+              </button>
+              <button className="w-[1.5vw]  bg-[#457B9D] h-[1.5vw] rounded-full flex justify-center items-center">
+                <ReactSVG className="w-[0.8vw]" src={icon2}/>
+              </button>
+              <button className="w-[1.5vw]  bg-[#457B9D] h-[1.5vw] rounded-full flex justify-center items-center">
+                  <ReactSVG className="w-[0.8vw]" src={icon4}/>
+              </button>
+              <button className="w-[1.5vw]  bg-[#E63946] h-[1.5vw] rounded-full flex justify-center items-center">
+                  <ReactSVG className="w-[0.8vw]" src={icon3}/>
+              </button>
+          </div>
+
+          <button 
+                onClick={() =>  {setDisplayMembers({...displayMembers, on: false})} }
+                className="w-[1.8vw]  bg-[#A8DADC] h-[1.8vw] rounded-full flex justify-center items-center">
+              <ReactSVG className="w-[1vw]" src={icon7}/>
+          </button>
     
-  //   </div>   
-  //   )
-  // }
+    </div>   
+    )
+
 
   if (chatId && parseInt(chatId) == id)
   {
@@ -60,7 +94,7 @@ export const Room = ({id, name, image, count, type}: Props) => {
       <div  key={id} className={[Style.frame2, "  h-[3.5vw] w-[90%] pl-[-9vw] bg-gradient-to-r from-[#457B9D] to-[#1D3557]] rounded-[2vw] text-center m-[1vw] flex justify-start  overflow-x-scroll overflow-y-hidden "].join(" ")}>
         
         {members?.map(e => {return <div 
-                                        // onClick={displayMemberClick}
+                                        onClick={() => setDisplayMembers({on: true, username: e.username, userId: e.userId, avatar: e.avatar})}
                                         className={' ml-[0.5vw] mr-[0.5vw] w-[3vw] h-[3vw] rounded-full flex-none pt-[0.3vw] '}>
                                       <Avatar src={avatar_img} wd_="2.7vw"/>
                                     </div>})}  

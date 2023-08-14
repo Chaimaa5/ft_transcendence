@@ -1,15 +1,17 @@
 .container-status{
-    width: 40%;
+    width: 50%;
     height: 97%;
-    background-color: var(--darkBlue);
     border-radius: 2vw;
     display: flex;
     flex-direction: column;
+    background-color: var(--darkBlue);
     box-shadow: 0vw 0vw 1.4vw  #091424;
     justify-content: flex-start;
     padding-top: 5%;
     padding-left: 3%;
     overflow-y: scroll;
+    z-index: 100;
+    
 }
 
 .status-{
@@ -20,15 +22,15 @@
 
 .status-cr{
     position: absolute;
-    height: 10%;
-    width: 10%;
+    height: 15%;
+    width: 15%;
     border-radius: 50%;
-    top: 23%;
+    top: 15%;
     left: 78%;
     z-index: 10;
 }
 
-.st-container{
+.st-container-{
     display: flex;
     justify-content: center;
     align-items: center;

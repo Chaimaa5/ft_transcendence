@@ -58,7 +58,7 @@ export const Chat = () => {
       Instanse.get<RoomObj[]>("/chat/channels" , {withCredentials: true})
       .then(res => {
         setUnjoinedRooms(res.data);
-        console.log("chaaaaanneeels")
+        console.log("chaaaaanneeels: ", res.data)
       })
       .catch(err => setError(err.message));     
     }

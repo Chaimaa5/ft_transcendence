@@ -15,7 +15,7 @@ Instanse.interceptors.response.use(
     },
     (error) => {
         if(error.response.data.message == "Unauthorized")
-            Instanse.get("/refresh")
+            Instanse.get("/api/refresh")
     }
 )
 

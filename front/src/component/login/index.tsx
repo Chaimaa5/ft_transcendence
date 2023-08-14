@@ -7,6 +7,7 @@ import { useRef } from "react";
 import bg from '../tools/sign/background.png'
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { socket_ } from "../api/api";
 
 const Spline = React.lazy(() => import('@splinetool/react-spline'));
 

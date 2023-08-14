@@ -46,32 +46,19 @@ const Leaderboord = () => {
         Instanse.get("/leaderboard")
                 .then((res) => {
                     setData(res.data);
+                    console.log(res.data)
                 })
-    },[data])
-    const achve: { isAchieved: boolean; imagePath: string }[] = [
-        { isAchieved: true, imagePath:  "" },
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: true, imagePath:  ""},
-        { isAchieved: true, imagePath:  ""},
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: true, imagePath:  ""},
-        { isAchieved: true, imagePath:  ""},
-        { isAchieved: false, imagePath: "" },
-        { isAchieved: false, imagePath: "" },
-    ];
+    },[])
+
     return(
         <div className="leader-container h-[44vw] w-[100%]">
             <div className="h-[50%] w-[100%] top-3-players">
                 <h1 className="h-[15%] text-[1vw] text-[#457B9D]">Leaderboard</h1>
                 <div className="top-3 pt-[1%]">
                 {data?.map((value, key) =>{
-                    
                     if(value.rank == 2){
                     return(
-                        <div className="h-[85%] w-[20%] m-[1%] leader-box order-1">
+                        <div key={key} className="h-[85%] w-[20%] m-[1%] leader-box order-1">
                             <Avatar src={value.avatar} wd_="3.5vw"/>
                             <img className="h-[60%] w-[100%]" src={cube}/>
                             <div className="leader-info pt-[5%] left-[37%]">
@@ -85,7 +72,7 @@ const Leaderboord = () => {
                     )}
                     if(value.rank == 1){
                         return(
-                            <div className="h-[100%] w-[20%] m-[1%] leader-box order-2">
+                            <div key={key} className="h-[100%] w-[20%] m-[1%] leader-box order-2">
                                 <Avatar src={value.avatar} wd_="3.5vw"/>
                                 <img className="w-[100%]" src={cube}/>
                                 <div className="leader-info pb-[1%] left-[35%]">
@@ -99,7 +86,7 @@ const Leaderboord = () => {
                     )}
                     if(value.rank == 3){
                         return(
-                        <div className="h-[70%] w-[20%] m-[1%] leader-box order-3">
+                        <div key={key} className="h-[70%] w-[20%] m-[1%] leader-box order-3">
                             <Avatar src={value.avatar} wd_="3.5vw"/>
                             <img className="h-[60%] w-[100%]" src={cube}/>
                             <div className="leader-info pt-[5%] left-[37%]">
@@ -115,11 +102,7 @@ const Leaderboord = () => {
             </div>
             <div className="h-[50%] w-[100%] leader-players">
                 <div className="h-[100%] w-[100%] pr-[1%]">
-                    {
-                        achve.map(()=>
                         <TopPlayers/>
-                        )
-                    }
                 </div>
             </div>
         </div>

@@ -36,8 +36,8 @@ const BlockList = () => {
                 <h2 className="text-[#A8DADC] text-[1vw] text-center">Blocked Accounts</h2>
             </div>
             <div className="w-[100%] p-[1%] h-[90%] flex justify-start items-center flex-col">
-            {response[0] && response?.map((data) =>
-                <div className="w-[60%] h-[14%] p-[3%] rounded-[2vw] border-[0.1vw] border-[#A8DADC] flex justify-between items-center">
+            {response[0] && response?.map((data, key) =>
+                <div key={key} className="w-[60%] h-[14%] p-[3%] rounded-[2vw] border-[0.1vw] border-[#A8DADC] flex justify-between items-center">
                     <Avatar src={data.avatar} wd_="2.5vw"/>
                     <h1 className="text-[#A8DADC] text-[1vw]">{data.username}</h1>
                     <button onClick={() => {

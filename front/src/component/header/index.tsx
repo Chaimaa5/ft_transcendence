@@ -5,7 +5,7 @@ import logout from '../tools/header/logout.svg';
 import './index.scss';
 import Instanse, {socket_} from "../api/api";
 import { Link } from "react-router-dom";
-import Notification from "./notification"
+import Notification from "./notifaction"
 import Search from "./search"
 
 const Header = () => {
@@ -19,7 +19,7 @@ const Header = () => {
                 <Search/>
             </div>
             <div className="h-[100%] w-[9%] flex justify-center items-center">
-                <button className="notfication pr-[10%] w-[50%] relative"
+                <div className="notfication pr-[10%] w-[50%] relative"
                     onMouseEnter={() => { setIshover(true)}}
                     onMouseLeave={() => {setIshover(false)}}>
                     <img className="h-[1vw]" src={notfication}/>
@@ -27,7 +27,7 @@ const Header = () => {
                         isHover &&
                         <Notification/>
                     }
-                </button>
+                </div>
                 <Link to="/login" onClick={() => {
                     Instanse.get("/logout")
                 }} className="w-[50%] pl-[10%]">

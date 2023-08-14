@@ -50,7 +50,7 @@ const Setup = () => {
     UpdateUserDTO.append('username', username_);
     UpdateUserDTO.append('avatar', avatar);
 
-     axios.post('http://localhost:3000/api/user/setup', UpdateUserDTO, header)
+     axios.post('http://localhost:3000/api/user/setup', UpdateUserDTO, header).then(res => {console.log(res.data);})
       nav('/home')
 
 

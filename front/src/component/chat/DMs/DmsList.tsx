@@ -14,7 +14,7 @@ export const DmsList = () => {
   
   useEffect(()=>{
     Instanse.get<DmObj[]>("/chat/rooms" , {withCredentials: true})
-    .then(res =>updateDms(res.data) )
+    .then(res =>{updateDms(res.data); console.log("DM: ", res.data) })
     .catch(err => console.log("This is an error message: " , err.message))
   }, [])
   

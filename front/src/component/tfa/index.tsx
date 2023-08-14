@@ -26,8 +26,9 @@ const TfaPage = () => {
                 />
             </div>
             <button onClick={() => {
-                Instanse.post("/VerifyTwoFA",{code: code})
+                Instanse.post("/enable",{code: code})
                 .then((res) => {
+                    console.log(res)
                     if(!res.data)
                         setholder("try again !")
                     else nav("/home")

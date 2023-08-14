@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 
 type friends_ = {
     id: string,
+    //username not found
     username: string,
     avatar: string,
     XP: number,
@@ -22,19 +23,19 @@ const Friends = () => {
     const routProp = useParams()
     const [response, setResponse] = useState<friends_[]>([]);
     
-    const Fetch = async () => {
-        await Instanse.get<friends_[]>('/profile/friends/' + routProp.username, {withCredentials: true})
+    const Fetch = () => {
+        Instanse.get<friends_[]>('/profile/friends/' + routProp.username)
         .then((res) => {
             setResponse(res.data)
+            console.log(res.data)
         });
     }
     
-    useEffect(
-        () => {
-            const FetchDt = async () => {await Fetch()}
-            FetchDt()
-        }
-    ,[response]);
+    useEffect(() => {
+            Fetch()
+    }
+    ,[routProp.username]);
+
     if(!response[0]){
         const addFriends = [1,2,3,4,]
         return(
@@ -45,7 +46,7 @@ const Friends = () => {
                     {
                         addFriends.map( (value, key) =>
                             <motion.div whileHover={{scale: 1.2, opacity: 0}}
-                                 tabIndex={key} className="opacity-[30%] flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">
+                                 key={key} className="opacity-[30%] flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">
                             </motion.div>
                         )
                     }
@@ -59,14 +60,20 @@ const Friends = () => {
         <div className="h-[95%] w-[100%] Friend">
         {
             response.map( (value, key) =>
-                <div className="flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">
+                <div key={key} className="flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar ">
                     <Link className="h-[100%] w-[10%] av-bar" to={"/profile/" + value.username}>
-                            <Avatar src={value.avatar} wd_="2.5vw"/>
+                            <Avatar src={value.avatar} wd_="2.8vw"/>
                     </Link>
-                    <h3 className="text-[0.8vw] text-[#A8DADC]">{value.username}</h3>
-                    <h3 className="text-[0.8vw] text-[#A8DADC]">{value.XP} xp</h3>
-                    <h3 className="text-[0.8vw] text-[#A8DADC]">Lv {value.level}</h3>
-                    <div className=" h-[90%]">
+                    <div className="w-[15%] h-[100%]   flex justify-center items-center" >
+                        <h3 className="text-[0.8vw] text-[#A8DADC]">{value.username}</h3>
+                    </div>
+                    <div className="w-[15%] h-[100%]   flex justify-center items-center">
+                        <h3 className="text-[0.8vw] text-[#A8DADC]">{value.XP} xp</h3>
+                    </div>
+                    <div className="w-[15%] h-[100%]   flex justify-center items-center">
+                        <h3 className="text-[0.8vw] text-[#A8DADC]">Lv {value.level}</h3>
+                    </div>
+                    <div className=" h-[90%] flex justify-center items-center">
                         <Button_ option="Invite"/>
                     </div>
                 </div>

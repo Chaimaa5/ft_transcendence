@@ -2,7 +2,7 @@ import React from "react";
 
 type achiev = {
     isAchieved: boolean,
-    imagePath: string
+    imagePath: string,
 }
 
 const Achievement = ({imagePath, isAchieved}:achiev) => {

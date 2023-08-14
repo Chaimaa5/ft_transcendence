@@ -82,7 +82,7 @@ const Profile = () => {
         .then((res) => {
             setResponse(res.data)
         });
-    },[]);
+    },[response]);
     
     if(response?.isBlocked) return
     return(
@@ -117,8 +117,8 @@ const Profile = () => {
                 </div>
                 <div className="achievement">
                     {
-                        achve.map((arr, key) =>   
-                        <Achievement imagePath={arr.imagePath} isAchieved={arr.isAchieved}/>)
+                        achve.map((arr, key) => 
+                        <Achievement key={key} imagePath={arr.imagePath} isAchieved={arr.isAchieved}/>)
                     }
                 </div>
             </div>

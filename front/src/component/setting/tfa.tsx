@@ -2,23 +2,13 @@ import React, { useEffect, useState } from "react";
 import "./index.scss"
 import Instanse from "../api/api";
 
-type btnType = {
-    background: string,
-    justifyContent: string
-}
-
-type btnBody = {
-    background: string,
-}
-
-
-
-
 
 const TfaContainer = () => {
     const [Qrcode, setQr] = useState("");
-    const [btnBody, SetBody] = useState<btnBody>({background: "#E63946"});
-    const [btnColor, SetBtn] = useState<btnType>({background: "#f29999", justifyContent: ""});
+    const [btnBody, SetBody] = useState<{background: string}>({background: "#E63946"});
+    const [btnColor, SetBtn] = useState<{
+        background: string,
+        justifyContent: string}>({background: "#f29999", justifyContent: ""});
     const [code, SetCode] = useState("");
     const [holder, setholder] = useState("Enter the 6-digit code")
     const [isActv, setIsActv] = useState(false);
@@ -39,6 +29,7 @@ const TfaContainer = () => {
     useEffect(() => {
         Instanse.get("/isEnabled")
             .then((res) => {
+                console.log(res.data)
                 if(res.data)
                     setIsActv(true);
             })

@@ -9,7 +9,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useDms from '../ChatStore/useDms';
 import { DmObj } from '../ChatStore/useDms';
 import { Link } from 'react-router-dom';
-
+import useRequestedRoom from '../ChatStore/useRequestedRoom';
+import useSocket from '../ChatStore/useSocket'
 
 interface Props{
     id: number,
@@ -20,16 +21,26 @@ interface Props{
 
 export const Dm = ({id, name, image, lastMsg}:Props) => {
     
-
+    const {chatSocket} =  useSocket();
     // const userName: string = "ridrissi"
     // const last_msg: string = "Hello world!";
     const chatId = useParams().roomId;
 
     const nav = useNavigate();
+
+    const joinRoomSocket = () => {
+        if (chatSocket)
+        {
+          
+          chatSocket.emit('joinChat', {roomId: chatId})
+        }
+    }
   
     return (
         <Link to={"/chat/" + id}>
-            <div className={" h-[3.5vw] w-[90%] pl-[-9vw] bg-gradient-to-r from-[#457B9D] to-[#1D3557] rounded-[2vw] text-center m-[1vw] flex justify-evenly items-center "}>
+            <div 
+                onClick={joinRoomSocket}
+                className={" h-[3.5vw] w-[90%] pl-[-9vw] bg-gradient-to-r from-[#457B9D] to-[#1D3557] rounded-[2vw] text-center m-[1vw] flex justify-evenly items-center "}>
                 
                     <Avatar src={image} wd_="3.5vw"/>
             

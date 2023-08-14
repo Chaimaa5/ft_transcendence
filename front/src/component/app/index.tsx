@@ -9,10 +9,12 @@ import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Leaderboord from "../leaderboord";
-import Instanse from "../api/api";
+import Instanse, { socket_ } from "../api/api";
 import CrContext from "../context/context";
 import Setting from "../setting/index";
+import Waiting from "../modes/waiting";
 import Chat from "../chat/Chat";
+
 
 type cntx = {
     username: string,
@@ -32,32 +34,47 @@ function Container(){
     const context = useContext<cntx>(CrContext);
     const [data, setData] = useState(context);
     useEffect(() => {
-        Instanse.get("/user")
-        .then((res) => setData(res.data))
-    }, [])
+        // socket_().then((sk) => {
+        //     sk.connect()
+        //   })
+            Instanse.get("/user")
+            .then((res) => setData(res.data))
+        },[]
+    )
+    if(location.pathname == "/waiting")
+        return(
+            <CrContext.Provider value={data}>
+            <div className="background">
+                <div className="allcontent">
+                    <Waiting/>
+                </div>
+            </div>
+        </CrContext.Provider>
+        )
     return(
         <CrContext.Provider value={data}>
             <div className="background">
-            <div className="allcontent">
-                <div className="header_">
-                    <Header/>
+                <div className="allcontent">
+                    <div className="header_">
+                        <Header/>
+                    </div>
+                    <div className="content_">
+                        <div className="navbar">
+                            <Navbar/>
+                        </div>
+                        <div className="page">
+                            {location.pathname == "/home" && <Home/>}
+                            {location.pathname.startsWith("/profile/") && <Profile/>}
+                            {location.pathname == "/leaderboord" && <Leaderboord/>}
+                            {location.pathname == "/setting" && <Setting/>}
+                            {location.pathname.startsWith("/chat") && <Chat/> }
+
+                        </div>
+                        <div className="status">
+                            <Status/>
+                        </div>
+                    </div>
                 </div>
-                <div className="content_">
-                    <div className="navbar">
-                        <Navbar/>
-                    </div>
-                    <div className="page">
-                        {location.pathname == "/home" && <Home/>}
-                        {location.pathname.startsWith("/profile/") && <Profile/>}
-                        {location.pathname == "/leaderboord" && <Leaderboord/>}
-                        {location.pathname.startsWith("/chat") && <Chat/> }
-                        {location.pathname == "/setting" && <Setting/>}
-                    </div>
-                    <div className="status">
-                        <Status/>
-                    </div>
-                </div>
-            </div>
             </div>
         </CrContext.Provider>
     )

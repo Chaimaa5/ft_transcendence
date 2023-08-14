@@ -82,7 +82,7 @@ const Modes = () => {
                         }} className="relative outline-0">
                             <Button_ option="Start"/>
                         </button>
-                        <Modal className="flex justify-center items-center"
+                        <Modal className="flex justify-center items-center h-[45vw]"
                               isOpen={isPop}
                               onRequestClose={() => {setPop(false)}}
                             >

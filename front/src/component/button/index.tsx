@@ -1,9 +1,10 @@
 import React from "react";
 import { ReactSVG } from "react-svg";
-import setup_icon from '../tools/button/continue.svg';
+import setup_icon from '../tools/button/Continue.svg';
 import start_icon from '../tools/button/start.svg';
 import invite_icon from '../tools/button/invite.svg';
 import watch_icon from '../tools/button/watch.svg';
+import out_icon from '../tools/btnsIcons/out.svg';
 import './index.scss';
 
 type btn = {
@@ -18,6 +19,8 @@ const Button_ = ({option}:btn ) => {
         icon = watch_icon;
     else if(option == "Invite")
         icon = invite_icon;
+    else if(option == "Back")
+        icon = out_icon
 
     
     return(

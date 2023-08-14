@@ -40,24 +40,27 @@ const TopPlayers = ()=> {
             .get<home_[]>('/home/bestRanked')
             .then((res) => {
                 setResponse(res.data)
-            });
+            })
+            .catch((err) => console.log(err))
     };
     useEffect(() => {
       HandleLogin();
     },[]);
     const plyrs = [1,2,3,4,5]
     return(
-        <motion.div animate={{x: "-43%", y: "-50%"}} className="players pos">
-            <div className="titels_">
-            <h3 className=" inf">Rank</h3>
-            <h3 className="relative left-[13%] inf">Username</h3>
-            <h3 className="relative left-[8%] inf">Score</h3>
-            <h3 className="relative left-[3%] inf">Level</h3>
-            <h3 className="inf">Topaz</h3>
+        <motion.div /*animate={{x: "-43%", y: "-50%"}}*/ className="players w-[45%] pos">
+            <div className="titels_ pl-[5%]">
+                <h3 className="inf ">Rank</h3>
+                <div className="flex justify-evenly pl-[15%] items-center w-[80%] ">
+                    <h3 className="inf w-[30%]">Username</h3>
+                    <h3 className="inf w-[30%]">Score</h3>
+                    <h3 className="inf w-[30%]">Level</h3>
+                </div>
+                    <h3 className="inf w-[15%]">Topaz</h3>
             </div>
             {response[0] &&
-            response?.map((data)=>
-                <div className="player-bar">
+            response?.map((data, key)=>
+                <div key={key} className="player-bar">
                     <div className="bar_cantainer">
                        <h3 className="inf">{data.rank}</h3>
                        <Link to={"/profile/" + data.username}>
@@ -65,18 +68,18 @@ const TopPlayers = ()=> {
                                 <Avatar src={data.avatar} wd_="3vw"/>
                             </div>
                         </Link>
-                       <h3 className="inf" >{data.username}</h3>
-                       <h3 className="inf">{data.XP} Xp</h3>
-                       <h3 className="inf">{data.level} Lv</h3>
+                       <h3 className="inf w-[15%]" >{data.username}</h3>
+                       <h3 className="inf w-[15%]">{data.XP} Xp</h3>
+                       <h3 className="inf w-[15%]">{data.level} Lv</h3>
                        <div className="elem">
                            <h3 className="inf">{0}</h3>
-                           <img src={topaz}/>
+                           <img className="w-[2.5vw]" src={topaz}/>
                        </div>
                     </div>
                 </div>    
             )
-            }{!response[0] && plyrs.map((data)=>
-            <div className="player-bar opacity-[30%]"></div>)}
+            }{!response[0] && plyrs.map((data, key)=>
+            <div key={key} className="player-bar opacity-[30%]"></div>)}
         </motion.div>
     )
 }
@@ -106,30 +109,43 @@ const Home = () => {
         else setanimation([])
     }
     return(
-        <div className="home_">
-            <motion.div animate={{x: "50%", y: "50%"}} className="welcoming pos">
-                <h3 className="title Welcom_title">WELCOME</h3>
-                <h5 className="dsc">To The <br /> Ultimate<br /> Pong<br /> Experience!</h5>
-                <button className="start_">
-                    <Button_ option="Start"/>
-                </button>
-                <motion.img whileHover={{skew: 5}} className="boy" src={pongboy} />
-            </motion.div>
-            <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream pos">
-                <h3 className="title title_stream">WATCH</h3>
-                <h5 className="dsc-stream">The Game In Action</h5>
-                    <button className="Watch_">
-                        <Button_ option="Watch"/>
-                    </button>
-                <motion.img whileHover={{scale: 1.06}} className="table" src={table_img}/>
-            </motion.div>
-            {/* <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
-                    <Modes/>
-            </motion.div> */}
-            <div className="modes pos">
-                    <Modes/>
+        <div className=" flex flex-col  w-[100%] h-[100%] justify-between align-center">
+            <div className="w-[100%] h-[50%] flex  justify-evenly items-start">
+                <motion.div animate={{x: "50%", y: "50%"}}  className="welcoming w-[45%] h-[90%] flex flex-col pt-[2%]">
+                    <div className="h-[25%] w-[100%] flex items-center justify-center">
+                        <h1 className="text-[6.5vw] title Welcom_title">WELCOME</h1>
+                    </div>                   
+                    <div className="flex flex-col h-[75%] pl-[12%] justify-evenly">
+                        <h5 className="dsc">To The <br /> Ultimate<br /> Pong<br /> Experience!</h5>
+                        <button className="start_">
+                            <Button_ option="Start"/>
+                        </button>
+                    </div>
+                    <motion.img whileHover={{skew: 5}} className="boy" src={pongboy} />
+                </motion.div>
+                <motion.div animate={{x: "-50%", y: "50%"}} className="flex h-[90%] w-[45%] relative top-[-45%] right-[-22.5%] ">
+                        <Modes/>
+                </motion.div>
             </div>
-            <TopPlayers/>
+            <div className="w-[100%] h-[50%] flex justify-evenly items-center">
+                <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream w-[45%] h-[90%] flex justify-evenly flex-col pos">
+                    <div className="h-[25%] w-[100%] flex items-center justify-center">
+                        <h3 className="title title_stream">WATCH</h3>
+                    </div>
+                    <div className="h-[23%] w-[100%] flex flex-col justify-between items-center">
+                        <h5 className="text-LightBlue">The Game In Action</h5>
+                        <button className=" h-[25%] w-[100%] flex justify-center items-center">
+                            <Button_ option="Watch"/>
+                        </button>
+                    </div>
+                    <motion.img whileHover={{scale: 1.06}} className="h-[33%]" src={table_img}/>
+                </motion.div>
+                {/* <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
+                        <Modes/>
+                    </motion.div> */}
+
+                <TopPlayers/>
+            </div>
         </div>
     )
 }
