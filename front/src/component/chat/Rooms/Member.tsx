@@ -3,7 +3,7 @@ import Avatar from '../../avatar'
 import avatar_img from '../../tools/sign/avatar.png'
 import { ReactSVG } from "react-svg";
 import adminIcon from "../../tools/btnsIcons/adminIcon.svg"
-import starIcon from "../../tools/btnsIcons/starIcon.svg"
+import starIcon from "../../tools/btnsIcons/StarIcon.svg"
 import Style from "./styleRoom.module.css"
 import Instanse from '../../api/api';
 import useRoomMembers from '../ChatStore/useRoomMembers';
