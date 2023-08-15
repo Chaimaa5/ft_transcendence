@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { TrainingRoundsBoard, TwoPlayersRoundsBoard } from './RoundsBoard'
+import {TwoPlayersRoundsBoard } from './RoundsBoard'
 import { useParams } from 'react-router-dom';
 import './App.css';
 import { socket } from './socket';

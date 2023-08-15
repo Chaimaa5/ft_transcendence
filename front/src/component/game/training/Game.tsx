@@ -1,5 +1,5 @@
 import {Ball} from "./Ball";
-import {GameTable} from "./GameTable";
+import {GameTable} from "../classes/GameTable";
 import {Paddle, PaddleSide} from "./Paddle";
 
 export interface Round {
@@ -31,7 +31,6 @@ export class Game {
 
 		this.myPaddle = new Paddle(this.table);
 		this.opponentPaddle = new Paddle(this.table);
-
 		this.roundsNumber = 3;
 		this.roundRequiredPoints = 2;
 		this.round = {

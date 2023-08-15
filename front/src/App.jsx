@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TfaPage from "./component/tfa"
 import Waiting from './component/modes/waiting';
 import { socket_ } from './component/api/api';
+import { TrainingComponent } from './component/game/training/TrainingComponent'
 
 function App() {
   
@@ -25,7 +26,7 @@ function App() {
           <Route path="/chat" element={<Container />} />
           <Route path="/chat/:roomId?" element={<Container />} />
           {/* <Route path="/game" element={<MultipPlayerGame />} /> */}
-          {/* <Route path="/training" element={<TrainingGame />} /> */}
+          <Route path="/training/:id" element={<TrainingComponent />} />
         </Routes>
     </Router>
     </div>

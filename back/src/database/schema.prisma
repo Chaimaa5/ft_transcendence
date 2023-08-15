@@ -113,7 +113,7 @@ model  Game {
   pointsToWin    Int?
   paddleSize String?
   lossLimit Int?
-  ballSpeed  String?
+  ballSpeed  Int?
   decreasingpaddleSize Boolean?
   // to change difficulty(flashy, smallPaddle)
   difficulty  String?

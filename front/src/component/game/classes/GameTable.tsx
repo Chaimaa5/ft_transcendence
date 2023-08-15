@@ -1,5 +1,4 @@
 import P5 from 'p5'
-import {Round} from './Game'
 import { Socket } from "socket.io-client";
 import { Player } from './Game';
 import { Round } from './Game';
@@ -20,14 +19,16 @@ export class GameTable {
 		this.tableHeight = tableHeight;
 	}
 
-	initTable(tableWidth : number, tableHeight : number, ctx : CanvasRenderingContext2D, p : P5, socket: Socket) {
+	initTable(tableWidth : number, tableHeight : number, ctx : CanvasRenderingContext2D, p : P5, socket?: Socket) {
 		this.prevTableWidth = tableWidth;
 		this.prevTableHeight = tableHeight;
 		this.tableWidth = tableWidth;
 		this.tableHeight = tableHeight;
 		this.ctx = ctx;
 		this.p = p;
-		this.socket = socket;
+		if(socket) {
+			this.socket = socket;
+		}
 	}
 	
 	displayScore(leftPlayer : Player, rightPlayer: Player, round : Round) {
@@ -79,6 +80,24 @@ export class GameTable {
 			this.p.textSize(this.tableWidth/7);
 			roundScore = padNumberWithZero(round.rightPlayerScore);
 			this.p.text(roundScore, this.tableWidth/2 + (pongNetW*6), pongNetY + this.tableHeight/15);
+		}
+	}
+
+	displayTrainingNet(leftPlayer : Player, rightPlayer: Player, round : Round) {
+		if(this.p) {
+			// define colors i'll be using to display the score
+			const blue = this.p.color(69, 123, 157, 80);
+			const extraLightBlue = this.p.color(168, 218, 220);
+			const transExtraLightBlue = this.p.color(168, 218, 220, 80);
+
+
+			const pongNetX = this.tableWidth/2 - ((this.tableWidth/70)/2);
+			const pongNetY = this.tableWidth/100;
+			const pongNetW = this.tableWidth/70;
+			const pongNetH = this.tableHeight - ((this.tableWidth/100)*2);
+			this.p.fill(blue);
+			this.p.rect( pongNetX, pongNetY, pongNetW, pongNetH);
+
 		}
 	}
 

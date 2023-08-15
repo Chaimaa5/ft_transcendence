@@ -1,19 +1,21 @@
 import React from 'react';
-import {TrainingRoundsBoard} from '../RoundsBoard'
-import TrainingPongBoard from './TrainingPongBoard'
+import { TrainingPongBoard } from './TrainingPongBoard'
+import { TrainingRoundsBoard } from './TrainingRoundsBoard';
 import { TrainingProvider } from './TrainingContext';
+import { useParams } from 'react-router-dom';
 
-import './App.css';
+import '../App.css';
 
-const TrainingComponent = () => {
+export const TrainingComponent = () => {
+
+  const routeProp = useParams();
   return (
     <TrainingProvider>
       <div className="App">
-      <TrainingRoundsBoard/>
-      <TrainingPongBoard/>
+        <TrainingRoundsBoard gameId={routeProp.id}/>
+        <TrainingPongBoard gameId={routeProp.id}/>
       </div>
     </TrainingProvider>
   );
 }
 
-export default TrainingComponent;

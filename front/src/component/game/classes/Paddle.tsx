@@ -8,6 +8,12 @@ export enum PaddleSide {
 	Right,
 }
 
+const paddleSizeMap: Map<string, number> = new Map([
+  ["small", 5],
+  ["medium", 4],
+  ["large", 3]
+]);
+
 export class Paddle {
 	paddlePosX : number;
 	paddlePosY : number;
@@ -100,6 +106,43 @@ export class Paddle {
 				min,
 				max
 			);
+		}
+	}
+
+	// training mode methods
+
+
+	initTrainingPaddle(
+		gradientColor1 : string,
+		gradientColor2 : string,
+		side : PaddleSide,
+		paddleSize : string
+	) {
+		this.gradientColor1 = gradientColor1;
+		this.gradientColor2 = gradientColor2;
+		this.side = side;
+		if(this.side === PaddleSide.Left) {
+			this.paddlePosX = this.table.tableWidth/100;
+			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
+		}
+		else if(this.side === PaddleSide.Right) {
+			this.paddlePosX = this.table.tableWidth - this.table.tableWidth*0.02 - (this.table.tableWidth/100);
+			this.paddlePosY = this.table.tableHeight/2 - ((this.table.tableHeight*0.3)/2);
+		}
+		this.paddleWidth = this.table.tableWidth*0.02;
+		const paddleSizeRatio = paddleSizeMap.get(paddleSize);
+		if(paddleSizeRatio)
+			this.paddleHeight = this.table.tableHeight*paddleSizeRatio;
+		this.stepsY = this.table.tableWidth/this.speedRatio;
+	}
+
+	update() {
+		if(this.table.p) {
+			this.paddlePosY += this.stepsY * this.direction;
+			this.paddlePosY = this.table.p.constrain(
+				this.paddlePosY,
+				0,
+				this.table.tableHeight - this.paddleHeight);
 		}
 	}
 

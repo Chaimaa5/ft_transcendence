@@ -5,7 +5,7 @@ interface TrainingContextProps {
     updateScore : (newScore : number) => void;
 }
 
-const TrainingContext = createContext<TrainingContextProps>({0, });
+const TrainingContext = createContext<TrainingContextProps | undefined>(undefined);
 
 export const TrainingProvider = ({ children }) => {
     const [score, setScore] = useState(0);
@@ -21,6 +21,10 @@ export const TrainingProvider = ({ children }) => {
     );
 };
 
-export const useTrainingContext = () => {
-    return useContext(TrainingContext);
+export const useTrainingContext = () : TrainingContextProps => {
+    const context = useContext(TrainingContext);
+    if(!context) {
+        throw new Error('useTraningContext must be used with a TrainingProvider')
+    }
+    return(context);
 };

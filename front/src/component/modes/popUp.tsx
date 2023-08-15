@@ -9,6 +9,7 @@ import { SliderMarks } from "antd/es/slider";
 import Instanse from "../api/api";
 import Avatar from "../avatar";
 import incon1 from "../tools/btnsIcons/1.svg"
+import {useNavigate} from 'react-router-dom'
 
 
 
@@ -78,6 +79,8 @@ const ModePopUp = ({whichOne}) => {
     const [input, setValue] = useState("");
     const [response, setResponse] = useState<{username: string, avatar: string}[]>([]);
     const [Player, SetPlayer] = useState("");
+    const nav = useNavigate();
+    const [gameId, setGameId] = useState();
     useEffect(() => {
             if(input){
                 SetPlayer("");
@@ -98,22 +101,28 @@ const ModePopUp = ({whichOne}) => {
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Ball Speed</h1>
                         <Slider marks={marksBall} max={3} min={1} defaultValue={2} onChange={(value) => {
-                            SetRounds(value);
+                            SetSpeed(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Paddle Size</h1>
                         <Slider marks={marksPaddle} max={3} min={1} defaultValue={2} onChange={(value) => {
-                            SetRounds(value);
+                            SetPaddleSize(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Loss Limits</h1>
                         <Slider max={10} min={1} defaultValue={6} onChange={(value) => {
-                            SetRounds(value);
+                            SetLimit(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
-                    <div onSubmit={() => {
+                    <div onClick={async () => {
+                            await Instanse.post('/game/training-settings', {BallSpeed, PaddleSize_, LossLimit}).then((response) => {
+                                console.log("response " + response.data);
+                                setGameId(response.data);
+                                console.log("game id state : " + gameId);
+                            });
+                            nav('/training/'+ gameId);
                             }} className="flex justify-center h-[20%] w-[80%]">
                              <Button_ option="continue"/>
                     </div>

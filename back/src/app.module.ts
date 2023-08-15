@@ -11,6 +11,7 @@ import { MuteService } from './chat/mute.service';
 // import { GameModule } from './game/game.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationsGateway } from './user/Notifications/notifications.gateway';
+import { GameModule } from './game/game.module';
 // import { GameGateway } from './game/game.gateway';
 // import { GameService } from './game/game.service';
 @Module({
@@ -19,7 +20,7 @@ import { NotificationsGateway } from './user/Notifications/notifications.gateway
       rootPath: join(__dirname, '..', 'upload'),
       serveRoot: '/api/upload' 
 
-    }), ChatModule
+    }), ChatModule, GameModule
   ],
   controllers: [],
   providers: [ChatGateway, MuteService],
