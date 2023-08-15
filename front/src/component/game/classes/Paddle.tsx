@@ -150,7 +150,7 @@ export class Paddle {
 
 	chaseBall(direction : number, ballPosY: number) {
 		if(this.table.p) {
-			const min = (direction === 1) ? 0 : ballPosY - this.paddleHeight;
+			const min = (direction === 1) ? 0 : ballPosY;
 			const max = (direction === 1) ? ballPosY - this.paddleHeight : this.table.tableHeight - this.paddleHeight;
 
 			this.paddlePosY += direction * this.stepsY;

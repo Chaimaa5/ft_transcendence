@@ -50,10 +50,10 @@ export class Game {
 
 	setPaddlesDimensions(width : number, height : number){
 		// left Paddle dimensions
-		this.myPaddle.paddleWidth = this.table.p.map(this.myPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.prevTableWidth);
+		this.myPaddle.paddleWidth = this.table.p.map(this.myPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.tableWidth);
 		this.myPaddle.paddleHeight = this.table.p.map(this.myPaddle.paddleHeight, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
 		// right Paddle dimensions
-		this.opponentPaddle.paddleWidth = this.table.p.map(this.opponentPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.prevTableWidth);
+		this.opponentPaddle.paddleWidth = this.table.p.map(this.opponentPaddle.paddleWidth, 0, this.table.prevTableWidth, 0, this.table.tableWidth);
 		this.opponentPaddle.paddleHeight = this.table.p.map(this.opponentPaddle.paddleHeight, 0, this.table.prevTableHeight, 0, this.table.tableHeight);
 		if(this.table.p) {
 			// scale the paddles postion compared to the new canvas dimensions so the position remains the same
