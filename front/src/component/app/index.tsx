@@ -14,7 +14,7 @@ import CrContext from "../context/context";
 import Setting from "../setting/index";
 import Waiting from "../modes/waiting";
 import Chat from "../chat/Chat";
-
+// import GameComponent from '../game/GameComponent'
 
 type cntx = {
     username: string,
@@ -68,7 +68,7 @@ function Container(){
                             {location.pathname == "/leaderboord" && <Leaderboord/>}
                             {location.pathname == "/setting" && <Setting/>}
                             {location.pathname.startsWith("/chat") && <Chat/> }
-
+                            {/* {location.pathname.startsWith("/game") && <GameComponent/> } */}
                         </div>
                         <div className="status">
                             <Status/>

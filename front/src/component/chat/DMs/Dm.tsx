@@ -32,7 +32,7 @@ export const Dm = ({id, name, image, lastMsg}:Props) => {
         if (chatSocket)
         {
           
-          chatSocket.emit('joinChat', {roomId: chatId})
+          chatSocket.emit('joinChat', id)
         }
     }
   

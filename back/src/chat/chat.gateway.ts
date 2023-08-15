@@ -12,12 +12,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
   
     clients: Map<string, Socket> = new Map<string, Socket>()
-    rooms = new Map<string, Socket[]>()
     chatService = new ChatService;
     socketStrategy = new SocketStrategy;
     userService = new UserService;
-
-    // room {[roomId: string], Socket[]} = {}
+    
+    rooms = new Map<number, Socket[]>()
 
     async afterInit(client: Socket) {
         console.log('WebSocket gateway initialized!');
@@ -40,26 +39,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
             if(client.data.payload.id){
                 let user = await this.userService.GetById(client.data.payload.id)
                 if (user)
-                {
                     this.clients.set(client.data.payload.id , client);
-                    // this.server.to(client.id).emit('connectionSuccess', { message: 'Connected successfully!' });
-                }
             }
         }
     }
 
 
     addToRoom(roomId: string, client: Socket){
-        if(!this.rooms.has(roomId)){
-            this.rooms.set(roomId, [client])
+        const room = parseInt(roomId)
+        if(!this.rooms.has(room)){
+            this.rooms.set(room, [client])
         }
-        const sockets = this.rooms.get(roomId)
+        const sockets = this.rooms.get(room)
         sockets?.push(client)
     }
 
     deleteFromRoom(roomId: string, client: Socket){
-        if(this.rooms.has(roomId)){
-            let sockets = this.rooms.get(roomId)
+        const room = parseInt(roomId)
+        if(this.rooms.has(room)){
+            let sockets = this.rooms.get(room)
             
             const index = sockets?.indexOf(client)
 
@@ -108,14 +106,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('joinChat')
     joinRoom(client: Socket, roomId: string){
-        console.log('Joined ', roomId)
         this.addToRoom(roomId, client);
         client.join(roomId);
     }
 
     @SubscribeMessage('sendMessage')
     async handleMessage(client: Socket, body : {roomId: string, message: string}){
-        const {roomId, message} = body;
+
+        const { roomId, message } = body;
         const room = parseInt(roomId);
         const userId = client.data.payload.id;
         if(message){
@@ -125,28 +123,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
                 // const Blocked = this.userService.getBlocked(userId);
                 // this.server.to(roomId).except(client.id).emit('message', message);
                 // console.log(this.rooms)
-                console.log("Keys in the map:", [...this.rooms.keys()]);
-
-                let ChatRoom = this.rooms.get(roomId)
-                console.log(ChatRoom)
                 if(rcvData){
-                    this.emitMessage(rcvData, roomId)
+                    this.emitMessage(rcvData, room)
                     // this.server.to(client.id).emit('receiveMessage',rcvData);
                 }
             }
         }
     }
     
-    emitMessage(rcvData: any, roomId: string) {
+    emitMessage(rcvData: any, roomId: number) {
         const ChatRoom = this.rooms.get(roomId)
-            if(ChatRoom ){
-                console.log('room: ', ChatRoom)
+        if(ChatRoom ){
                 // ChatRoom = ChatRoom.filter(ChatRoom => {
                 //     const id = ChatRoom.data.payload.id;
                 //     return !Blocked.has(id) 
                 // })
                 ChatRoom.forEach(socket =>{
-                    // console.log('id:', socket.data.payload.id)
+                    console.log('id:', socket.data.payload.id)
                     this.server.to(socket.id).emit('receiveMessage', rcvData)
                 })
             }

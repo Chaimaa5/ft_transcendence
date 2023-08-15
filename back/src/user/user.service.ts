@@ -242,7 +242,7 @@ export class UserService {
                             },
                         });
                 
-                        await this.notifications.addNotifications(id, Id as string, 'friendship', 'sent you an invite')
+                        await this.notifications.addNotifications(id, Id as string, 'Friendship invite', 'sent you an invite')
                     }
                     //emit notification
                 }
@@ -293,7 +293,7 @@ export class UserService {
                     },
                 });
                 await this.chatService.CreateRoom(id, Id, exist.username);
-                await this.notifications.addNotifications(id, Id, 'friendship', 'accepted your invite')
+                await this.notifications.addNotifications(id, Id, 'Friendship acceptance', 'accepted your invite')
             }
             else
                 throw new UnauthorizedException('User Does Not Exist')
@@ -304,21 +304,41 @@ export class UserService {
 
     async blockFriend(id : string, Id: string){
         if (id){
+            console.log('block')
             const exist = await this.FindbyID(Id)
             if (exist){
-                await this.prisma.friendship.updateMany({
-                    where: {
-                        OR: [
-                            {senderId: id, receiverId: Id},
-                            {senderId: Id, receiverId: id},
-                        ],
-    
-                    },
-                    data: {
-                        status: 'blocked',
-                        blockerId: id,
-                    },
-                });
+                const friendship = await this.prisma.friendship.findFirst({where:{
+                    OR: [
+                        {senderId: id, receiverId: Id},
+                        {senderId: Id, receiverId: id},
+                    ],
+                }})
+                if(friendship){
+                    await this.prisma.friendship.updateMany({
+                        where: {
+                            OR: [
+                                {senderId: id, receiverId: Id},
+                                {senderId: Id, receiverId: id},
+                            ],
+        
+                        },
+                        data: {
+                            status: 'blocked',
+                            blockerId: id,
+                        },
+                    });
+                }
+                else{
+                    console.log('here')
+                    await this.prisma.friendship.create({
+                        data: {
+                            senderId: id,
+                            receiverId: Id,
+                            status: 'blocked',
+                            blockerId: id,
+                        },
+                    });
+                }
             }
             else
                 throw new UnauthorizedException('User Does Not Exist')

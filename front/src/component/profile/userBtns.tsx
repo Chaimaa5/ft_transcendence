@@ -34,7 +34,7 @@ const UserBtns = ({username}) => {
             {data?.isSender &&
                 <div className="flex h-[100%] w-[48%] items-end">
                     <button onClick={() => {
-                        Instanse.get("/user/block/" + data.id);
+                        Instanse.get("/user/remove/" + data.id);
                     }} className="w-[1.8vw] mr-[1%] bg-[#E63946] h-[1.8vw] rounded-full flex justify-center items-center">
                         <ReactSVG className="w-[0.8vw]" src={incon6}/>
                     </button>
@@ -58,7 +58,9 @@ const UserBtns = ({username}) => {
                 }} className="w-[1.8vw] mr-[1%] bg-[#457B9D] h-[1.8vw] rounded-full flex justify-center items-center">
                     <ReactSVG className="relative left-[5%] w-[1vw]" src={icon}/>
                 </button>
-                <button className="w-[1.8vw] mr-[1%] bg-[#E63946] h-[1.8vw] rounded-full flex justify-center items-center">
+                <button onClick={() => {
+                        Instanse.get("/user/block/" + data?.id);
+                }}className="w-[1.8vw] mr-[1%] bg-[#E63946] h-[1.8vw] rounded-full flex justify-center items-center">
                     <ReactSVG className="w-[1vw]" src={incon3}/>
                 </button>
             </div>
