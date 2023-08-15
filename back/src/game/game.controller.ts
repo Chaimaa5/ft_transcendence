@@ -70,7 +70,8 @@ export class GameController{
 
 	@Get('/training-settings/:id')
 	async getTrainingSettings(@Param('id') id : string) {
-
+		const gameId : number = parseInt(id);
+		return await this.gameService.getTrainingSettings(gameId);
 	}
 
 	@Get('/training-game/:id')

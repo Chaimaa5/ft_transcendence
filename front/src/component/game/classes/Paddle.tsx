@@ -116,8 +116,10 @@ export class Paddle {
 		gradientColor1 : string,
 		gradientColor2 : string,
 		side : PaddleSide,
-		paddleSize : string
+		paddleSize : string,
+		speed : number
 	) {
+		this.speedRatio = (speed === 1) ? 200  : (speed === 2) ? 150 : 100;
 		this.gradientColor1 = gradientColor1;
 		this.gradientColor2 = gradientColor2;
 		this.side = side;
@@ -132,7 +134,7 @@ export class Paddle {
 		this.paddleWidth = this.table.tableWidth*0.02;
 		const paddleSizeRatio = paddleSizeMap.get(paddleSize);
 		if(paddleSizeRatio)
-			this.paddleHeight = this.table.tableHeight*paddleSizeRatio;
+			this.paddleHeight = this.table.tableHeight/paddleSizeRatio;
 		this.stepsY = this.table.tableWidth/this.speedRatio;
 	}
 
@@ -148,7 +150,7 @@ export class Paddle {
 
 	chaseBall(direction : number, ballPosY: number) {
 		if(this.table.p) {
-			const min = (direction === 1) ? 0 : ballPosY;
+			const min = (direction === 1) ? 0 : ballPosY - this.paddleHeight;
 			const max = (direction === 1) ? ballPosY - this.paddleHeight : this.table.tableHeight - this.paddleHeight;
 
 			this.paddlePosY += direction * this.stepsY;

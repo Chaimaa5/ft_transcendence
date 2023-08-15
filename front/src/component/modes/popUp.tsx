@@ -72,15 +72,15 @@ const ModePopUp = ({whichOne}) => {
 
     const [isFlashy, SetFlashy] = useState(false);
     const [PaddleSize, SetSize] = useState(false);
-    const [PaddleSize_, SetPaddleSize] = useState(3);
-    const [BallSpeed, SetSpeed] = useState(2);
-    const [LossLimit, SetLimit] = useState(2);
     const [Invite, SetInvite] = useState(false);
     const [input, setValue] = useState("");
     const [response, setResponse] = useState<{username: string, avatar: string}[]>([]);
     const [Player, SetPlayer] = useState("");
     const nav = useNavigate();
-    const [gameId, setGameId] = useState();
+	let ballSpeed : number = 2;
+	let paddleSize : number = 2;
+	let lossLimit : number = 6;
+	let gameId : number;
     useEffect(() => {
             if(input){
                 SetPlayer("");
@@ -101,28 +101,26 @@ const ModePopUp = ({whichOne}) => {
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Ball Speed</h1>
                         <Slider marks={marksBall} max={3} min={1} defaultValue={2} onChange={(value) => {
-                            SetSpeed(value);
+                            ballSpeed = value;
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Paddle Size</h1>
                         <Slider marks={marksPaddle} max={3} min={1} defaultValue={2} onChange={(value) => {
-                            SetPaddleSize(value);
+							paddleSize = value;
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Loss Limits</h1>
                         <Slider max={10} min={1} defaultValue={6} onChange={(value) => {
-                            SetLimit(value);
+							lossLimit = value;
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div onClick={async () => {
-                            await Instanse.post('/game/training-settings', {BallSpeed, PaddleSize_, LossLimit}).then((response) => {
-                                console.log("response " + response.data);
-                                setGameId(response.data);
-                                console.log("game id state : " + gameId);
+                            await Instanse.post('/game/training-settings', {ballSpeed, paddleSize, lossLimit}).then((response) => {
+								gameId = response.data;
                             });
-                            nav('/training/'+ gameId);
+                            nav('/training/' + gameId);
                             }} className="flex justify-center h-[20%] w-[80%]">
                              <Button_ option="continue"/>
                     </div>

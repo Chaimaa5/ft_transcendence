@@ -348,13 +348,13 @@ export class GameService {
 
 
 	async postTrainingSettings(user : User, body : any) {
-		const paddleSize : string = paddleSizeMap[body.PaddleSize];
+		const paddleSize : string = paddleSizeMap[body.paddleSize];
 		const game = await this.prisma.game.create({ data : {
 			mode : 'training',
 			player1 : {connect: {id: user.id}},
-			lossLimit : body.LossLimit,
+			lossLimit : body.lossLimit,
 			paddleSize : paddleSize,
-			ballSpeed : body.BallSpeed,
+			ballSpeed : body.ballSpeed,
 			status : 'playing',
 		}
 		})
@@ -373,11 +373,10 @@ export class GameService {
 				ballSpeed : true,
 			}
 		})
-		return (game);
+		return(game)
 	}
 
 	async getTrainingGame(id : number) {
-		console.log("game id : " + id);
 		const game = await this.prisma.game.findUnique({where : {id : id},
 			select : {
 				lossLimit : true,

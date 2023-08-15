@@ -13,8 +13,8 @@ export const TrainingPongBoard = (gameId) => {
 
 	const {score, updateScore} = useTrainingContext();
 
-	const [ballSpeed, setBallSpeed] = useState(0);
-	const [paddleSize, setPaddleSize] = useState('');
+	const [ballSpeed, setBallSpeed] = useState<number>(-1);
+	const [paddleSize, setPaddleSize] = useState<string>('');
 	const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
@@ -48,8 +48,8 @@ export const TrainingPongBoard = (gameId) => {
 				ctx = html5Canvas.getContext('2d');
 				game.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p);
 				game.ball.initTrainingBall(ballSpeed);
-				game.myPaddle.initTrainingPaddle(color1, color2, PaddleSide.Right, paddleSize);
-				game.opponentPaddle.initTrainingPaddle(color1, color2, PaddleSide.Left, paddleSize);
+				game.myPaddle.initTrainingPaddle(color1, color2, PaddleSide.Right, paddleSize, ballSpeed);
+				game.opponentPaddle.initTrainingPaddle(color1, color2, PaddleSide.Left, paddleSize, ballSpeed);
 			};
 	
 			p.draw = () => {
@@ -94,18 +94,24 @@ export const TrainingPongBoard = (gameId) => {
 	}
 
 	useEffect(() => {
-		Instanse.get(`/game/training-settings/${gameId.gameId}`)
-		.then(response => {
-			setPaddleSize(response.data.paddleSize);
-			setBallSpeed(response.data.ballSpeed);
-			setDataIsLoaded(true);
-		})
-	})
+		async function fetchData() {
+			try {
+				await Instanse.get(`/game/training-settings/${gameId.gameId}`)
+				.then(response => {
+					setPaddleSize(response.data.paddleSize);
+					setBallSpeed(response.data.ballSpeed);
+				})
+			} catch(error) {
+				console.error('Error fetching data @Get /game/training-settings/:id" : ', error)
+			}
+		}
+		fetchData();
+	}, [])
 
 	return (
 		<div className="pong-board">
 			<div className="pong-table">
-			{(dataIsLoaded == true) && <TrainingPongSketch />}
+			<TrainingPongSketch />
 			</div>
 		</div>
 	);
