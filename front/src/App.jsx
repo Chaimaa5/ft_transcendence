@@ -5,12 +5,12 @@ import Login from './component/login/index';
 import Setup from './component/setup';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TfaPage from "./component/tfa"
-import Waiting from './component/modes/waiting';
 import { socket_ } from './component/api/api';
 import { TrainingApp } from './component/game/training/TrainingApp'
+import GameComponent from './component/game/GameComponent';
 
 function App() {
-  
+
   return (
      <div className="app-">
     <Router>
@@ -25,8 +25,8 @@ function App() {
           <Route path='/waiting' element={<Container/>}/>
           <Route path="/chat" element={<Container />} />
           <Route path="/chat/:roomId?" element={<Container />} />
-          {/* <Route path="/game" element={<MultipPlayerGame />} /> */}
           <Route path="/training/:id" element={<TrainingApp />} />
+		  <Route path="/game/:id" element={<GameComponent />}/>
         </Routes>
     </Router>
     </div>

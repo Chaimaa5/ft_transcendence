@@ -12,7 +12,7 @@ import Leaderboord from "../leaderboord";
 import Instanse, { socket_ } from "../api/api";
 import CrContext from "../context/context";
 import Setting from "../setting/index";
-import Waiting from "../modes/waiting";
+import Waiting from "../game/waiting";
 import Chat from "../chat/Chat";
 // import GameComponent from '../game/GameComponent'
 
@@ -34,6 +34,7 @@ function Container(){
     const context = useContext<cntx>(CrContext);
     const [data, setData] = useState(context);
     useEffect(() => {
+		
         // socket_().then((sk) => {
         //     sk.connect()
         //   })

@@ -271,16 +271,17 @@ export class GameService {
 		}
 	}
 
-	async joinGame(user: User, body: any) {
-		const gameId = parseInt(body.id);
-		const game = await this.prisma.game.findUnique({where : {id: gameId}, select : {
+	async joinGame(user: User, gameId: string) {
+		const id = parseInt(gameId);
+		const game = await this.prisma.game.findUnique({where : {id: id}, select : {
 			status : true,
 		}})
 		if(game?.status == 'pending') {
-			await this.prisma.game.update({where :  {id : gameId}, data : {
+			const game = await this.prisma.game.update({where :  {id : id}, data : {
 				playerId2 : user.id,
 				status : 'created'
-			}})
+			}});
+			this.eventsEmitter.emit('startGame', game.id);
 		}
 		else {
 			throw('game already created');
@@ -304,6 +305,14 @@ export class GameService {
 
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
+		// console.log("post challenge service : ");
+		// console.log("isPlayerInvited : " + body.isPlayerInvited);
+		// console.log("rounds : " + body.rounds);
+		// console.log("pointToWing : " + body.pointsToWin);
+		// console.log("isFlashy : " + body.isFlashy);
+		// console.log("isDecreasingPaddle : " + body.isDecreasingPaddle);
+		// console.log("Player : " + body.Player);
+		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
@@ -312,7 +321,7 @@ export class GameService {
 			difficulty : body.difficulty,
 			status: 'pending'
 		}})
-		if(body.Player)
+		if(body.isPlayerInvited)
 		{
 			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
 			if(player) {

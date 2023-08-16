@@ -56,10 +56,10 @@ export class GameController{
 		}
 	}
 
-	@Post('/join-game')
-	async handleJoingGame(@Req() req : Request, @Body() body : any){
+	@Post('/join-game/:id')
+	async handleJoingGame(@Req() req : Request, @Param('id') id : string){
 		const user : User = req.user as User;
-		return await this.gameService.joinGame(user,body);
+		return await this.gameService.joinGame(user,id);
 	}
 
 	@Post('/training-settings')

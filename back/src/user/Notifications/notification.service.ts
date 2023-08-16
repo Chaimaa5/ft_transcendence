@@ -44,23 +44,30 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
     const receiver = await this.prisma.user.findUnique({where: {id: receiverId}})
 
     if(sender && receiver){
-
         const notification = await this.prisma.notification.create({
             data: {
                 sender: {connect: {id: senderId}},
                 receiver: {connect: {id: receiverId}},
                 status: false,
-                type: 'game',
+                type: 'Game',
                 content: '',
                 gameId: gameId
             },
         });
-        console.log(notification)
-        this.Emitter.emit('notifications', notification)
+
+		const invite = await this.prisma.notification.findUnique({where: {id: notification.id}, 
+		select:{
+			sender: true,
+			gameId: true,
+			type:true
+		}})
+		if(invite?.gameId) {
+			this.notifEventsEmitter.emit('notifications',invite)
+		}
     }
 }
    
-get  eventsEmitter() {
+get  notifEventsEmitter() {
     return(this.Emitter)
 }
 

@@ -67,10 +67,7 @@ const ModePopUp = ({whichOne}) => {
     const [Next, GoToNext] = useState(false);
     const [Create, SetCreate] = useState(false);
     const [Join, SetJoin] = useState(false);
-    const [Rounds , SetRounds] = useState(3);
-    const [Pointes, SetPointes] = useState(4);
 
-    const [isFlashy, SetFlashy] = useState(false);
     const [PaddleSize, SetSize] = useState(false);
     const [Invite, SetInvite] = useState(false);
     const [input, setValue] = useState("");
@@ -81,6 +78,11 @@ const ModePopUp = ({whichOne}) => {
 	let paddleSize : number = 2;
 	let lossLimit : number = 6;
 	let gameId : number;
+	let isPlayerInvited = false;
+	let rounds : number = 3;
+	let pointsToWin : number = 5;
+	let isFlashy : boolean = false;
+	let isDecreasingPaddle : boolean = false;
     useEffect(() => {
             if(input){
                 SetPlayer("");
@@ -91,6 +93,7 @@ const ModePopUp = ({whichOne}) => {
             } else setResponse([]);
         },[input]
     )
+
     if(whichOne){
         return(
             <>
@@ -167,39 +170,46 @@ const ModePopUp = ({whichOne}) => {
                     <form className="h-[100%] w-[90%] flex flex-col  justify-evenly items-center">
                         <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
-                            <h1 className="text-[0.7vw] text-[#A8DADC]">Roundes</h1>
+                            <h1 className="text-[0.7vw] text-[#A8DADC]">Rounds</h1>
                             <Slider max={4} min={1} defaultValue={3} onChange={(value) => {
-                                SetRounds(value);
+                                rounds = value;
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
                             <h1 className=" text-[0.7vw] text-[#A8DADC]">Pointes</h1>
                             <Slider max={6} min={3} defaultValue={5} onChange={(value) => {
-                                SetPointes(value)
+								pointsToWin = value;
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[80%]">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Flashy Mode</h1>
                             <input onChange={(e) => {
-                                SetFlashy(e.isTrusted)
-                                SetSize(false)
+								isFlashy = e.isTrusted;
+								isDecreasingPaddle = false;
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[80%]">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">paddle size decreasing</h1>
                             <input onChange={(e) => {
-                                SetSize(e.isTrusted)
-                                SetFlashy(false)
+								isDecreasingPaddle = e.isTrusted;
+								isFlashy = false;
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="flex w-[100%] justify-evenly">
                             <button onClick={() => {SetInvite(true)}} className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="Invite"/>
                             </button>
-                            <button onClick={() => { Instanse.post('/game/challenge', {Rounds, Pointes, isFlashy, PaddleSize})
-                                }}className="flex justify-center h-[10%] w-[80%]">
+                            <div onClick={async () => {
+								if(Player) {
+									isPlayerInvited = true;
+								}
+								await Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
+									gameId = response.data;
+								});
+								nav('/game/' + gameId);
+                            }}className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="continue"/>
-                            </button>
+                            </div>
                         </div>
                     </form>
                 }

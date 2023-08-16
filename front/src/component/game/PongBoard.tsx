@@ -141,10 +141,6 @@ export const PongBoard = (gameId) => {
 			setDataIsLoaded(true);
 		})
 
-		socket.on('connect', () => {
-			console.log('client side : client connected to the server');
-			socket.emit('joinRoom', ("room_" + gameId));
-		});
 
 		return() => {
 			socket.off('connect', () => {

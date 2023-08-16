@@ -27,7 +27,7 @@ export class GameGateway implements OnGatewayConnection{
 	
 
 
-	afterInit() {
+	afterInit(){
 		this.logger.log('game server initialized');
 		this.gameService.eventsEmitter.on('handleUpdateScore', (room : RoomState) => {
 			const leftPlayer =  {roundScore : room.players[0].roundScore, userName : room.players[0].username};
@@ -42,7 +42,10 @@ export class GameGateway implements OnGatewayConnection{
 
 		this.gameService.eventsEmitter.on('handleEndGame', () => {
 			this.server.emit('endGame');
-		}) 
+		})
+		this.gameService.eventsEmitter.on('startGame', (gameId:number) => {
+			this.server.to("room_" + gameId).emit('launchGame')
+		})
 	}
 
 	

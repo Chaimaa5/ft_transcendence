@@ -548,7 +548,8 @@ export class UserService {
                         username: true,
                         avatar: true
                     }
-                }
+                },
+				gameId: true,
             }
         });
 

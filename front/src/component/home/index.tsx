@@ -8,7 +8,7 @@ import Modes from "../modes"
 import Avatar from "../avatar";
 import {motion} from "framer-motion"
 import { useState, useEffect } from "react";
-import Instanse from "../api/api"
+import Instanse, { socket_ } from "../api/api"
 import CrContext from "../context/context"
 import Profile from "../profile/index";
 import { Link } from "react-router-dom";

@@ -11,6 +11,7 @@ import { ChatController } from 'src/chat/chat.controller';
 import { ChatService } from 'src/chat/chat.service';
 import { NotificationService } from './Notifications/notification.service';
 import { NotificationsGateway } from './Notifications/notifications.gateway';
+import { GameService } from 'src/game/game.service';
 
 @Module({
   imports: [],

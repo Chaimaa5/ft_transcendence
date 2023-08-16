@@ -29,7 +29,9 @@ const GameNtf = ({name, gameId, avatar}) => {
                 <Avatar src={avatar} wd_="2vw"/>
             <h2 className="text-[#1D3557] text-[0.5vw]">{name} Challenged You</h2>
             <div className="h-[100%] w-[20%] flex justify-between items-center">
-                <button onClick={() => {
+                <button onClick={async () => {
+					console.log("gameeeee : "+ gameId);
+					await Instanse.post("/game/join-game/" + gameId);
                     nav("/game/" + gameId)
                 }} className="flex justify-center items-center h-[1vw] w-[1vw] rounded-[50%] bg-[#1D3557]">
                     <ReactSVG src={incon4} className="w-[70%]"/>
@@ -72,13 +74,12 @@ const FriendNtfAc = ({name, avatar, id}) => {
 
 const Notification = () => {
 
-    const [Data, SetData] = useState<not>();
+	const [Data, SetData] = useState<not>();
     function test () {
-        socket_('notifications').then((sk) => {
+        socket_().then((sk) => {
         sk.connect()
         sk.on("notifications", (data) => {
            SetData(data);
-           console.log(data)
         });
     })
     }
@@ -97,14 +98,14 @@ const Notification = () => {
                         <FriendNtf key={key} name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
                     )
                 else if(value.type == "Friendship acceptance")
-                    return (
-                        <FriendNtfAc key={key} name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
-                    )
-                    else if(value.type == "Game")
-                    return (
-                        <GameNtf key={key} name={value.sender.username} gameId={value.gameId} avatar={value.sender.avatar}/>
-                        )
-                    })
+					return (
+						<FriendNtfAc key={key} name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
+					)
+					else if(value.type == "Game")
+					return (
+						<GameNtf key={key} name={value.sender.username} gameId={value.gameId} avatar={value.sender.avatar}/>
+						)
+			})
             }
         </div>
     )
