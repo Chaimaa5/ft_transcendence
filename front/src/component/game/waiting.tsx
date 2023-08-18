@@ -3,20 +3,6 @@ import Avatar from "../avatar";
 import { socket_ } from "../api/api";
 
 const Waiting = () => {
-	function listen () {
-		socket_('notifications').then((sk) => {
-
-		sk.on("startGame", (data) => {
-		   console.log(data)
-		   console.log('accepted');
-		});
-
-	})}
-
-	useEffect(()=> {
-		listen();
-	},[])
-	
     return(
         <div className="h-[100%] w-[100%] flex justify-center items-center">
             <div className="h-[20%] w-[30%] flex items-center justify-between ">

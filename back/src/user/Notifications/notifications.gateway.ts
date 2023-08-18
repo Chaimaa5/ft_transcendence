@@ -19,8 +19,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 
     async afterInit(server: Socket) {
-        console.log('WebSocket gateway initialized!');
-        this.notificationService.notifEventsEmitter.on('notifications',(notification: any)=>{
+		console.log('WebSocket gateway initialized!');
+        this.notificationService.notifEventsEmitter.on('notifications',( notification : any)=>{
             const socket = this.clients.get(notification.receiverId)
             if(socket){
                 this.server.to(socket.id).emit('notifications', notification)

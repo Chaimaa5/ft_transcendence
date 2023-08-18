@@ -232,6 +232,8 @@ export class GameService {
 
 	addPlayer(roomId : string, playerId : string, username : string) {
 		const room = this.rooms.get(roomId);
+		console.log("rooms : " + JSON.stringify(this.rooms, null, 2));
+		console.log("player Number : " + room?.playersNumber);
 		if(room){
 			const side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
 			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
@@ -276,7 +278,7 @@ export class GameService {
 		const game = await this.prisma.game.findUnique({where : {id: id}, select : {
 			status : true,
 		}})
-		if(game?.status == 'pending') {
+		if(game?.status === 'pending') {
 			const game = await this.prisma.game.update({where :  {id : id}, data : {
 				playerId2 : user.id,
 				status : 'created'
@@ -305,31 +307,24 @@ export class GameService {
 
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
-		// console.log("post challenge service : ");
-		// console.log("isPlayerInvited : " + body.isPlayerInvited);
-		// console.log("rounds : " + body.rounds);
-		// console.log("pointToWing : " + body.pointsToWin);
-		// console.log("isFlashy : " + body.isFlashy);
-		// console.log("isDecreasingPaddle : " + body.isDecreasingPaddle);
-		// console.log("Player : " + body.Player);
 		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
 			rounds : body.rounds,
 			pointsToWin : body.pointsToWin,
-			difficulty : body.difficulty,
+			difficulty : difficulty,
 			status: 'pending'
 		}})
+		if(game.rounds && game.pointsToWin && game.difficulty) {
+			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
+		}
 		if(body.isPlayerInvited)
 		{
 			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
 			if(player) {
 				this.notification.addGameInvite(user.id, player.id, game.id)
 			}
-		}
-		if(game.rounds && game.pointsToWin && game.difficulty) {
-			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
 		}
 		return game.id
     }

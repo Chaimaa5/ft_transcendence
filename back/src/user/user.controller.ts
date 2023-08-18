@@ -23,6 +23,12 @@ export class UserController{
         return await this.userservice.FindbyID(user.id);
     }
 
+	@Get('/id')
+    async GetUserId(@Req() req: Request){
+        const user : User = req.user as User;
+		return (user.id)
+    }
+
     @Get('players')
     async Players(){
         return await this.userservice.Players();

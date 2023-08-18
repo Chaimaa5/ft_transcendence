@@ -7,7 +7,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TfaPage from "./component/tfa"
 import { socket_ } from './component/api/api';
 import { TrainingApp } from './component/game/training/TrainingApp'
-import GameComponent from './component/game/GameComponent';
+import	{GameApp}	from './component/game/GameApp';
+import { GameProvider } from './component/game/GameContext';
 
 function App() {
 
@@ -26,7 +27,7 @@ function App() {
           <Route path="/chat" element={<Container />} />
           <Route path="/chat/:roomId?" element={<Container />} />
           <Route path="/training/:id" element={<TrainingApp />} />
-		  <Route path="/game/:id" element={<GameComponent />}/>
+		  <Route path="/game/:id/:mode" element={<GameProvider><GameApp/></GameProvider>} />
         </Routes>
     </Router>
     </div>

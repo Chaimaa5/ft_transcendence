@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useEffect, useState, useTransition } from 'react'
 import Instanse from '../api/api';
-import { socket } from './socket';
+import { useGameContext } from './GameContext';
 
  
-export const TwoPlayersRoundsBoard = (gameMode, gameId) => {
+export const TwoPlayersRoundsBoard = ({gameMode, gameId}) => {
 
 	const [roundsNumber, setRoundsNumber] = useState(0);
 	const [pointsToWin, setPointsToWin] = useState(0);
@@ -11,16 +11,21 @@ export const TwoPlayersRoundsBoard = (gameMode, gameId) => {
 	
 	const rounds = Array.from(Array(roundsNumber).keys());
 
+	const {socket} = useGameContext();
+
 	useEffect(() => {
-		Instanse.get(`two-players-game/${gameId}`)
+		console.log("charlie : " + gameId);
+		Instanse.get(`/game/two-players-game/${gameId}`)
 		.then(response => {
 			setRoundsNumber(response.data.rounds);
 			setPointsToWin(response.data.pointsToWin);
 		});
 
-		socket.on('updateScore', (payload) => {
-			setPlayedRounds(payload.playedRounds);
-		});
+		if(socket) {
+			socket.on('updateScore', (payload) => {
+				setPlayedRounds(payload.playedRounds);
+			});
+		}
 	})
 
 	return (

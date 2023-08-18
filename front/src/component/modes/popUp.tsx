@@ -206,7 +206,7 @@ const ModePopUp = ({whichOne}) => {
 								await Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
 									gameId = response.data;
 								});
-								nav('/game/' + gameId);
+								nav('/game/' + gameId + "/challenge");
                             }}className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="continue"/>
                             </div>

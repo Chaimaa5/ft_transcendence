@@ -78,11 +78,12 @@ export class AuthController {
         await this.authservice.disableTFA(user.id);
     }
 
+	
+
     @Get('/access')
     @UseGuards(AuthGuard('jwt'))
     async GetAccess(@Req() req: Request, @Res() res: Response){
         const user : User = req.user as User;
-
         const access = await this.authservice.generateToken(user)
         res.json(access)
         return res;
