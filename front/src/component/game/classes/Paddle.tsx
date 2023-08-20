@@ -21,6 +21,7 @@ export class Paddle {
 	paddleWidth : number;
 	paddleHeight : number;
 	borderRadius : number;
+	prevBorderRadius : number;
 	gradientColor1 : string;
 	gradientColor2 : string;
 	stepsY : number;
@@ -30,6 +31,7 @@ export class Paddle {
 	prevDirection : number;
 	prevWindowHeight : number;
 	speedRatio : number;
+	username : string;
 
 	constructor (table : GameTable) {
 		this.paddlePosX = NaN;
@@ -37,6 +39,7 @@ export class Paddle {
 		this.paddleWidth = NaN;
 		this.paddleHeight = NaN;
 		this.borderRadius = 60;
+		this.prevBorderRadius = 60;
 		this.gradientColor1 = '';
 		this.gradientColor2 = '';
 		this.table = table;
@@ -57,7 +60,7 @@ export class Paddle {
 		this.paddlePosY = this.table.mapValue(this.paddlePosY, this.table.serverTableHeight, this.table.tableHeight);
 		this.prevPaddlePosY = this.paddlePosY;
 		this.paddleWidth = this.table.tableWidth*0.02;
-		this.paddleHeight = this.table.tableHeight*0.3;
+		this.paddleHeight = this.table.mapValue(this.paddleHeight, this.table.serverTableWidth, this.table.tableWidth);
 		this.stepsY = this.table.tableWidth/this.speedRatio;
 	}
 
@@ -73,7 +76,9 @@ export class Paddle {
 		}
 	}
 
-	updateMyPaddle() {
+	updateMyPaddle(ratio : number) {
+		this.stepsY = this.table.tableWidth/(this.speedRatio-(ratio*3));
+		console.log("steps : " + this.stepsY);
 		if(this.table.p && this.table.socket) {
 			this.paddlePosY += this.stepsY * this.direction;
 			this.paddlePosY = this.table.p.constrain(

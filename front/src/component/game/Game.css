@@ -9,7 +9,7 @@
 	--white: #F1FAEE;
 }
 
-.App {
+.Game {
 	background: linear-gradient(225deg, var(--dark-blue) 0%, var(--blue) 100%);
 	display: flex;
 	height: 100vh;

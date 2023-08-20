@@ -36,9 +36,6 @@ const initializeSocket = async (Skt : skt) => {
 	  // Now that the connection is established, set the socketInstance
 	Skt.socket = socketInstance;
 	Skt.isSocketInitialized = true;
-	
-	  
-	console.log("socket id: " + socketInstance.id);
 };
 
 
@@ -47,8 +44,6 @@ export async function useSocketManager(){
 	const Skt = new skt;
 
 	await initializeSocket(Skt);
-
-	console.log("here : " + Skt.socket+ " " + Skt.isSocketInitialized);
 	
     return ({socket : Skt.socket, isSocketInitialized : Skt.isSocketInitialized});
 }

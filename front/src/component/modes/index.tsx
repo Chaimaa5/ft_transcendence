@@ -9,6 +9,8 @@ import Challenge_img from "../tools/modes/1vs1.png"
 import { ReactSVG } from "react-svg";
 import ModePopUp from "./popUp"
 import Modal from 'react-modal';
+import Instanse from "../api/api";
+import { useNavigate } from "react-router-dom";
 const Modes = () => {
 
     const [isopen, setopen] = useState(true);
@@ -63,6 +65,8 @@ const Modes = () => {
     }
     const [isPop, setPop] = useState(false);
 
+	const nav = useNavigate();
+
     return(
         <>
 
@@ -104,7 +108,9 @@ const Modes = () => {
                             <h1 className="leading-[2.2vw] text-[#F1FAEE] text-[2vw]">Multiplayer <br/> Mode</h1>
                             <h6 className="text-center text-[#F1FAEE] text-[0.7vw]" >Compete in Intense Multiplayer Matches!</h6>
                         </div>
-                        <button className="relative ">
+                        <button onClick={async () => {
+							nav("/game/multi");
+						}} className="relative ">
                             <Button_ option="Start"/>
                         </button>
                     </>

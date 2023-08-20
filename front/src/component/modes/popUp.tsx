@@ -13,6 +13,13 @@ import {useNavigate} from 'react-router-dom'
 
 
 
+interface pendingGamesProps {
+	id : string;
+	player1 : {
+		avatar : string;
+		username: string;
+	}
+}
 
 
 const marksPaddle = {
@@ -68,21 +75,26 @@ const ModePopUp = ({whichOne}) => {
     const [Create, SetCreate] = useState(false);
     const [Join, SetJoin] = useState(false);
 
-    const [PaddleSize, SetSize] = useState(false);
     const [Invite, SetInvite] = useState(false);
     const [input, setValue] = useState("");
     const [response, setResponse] = useState<{username: string, avatar: string}[]>([]);
     const [Player, SetPlayer] = useState("");
     const nav = useNavigate();
-	let ballSpeed : number = 2;
-	let paddleSize : number = 2;
-	let lossLimit : number = 6;
-	let gameId : number;
+
+	// let gameId : number;
+	const [gameId, setGameId] = useState(0);
+	// training settings
+	const [ballSpeed, setBallSpeed] = useState(2);
+	const [paddleSize, setPaddleSize] = useState(2);
+	const [lossLimit, setLossLimit] = useState(6);
+	// challenge settings
 	let isPlayerInvited = false;
-	let rounds : number = 3;
-	let pointsToWin : number = 5;
-	let isFlashy : boolean = false;
-	let isDecreasingPaddle : boolean = false;
+	const [rounds, setRounds] = useState(3);
+	const [pointsToWin, setPointsToWin] = useState(5);
+	const [isFlashy, setIsFlashy] = useState(false);
+	const [isDecreasingPaddle, setIsDecreasingPaddle] = useState(false);
+	const [pendingGames, setPendingGames] = useState<pendingGamesProps[]>([]);
+
     useEffect(() => {
             if(input){
                 SetPlayer("");
@@ -94,6 +106,12 @@ const ModePopUp = ({whichOne}) => {
         },[input]
     )
 
+	useEffect(() => {
+		Instanse.get('/game/pending-games').then((res) => {
+			setPendingGames(res.data);
+		})
+	},[])
+
     if(whichOne){
         return(
             <>
@@ -104,26 +122,26 @@ const ModePopUp = ({whichOne}) => {
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Ball Speed</h1>
                         <Slider marks={marksBall} max={3} min={1} defaultValue={2} onChange={(value) => {
-                            ballSpeed = value;
+                            setBallSpeed(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Paddle Size</h1>
                         <Slider marks={marksPaddle} max={3} min={1} defaultValue={2} onChange={(value) => {
-							paddleSize = value;
+							setPaddleSize(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div className="flex h-[10%] w-[100%] justify-between items-center">
                         <h1 className="text-[0.7vw] text-[#A8DADC]">Loss Limits</h1>
                         <Slider max={10} min={1} defaultValue={6} onChange={(value) => {
-							lossLimit = value;
+							setLossLimit(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
                     <div onClick={async () => {
                             await Instanse.post('/game/training-settings', {ballSpeed, paddleSize, lossLimit}).then((response) => {
-								gameId = response.data;
+								setGameId(response.data);
+								nav('/training/' + response.data);
                             });
-                            nav('/training/' + gameId);
                             }} className="flex justify-center h-[20%] w-[80%]">
                              <Button_ option="continue"/>
                     </div>
@@ -172,27 +190,29 @@ const ModePopUp = ({whichOne}) => {
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Rounds</h1>
                             <Slider max={4} min={1} defaultValue={3} onChange={(value) => {
-                                rounds = value;
+                                setRounds(value);
+								console.log("value : " + value + " rounds : " + rounds);
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
-                            <h1 className=" text-[0.7vw] text-[#A8DADC]">Pointes</h1>
+                            <h1 className=" text-[0.7vw] text-[#A8DADC]">Points</h1>
                             <Slider max={6} min={3} defaultValue={5} onChange={(value) => {
-								pointsToWin = value;
+								setPointsToWin(value);
+								console.log("value : " + value + " pointToWin : " + pointsToWin);
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[80%]">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Flashy Mode</h1>
                             <input onChange={(e) => {
-								isFlashy = e.isTrusted;
-								isDecreasingPaddle = false;
+								setIsFlashy(e.isTrusted);
+								setIsDecreasingPaddle(false);
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[80%]">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">paddle size decreasing</h1>
                             <input onChange={(e) => {
-								isDecreasingPaddle = e.isTrusted;
-								isFlashy = false;
+								setIsDecreasingPaddle(e.isTrusted);
+								setIsFlashy(false);
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="flex w-[100%] justify-evenly">
@@ -204,9 +224,9 @@ const ModePopUp = ({whichOne}) => {
 									isPlayerInvited = true;
 								}
 								await Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
-									gameId = response.data;
+									setGameId(response.data) ;
+									nav('/game/' + response.data + "/challenge");
 								});
-								nav('/game/' + gameId + "/challenge");
                             }}className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="continue"/>
                             </div>
@@ -246,26 +266,36 @@ const ModePopUp = ({whichOne}) => {
                             }
                         </div>
                         <button onClick={() => {
+							
                             GoToNext(true); SetInvite(false)
                         }} className="">
-                            <Button_ option="Back"/>
+                    	  <Button_ option="Back"/>
                         </button>
                     </div>
                 }
                 {Next && Join && 
                     <div className="flex flex-col  items-center justify-evenly h-[100%] w-[100%]">
                         <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
-                        <h5 className="text-[0.8vw] text-[#A8DADC]">Games List</h5>
-                        <div className="flex flex-col h-[80%] w-[100%] justify-bteween items-center overflow-y-scroll">
-                            <div className="flex justify-between items-center h-[20%] p-[5%] border-LightBlue border-[0.15vw] w-[80%] rounded-[2vw] m-[1%]">
-                                <Avatar src="" wd_="2.3vw"/>
-                                <h1 className="text-[0.6vw] w-[60%] text-LightBlue">Challenge<br/>mmoutawa</h1>
-                                <button className="h-[2vw] w-[2vw] flex justify-center items-center relative rounded-[50%] bg-DarkBlue hover:bg-LightBlue">
-                                    <ReactSVG className="w-[0.8vw] fill-White absolute left-[35%] hover:fill-DarkBlue" src={incon1}/>   
-                                </button>
-                            </div>
-                       
-                        </div>
+                        <h5 className="text-[0.8vw] text-[#A8DADC]">Games List</h5>	
+							<div className="flex flex-col h-[80%] w-[100%] justify-bteween items-center overflow-y-scroll">
+									{pendingGames.map((value, key) => {
+										return(
+											<div className="flex justify-between items-center h-[20%] p-[5%] border-LightBlue border-[0.15vw] w-[80%] rounded-[2vw] m-[1%]">
+												<Avatar src={value.player1.avatar} wd_="2.3vw"/>
+												<h1 className="text-[0.6vw] w-[60%] text-LightBlue">Challenge<br/>{value.player1.username}</h1>
+												<button onClick={async () => {
+													await Instanse.post("/game/join-game/" + value.id).then((res) => {
+														nav("/game/" + value.id + "/challenge?accepted=true")
+													})
+												}} className="h-[2vw] w-[2vw] flex justify-center items-center relative rounded-[50%] bg-DarkBlue hover:bg-LightBlue">
+													<ReactSVG className="w-[0.8vw] fill-White absolute left-[35%] hover:fill-DarkBlue" src={incon1}/>   
+												</button>
+											</div>
+										)
+									})
+								}
+							</div>
+						{/* } */}
                 </div>
                 }
             </div>

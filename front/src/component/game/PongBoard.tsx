@@ -9,7 +9,7 @@ import Instanse from "../api/api";
 import { useGameContext } from './GameContext';
 
 
-export const PongBoard = (gameId) => {
+export const PongBoard = ({gameProp ,gameIdProp}) => {
 	const tableCanvasSizeRef = useRef<{width: number, height: number}>({
 		width: 0,
 		height: 0
@@ -17,7 +17,8 @@ export const PongBoard = (gameId) => {
 	const [dataIsLoaded, setDataIsLoaded] = useState(false);
 	const {socket} = useGameContext();
 	const gameRef = useRef(new Game(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height));
-	
+	const roomId = "room_" + gameIdProp;
+
 	function getDivWidthAndHeight(divId : string) : {width : number, height : number} {
 		const Div = document.querySelector(divId) as HTMLElement;
 		return({
@@ -41,44 +42,44 @@ export const PongBoard = (gameId) => {
 				canvas = p.createCanvas(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height).parent(div);
 				const html5Canvas = canvas.elt;
 				ctx = html5Canvas.getContext('2d');
-				gameRef.current.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p, socket);
-				gameRef.current.ball.initBall();
-				gameRef.current.myPaddle.initPaddle(color1, color2);
-				gameRef.current.opponentPaddle.initPaddle(color1, color2);
+				gameProp.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p, socket);
+				gameProp.ball.initBall();
+				gameProp.myPaddle.initPaddle(color1, color2);
+				gameProp.opponentPaddle.initPaddle(color1, color2);
 			};
 	
 			p.draw = () => {
 				p.clear();
-				gameRef.current.myPaddle.show();
-				gameRef.current.myPaddle.updateMyPaddle();
-				gameRef.current.opponentPaddle.show();
-				gameRef.current.table.displayScore(gameRef.current.leftPlayer, gameRef.current.rightPlayer, gameRef.current.round);
-				gameRef.current.ball.show();
+				gameProp.myPaddle.show();
+				gameProp.myPaddle.updateMyPaddle(gameProp.ball.speedRatio);
+				gameProp.opponentPaddle.show();
+				gameProp.table.displayScore(gameProp.leftPlayer, gameProp.rightPlayer, gameProp.round);
+				gameProp.ball.show();
 			}
 	
 			p.windowResized = () => {
 				tableCanvasSizeRef.current.width = getDivWidthAndHeight(".pong-table").width;
 				tableCanvasSizeRef.current.height = getDivWidthAndHeight(".pong-table").height;
-				gameRef.current.setTableDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
-				gameRef.current.setPaddlesDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
-				gameRef.current.ball.adjustBallDimensions();
-				gameRef.current.myPaddle.adjustPaddleSpeed();
-				gameRef.current.opponentPaddle.adjustPaddleSpeed();
+				gameProp.setTableDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
+				gameProp.setPaddlesDimensions(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height);
+				gameProp.ball.adjustBallDimensions();
+				gameProp.myPaddle.adjustPaddleSpeed();
+				gameProp.opponentPaddle.adjustPaddleSpeed();
 				p.resizeCanvas(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, true);
 			}
 
 			p.keyReleased = () => {
-				gameRef.current.myPaddle.move(0);
+				gameProp.myPaddle.move(0);
 			}
 
 			p.keyPressed = () => {
 				if(p.keyCode === 38) 
 				{
-					gameRef.current.myPaddle.move(-1);
+					gameProp.myPaddle.move(-1);
 				}
 				else if (p.keyCode === 40)
 				{
-					gameRef.current.myPaddle.move(1);
+					gameProp.myPaddle.move(1);
 				}
 			}
 		}
@@ -89,56 +90,60 @@ export const PongBoard = (gameId) => {
 		if(socket) {
 
 			socket.on('updateBallPosition', (payload) => {
-				gameRef.current.ball.ballPosX = gameRef.current.table.mapValue(payload.x, gameRef.current.table.serverTableWidth, gameRef.current.table.tableWidth);
-				gameRef.current.ball.ballPosY = gameRef.current.table.mapValue(payload.y, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
+				if(payload.roomId === ("room_" + gameIdProp)) {
+					gameProp.ball.ballPosX = gameProp.table.mapValue(payload.x, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
+					gameProp.ball.ballPosY = gameProp.table.mapValue(payload.y, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
+					gameProp.ball.speedRatio = gameProp.table.mapValue(payload.speedRatio, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
+				}
 			})
 	
 			socket.on('updateScore', (payload) => {
-				gameRef.current.leftPlayer.roundScore = payload.leftPlayerRoundScore;
-				gameRef.current.rightPlayer.roundScore = payload.rightPlayerRoundScore;
-				gameRef.current.round.roundNumber = payload.playeRounds;
-				gameRef.current.round.leftPlayerScore = payload.leftScore;
-				gameRef.current.round.rightPlayerScore = payload.rightScore;
-				gameRef.current.myPaddle.paddleHeight = gameRef.current.table.mapValue(payload.paddleHeight, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
-				gameRef.current.opponentPaddle.paddleHeight = gameRef.current.table.mapValue(payload.paddleHeight, gameRef.current.table.serverTableHeight, gameRef.current.table.tableHeight);
+				if(payload.roomId === roomId) {
+					gameProp.leftPlayer.roundScore = payload.leftPlayerRoundScore;
+					gameProp.rightPlayer.roundScore = payload.rightPlayerRoundScore;
+					gameProp.round.roundNumber = payload.playeRounds;
+					gameProp.round.leftPlayerScore = payload.leftScore;
+					gameProp.round.rightPlayerScore = payload.rightScore;
+					gameProp.myPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
+					gameProp.opponentPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
+					gameProp.myPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
+					gameProp.opponentPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
+				}
 			})
-	
-			socket.on('endGame', () => {
-					gameRef.current.endGame();
-			})
+
 	
 			socket.on('updatePaddlePosition', (payload) => {
-					gameRef.current.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
-			})
-	
-			socket.on('joinedRoom', (payload) =>{
-					console.log(" the client has joined the room : " + payload.roomId);
-					console.log("socket  id : " + socket.id)
-					gameRef.current.table.roomId = payload.roomId;
-					gameRef.current.myPaddle.side = payload.side;
-					gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
-					gameRef.current.table.serverTableWidth = payload.serverTableWidth;
-					gameRef.current.table.serverTableHeight = payload.serverTableHeight;
+					gameProp.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
 			})
 	
 			socket.on('startGame', (payload) => {
-					const myPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
-					const opponentPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
-					gameRef.current.myPaddle.paddlePosX = myPaddleObj.x;
-					gameRef.current.myPaddle.paddlePosY = myPaddleObj.y;
-					gameRef.current.opponentPaddle.paddlePosX = opponentPaddleObj.x;
-					gameRef.current.opponentPaddle.paddlePosY = opponentPaddleObj.y;
-					gameRef.current.ball.ballPosX = payload.ballPosX;
-					gameRef.current.ball.ballPosY = payload.ballPosY;
-					gameRef.current.ball.speedX = payload.ballSpeedX;
-					gameRef.current.ball.speedY = payload.ballSpeedY;
-					gameRef.current.ball.randomInitialBallDirection = payload.initialBallAngle;
-					Instanse.get('challenge-game/' + gameId).
+				if(payload.roomId === roomId) {
+					const myPaddleObj = (gameProp.myPaddle.side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
+					const opponentPaddleObj = (gameProp.myPaddle.side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
+					// paddle Position 
+					gameProp.myPaddle.paddlePosX = myPaddleObj.x;
+					gameProp.myPaddle.paddlePosY = myPaddleObj.y;
+					gameProp.opponentPaddle.paddlePosX = opponentPaddleObj.x;
+					gameProp.opponentPaddle.paddlePosY = opponentPaddleObj.y;
+					// ball position and speed and initial angle
+					gameProp.ball.ballPosX = payload.ballPosX;
+					gameProp.ball.ballPosY = payload.ballPosY;
+					gameProp.ball.speedX = payload.ballSpeedX;
+					gameProp.ball.speedY = payload.ballSpeedY;
+					gameProp.ball.randomInitialBallDirection = payload.initialBallAngle;
+					gameProp.ball.speedRatio = payload.speedRatio;
+					// paddle height 
+					gameProp.myPaddle.paddleHeight = payload.paddleHeight;
+					gameProp.opponentPaddle.paddleHeight = payload.paddleHeight;
+					Instanse.get('/game/challenge-game/' + gameIdProp).
 					then(response => {
-						gameRef.current.rightPlayer.userName = response.data.player2.username;
-						gameRef.current.leftPlayer.userName = response.data.player1.username;
+						gameProp.rightPlayer = {userName: "" , roundScore : 0};
+						gameProp.leftPlayer = {userName: "" , roundScore : 0};
+						gameProp.rightPlayer.userName = response.data.player2.username;
+						gameProp.leftPlayer.userName = response.data.player1.username;
+						setDataIsLoaded(true);
 					})
-					setDataIsLoaded(true);
+				}
 			})
 	
 	

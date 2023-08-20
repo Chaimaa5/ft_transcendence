@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { GameProvider } from "./GameContext";
-import { GameComponent } from "./GameComponent";
+import { MultiComponent } from "./MultiComponent";
 import { Socket } from "socket.io-client";
 import { useSocketManager } from "./socket";
 import { useGameContext } from './GameContext';
 import { useParams } from "react-router-dom";
+import Instanse from "../api/api";
 
 
-export const GameApp = () => {
+export const MultiApp = () => {
 	const [isSocketInitialized, setIsSocketInitialized] = useState(false);
 	const {updateSocket} = useGameContext();
 
@@ -18,7 +19,7 @@ export const GameApp = () => {
 			updateSocket(res.socket);
 		})
 	}
-
+	const mode = useParams().mode;
 
 
 	useEffect(()=>{
@@ -28,7 +29,7 @@ export const GameApp = () => {
 	return (
 		<>
 		{(isSocketInitialized == true) ?
-			(<GameComponent/>
+			(<MultiComponent/>
 			) : (
 			<h1>Loading</h1>
 			)

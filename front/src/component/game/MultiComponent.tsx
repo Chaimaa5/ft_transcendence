@@ -11,30 +11,40 @@ import { useGameContext } from './GameContext';
 import { Game } from './classes/Game';
 import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
+import Matched from './Matched';
 
 
-export const GameComponent = () => {
-	const gameId = useParams().id;
+export const MultiComponent = () => {
 	const mode = useParams().mode;
 	const [gamePending, setGamePending] = useState(true);
 	const [gameEnded, setGameEnded] = useState(false);
 	const [gameCorrupted, setGameCorrupted] = useState(false);
+	const [playersMatched, setPlayersMatched] = useState(false);
 	const {socket} = useGameContext();
-	const queryParams = new URLSearchParams(location.search);
-	const accepted = queryParams.get('accepted');
-	const [username, setUserName] = useState();
+	const [username, setUserName] = useState(); 
+	const [gameId, setGameId] = useState();
+	const [player2, setPlayer2] = useState();
+	const [renderBoard, setRenderBoard] = useState(false);
 	const roomId = "room_" + gameId;
+
 
 	const gameRef = useRef(new Game(0, 0));
 
 	useEffect(() => {
-		if(accepted==="true") {
-			setGamePending(false);
-		}
-
 		if(socket) {
-			socket.emit('joinRoom', { roomId: "room_" + gameId });
-			
+			socket.emit('joinQueue');
+
+			socket.on('joinedQueue', (payload) =>{
+				setUserName(payload.username);
+			})
+
+			socket.on('match', (payload) => {
+				setPlayer2(payload.username);
+				setGameId(payload.gameId);
+				setGamePending(false);
+				setPlayersMatched(true);
+			})
+
 			socket.on('joinedRoom', (payload) =>{
 				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
@@ -43,8 +53,10 @@ export const GameComponent = () => {
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
-				setUserName(payload.username);
+				console.log("true");
+				setRenderBoard(true);
 			})
+
 		
 			socket.on('launchGame', (payload) => {
 				if(payload.gameId = gameId) {
@@ -82,11 +94,19 @@ export const GameComponent = () => {
 			};
 		}
 	}, []);
-	
+	const handleMatchedUnmount = () => {
+		setPlayersMatched(false);
+		if(socket) {
+			socket.emit('joinRoom', { roomId: "room_" + gameId })
+		}
+	  };
+
   return (
   	<div className="Game">
-		{(gamePending === true && username) ? (
-			<Waiting username={username} mode=""/>
+		{(gamePending === true && username ) ? (
+			<Waiting username={username} mode={"multi"} />
+		) :(playersMatched === true ) ? (
+			<Matched username={username} player2={player2} onUnmount={handleMatchedUnmount}/>
 		) : (gameEnded === true) ? (
 			<EndGame /> 
 		) : (gameCorrupted === true) ? (
@@ -96,7 +116,7 @@ export const GameComponent = () => {
 				<TwoPlayersRoundsBoard  gameMode={mode} gameIdProp={gameId}/>
 				<PongBoard gameProp={gameRef.current} gameIdProp={gameId}/>
 			</>
-		) 
+		)
 		}
 	</div>
   );

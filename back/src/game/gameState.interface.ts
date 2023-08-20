@@ -22,6 +22,7 @@ export interface BallState {
 
 export interface RoomState {
 	roomId : string;
+	isGameEnded : boolean;
 	playersNumber : number;
 	ball : BallState;
 	speedIncrement : number;

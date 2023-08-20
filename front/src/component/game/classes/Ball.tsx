@@ -55,7 +55,7 @@ export class Ball {
 	};
 
 	initBall() {
-		this.speedRatio = 200;
+		this.speedRatio = 100;
 		this.ballSize = (this.table.tableWidth * 0.02) + 5;
 		this.radius = this.ballSize/2;
 		this.ballPosX = this.table.mapValue(this.ballPosX, this.table.serverTableWidth, this.table.tableWidth);

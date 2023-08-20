@@ -3,7 +3,7 @@ import Instanse from '../api/api';
 import { useGameContext } from './GameContext';
 
  
-export const TwoPlayersRoundsBoard = ({gameMode, gameId}) => {
+export const TwoPlayersRoundsBoard = ({gameMode, gameIdProp}) => {
 
 	const [roundsNumber, setRoundsNumber] = useState(0);
 	const [pointsToWin, setPointsToWin] = useState(0);
@@ -14,9 +14,8 @@ export const TwoPlayersRoundsBoard = ({gameMode, gameId}) => {
 	const {socket} = useGameContext();
 
 	useEffect(() => {
-		console.log("charlie : " + gameId);
-		Instanse.get(`/game/two-players-game/${gameId}`)
-		.then(response => {
+		Instanse.get(`/game/two-players-game/${gameIdProp}`)
+		.then((response) => {
 			setRoundsNumber(response.data.rounds);
 			setPointsToWin(response.data.pointsToWin);
 		});
@@ -26,7 +25,7 @@ export const TwoPlayersRoundsBoard = ({gameMode, gameId}) => {
 				setPlayedRounds(payload.playedRounds);
 			});
 		}
-	})
+	},[])
 
 	return (
 		<div className="rounds-board">

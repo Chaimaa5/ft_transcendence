@@ -6,11 +6,14 @@ import { use } from 'passport';
 import { BallState, PaddleSide, PaddleState, RoomState } from './gameState.interface';
 import { EventEmitter } from 'events' 
 import { NotificationService } from 'src/user/Notifications/notification.service';
+import { UserService } from 'src/user/user.service';
+import { Socket } from 'socket.io'
 
 export class Player {
 	id : string;
 	username : string;
 	status : 'waiting' | 'matched';
+	socket : Socket;
 }
 
 
@@ -32,6 +35,7 @@ export class GameService {
     prisma = new PrismaClient();
 	roomIdCounter = 1;
 	notification = new NotificationService
+	user = new UserService
 	
     constructor(){}
 
@@ -59,26 +63,31 @@ export class GameService {
 	startGameLoop(roomId : string) {
 		const room = this.rooms.get(roomId);
 		if(room) {
-			setInterval(() => {
-				this.moveBall(room.ball);
+			const intervalId = setInterval(() => {
+				this.moveBall(room.ball, roomId, (room.thisRound.roundNumber*room.speedIncrement));
 				this.checkEdges(room);
-				this.checkPaddleHits(room.ball, room.players[0], room.thisRound.roundNumber, room.speedIncrement);
-				this.checkPaddleHits(room.ball, room.players[1], room.thisRound.roundNumber, room.speedIncrement);
+				if(room.isGameEnded === true) {
+					clearInterval(intervalId);
+					return;
+				}
+
+				this.checkPaddleHits(room.ball, room.players[0], room.thisRound.roundNumber, room.speedIncrement, room.paddleHeightDecrement);
+				this.checkPaddleHits(room.ball, room.players[1], room.thisRound.roundNumber, room.speedIncrement, room.paddleHeightDecrement);
 			}, 1000/60)
 		}
 	}
-	
-	moveBall(ball : BallState) {
+	// (room.thisRound.roundNumber * room.speedIncrement)
+	moveBall(ball : BallState, roomId : string, speedRatio : number) {
 		ball.x = ball.x + ball.ballSpeedX;
 		ball.y = ball.y + ball.ballSpeedY;
-		this.events.emit('handleUpdateBallPosition', {x : ball.x , y : ball.y});
+		this.events.emit('handleUpdateBallPosition', {roomId : roomId, x : ball.x , y : ball.y, speedRatio : speedRatio});
 	}
 
 	nextRound(room : RoomState) {
 		room.thisRound.roundNumber++;
 		room.thisRound.leftPlayerScore = 0;
 		room.thisRound.rightPlayerScore = 0;
-		room.paddleHeight = VIRTUAL_TABLE_HEIGHT/(3 + (room.thisRound.roundNumber * room.paddleHeightDecrement));
+		room.paddleHeight = VIRTUAL_TABLE_HEIGHT/(3 + ((room.thisRound.roundNumber+1) * room.paddleHeightDecrement));
 	}
 
 	updateScore(room : RoomState, side : PaddleSide) {
@@ -88,7 +97,8 @@ export class GameService {
 				this.nextRound(room);
 				room.players[0].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
-					this.events.emit('endGame');
+					room.isGameEnded = true;
+					this.events.emit('handleEndGame', room.roomId);
 				}
 			}
 		}
@@ -98,7 +108,8 @@ export class GameService {
 				this.nextRound(room);
 				room.players[1].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
-					this.events.emit('handleEndGame');
+					room.isGameEnded = true;
+					this.events.emit('handleEndGame', room.roomId);
 				}
 			}
 		}
@@ -116,18 +127,19 @@ export class GameService {
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
-			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
+			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
+			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
 			this.updateScore(room, PaddleSide.Left);
-			this.events.emit('handleUpdateScore', PaddleSide.Left);
+			this.events.emit('handleUpdateScore', room);
 		}
 		if((room.ball.x - radius) <= 0)
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
-			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
-			this.events.emit('handleUpdateScore', PaddleSide.Right);
+			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
+			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
+			this.updateScore(room, PaddleSide.Right);
+			this.events.emit('handleUpdateScore',room);
 		}
 	}
 
@@ -140,18 +152,19 @@ export class GameService {
 		return(angle * (Math.PI/180));
 	}
 
-	checkPaddleHits(ball : BallState, player : PaddleState, roundNumber : number, speedIncrement : number) {
+	checkPaddleHits(ball : BallState, player : PaddleState, roundNumber : number, speedIncrement : number, paddleHeightDecrement : number) {
 		const radius = ((VIRTUAL_TABLE_WIDTH*0.02) + 5)/2;
+		const paddleHeight =  VIRTUAL_TABLE_HEIGHT/(3 + ((roundNumber+1) * paddleHeightDecrement));
 		if((ball.y + radius) > player.y
-		&& (ball.y - radius )< (player.y + VIRTUAL_PADDLE_HEIGHT)) {
+		&& (ball.y - radius )< (player.y + paddleHeight)) {
 		let angle;
 		if(player.side === PaddleSide.Right && (ball.x + radius) > player.x)
 		{
 			if(ball.x < player.x) {
 				const diff = ball.y - player.y;
-				angle = this.mapRange(diff, 0, VIRTUAL_PADDLE_HEIGHT, this.radians(225), this.radians(135));
-				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (roundNumber * speedIncrement)) *  Math.cos(angle);
-				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (roundNumber * speedIncrement)) *  Math.sin(angle);
+				angle = this.mapRange(diff, 0, paddleHeight, this.radians(225), this.radians(135));
+				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.cos(angle);
+				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.sin(angle);
 				ball.x = player.x - radius;
 			}
 		}
@@ -159,9 +172,9 @@ export class GameService {
 		{
 			if(ball.x > player.x){
 				const diff = ball.y - player.y;
-				angle = this.mapRange(diff, 0, VIRTUAL_PADDLE_HEIGHT, -this.radians(45), this.radians(45));
-				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (roundNumber * speedIncrement)) *  Math.cos(angle);
-				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO + (roundNumber * speedIncrement)) *  Math.sin(angle);
+				angle = this.mapRange(diff, 0, paddleHeight, -this.radians(45), this.radians(45));
+				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.cos(angle);
+				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.sin(angle);
 				ball.x = player.x + VIRTUAL_PADDLE_WIDTH + radius;
 			}
 		}
@@ -179,7 +192,7 @@ export class GameService {
 	}
 
 	calculateSpeedIncrement(rounds : number, difficulty : string)  : number{
-		const minSpeedRatio : number = 100;
+		const minSpeedRatio : number = 0;
 		const maxSpeedRatio : number = 200;
 		let speedIncrement : number = 0;
 		if(difficulty === 'flashy') {
@@ -189,10 +202,10 @@ export class GameService {
 	}
 
 	calculatePaddleHeightDecrement(rounds : number, difficulty : string) : number {
-		const minHeightRatio : number = 3;
-		const maxHeightRatio : number = 5;
+		const minHeightRatio : number = 0;
+		const maxHeightRatio : number = 8;
 		let paddleHeightDecrement : number = 0;
-		if(difficulty === 'paddleSize') {
+		if(difficulty === 'decreasingPaddle') {
 			paddleHeightDecrement = (maxHeightRatio - minHeightRatio)/rounds;
 		}
 		return(paddleHeightDecrement);
@@ -206,17 +219,18 @@ export class GameService {
 
 	createRoom(gameId : number, rounds : number, pointsToWin : number, difficulty : string) : string {
 		const roomId = "room_" + gameId;
-		const speedIncrement = this.calculateSpeedIncrement(rounds, difficulty);
-		const paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds, difficulty);
+		const speedIncrement = this.calculateSpeedIncrement(rounds*pointsToWin, difficulty);
+		const paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds*pointsToWin, difficulty);
 		this.rooms.set(
 			roomId,
 			{
 				roomId : roomId,
+				isGameEnded : false,
 				playersNumber : 0,
 				ball : {x : VIRTUAL_TABLE_WIDTH/2, y : VIRTUAL_PADDLE_HEIGHT/2, ballSpeedX: VIRTUAL_TABLE_WIDTH/VIRTUAL_SPEED_RATIO, ballSpeedY: VIRTUAL_TABLE_WIDTH/VIRTUAL_SPEED_RATIO },
 				speedIncrement : speedIncrement,
 				paddleHeightDecrement : paddleHeightDecrement,
-				paddleHeight : VIRTUAL_TABLE_HEIGHT/3,
+				paddleHeight : VIRTUAL_TABLE_HEIGHT/(3 + paddleHeightDecrement),
 				players : [],
 				thisRound : {
 					roundNumber : 0,
@@ -240,6 +254,7 @@ export class GameService {
 			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
 				room.players.push({playerId : playerId, username : username, side: side, roundScore: 0, x : x, y : y});
 				room.playersNumber++;
+			console.log("side : " + side + " in room id : " + room.roomId);
 			return(side);
 		}
 	}
@@ -249,7 +264,11 @@ export class GameService {
 	}
 
 	// game endpoints methods
+
+
+
 	private players : Player[] = [];
+
 
 	updateStatus(playerId : string, status : 'waiting' | 'matched') {
 		const player = this.players.find(p => p.id === playerId);
@@ -258,22 +277,34 @@ export class GameService {
 		}
 	}
 
-	createPlayer(player : Player) {
+	createPlayer(username : string, id : string, client : Socket) {
+		const player = new Player()
+		player.id = id;
+		player.username = username;
+		player.socket = client;
+		player.status = 'waiting';
 		this.players.push(player);
+		const matchedPlayers = this.getMatchedPlayers();
+		if(matchedPlayers && matchedPlayers.length === 2) {
+			console.log("am here");
+			const gameId = this.createGame(matchedPlayers);
+		}
 	}
 
 	getMatchedPlayers() {
 		const waitingPlayers = this.players.filter(player => player.status === 'waiting');
-		if(waitingPlayers.length >= 2) {
+		if(waitingPlayers.length >= 2 && (waitingPlayers[0].id != waitingPlayers[1].id)) {
 			const matchedPlayers = waitingPlayers.splice(0,2);
 			matchedPlayers.forEach(player => {
 				this.updateStatus(player.id, 'matched')
 			})
+			this.players = this.players.filter(player => player.status !== 'matched');
+			console.log("players length : " + this.players.length);
 			return(matchedPlayers)
 		}
 	}
 
-	async joinGame(user: User, gameId: string) {
+	async joinCreatedGame(user: User, gameId: string) {
 		const id = parseInt(gameId);
 		const game = await this.prisma.game.findUnique({where : {id: id}, select : {
 			status : true,
@@ -294,7 +325,7 @@ export class GameService {
 		const game = await this.prisma.game.create({data : {
 			mode : 'multiplayer',
 			playerId1 : matchedPlayers[0].id,
-			playerId2 : matchedPlayers[0].id,
+			playerId2 : matchedPlayers[1].id,
 			rounds : 3,
 			pointsToWin : 5,
 			status : 'created'
@@ -302,6 +333,7 @@ export class GameService {
 		if(game.rounds && game.pointsToWin) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, 'multiplayer');
 		}
+		this.eventsEmitter.emit("handleMatched", {player1 : matchedPlayers[0], player2 : matchedPlayers[1], gameId : game.id});
 		return(game.id)
 	}
 
@@ -323,7 +355,7 @@ export class GameService {
 		{
 			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
 			if(player) {
-				this.notification.addGameInvite(user.id, player.id, game.id)
+				await this.notification.addGameInvite(user.id, player.id, game.id)
 			}
 		}
 		return game.id
@@ -349,6 +381,40 @@ export class GameService {
         })
         return(game);
     }
+
+	
+	async getPendingGames(id : string) {
+		let pendingGames = await this.prisma.game.findMany({
+			where : {
+				AND: [
+					{status : 'pending'},
+					{playerId1: {not : id}}
+				]
+	
+			},
+			select: {
+				id : true,
+				player1 : {
+					select : {
+						avatar : true,
+						username : true,
+					}
+				}
+			}
+		});
+
+		for(const game of pendingGames){
+			if(game.player1.avatar){
+				if(!game.player1.avatar.includes('cdn.intra') &&  !game.player1.avatar.includes('google'))
+					game.player1.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + '/api' + game.player1.avatar 
+			}
+		}
+			// return {
+				 
+			// }
+
+		return(pendingGames);
+	}
 
 
 	async postTrainingSettings(user : User, body : any) {
@@ -394,8 +460,19 @@ export class GameService {
 			select : {
 				rounds : true, 
 				pointsToWin  : true,
+			
 			}
 		})
 		return(game);
+	}
+
+	async deleteGameById(gameId : string) {
+		const id = parseInt(gameId);
+		try {
+			await this.prisma.game.delete({where : {id : id}})
+		}
+		catch(error) {
+			console.error("deleting game by Id failed + |" +  gameId + "|");
+		}
 	}
 }

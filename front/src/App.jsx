@@ -8,6 +8,7 @@ import TfaPage from "./component/tfa"
 import { socket_ } from './component/api/api';
 import { TrainingApp } from './component/game/training/TrainingApp'
 import	{GameApp}	from './component/game/GameApp';
+import	{MultiApp}	from './component/game/MultiApp';
 import { GameProvider } from './component/game/GameContext';
 
 function App() {
@@ -23,11 +24,11 @@ function App() {
           <Route path="/leaderboord" element={<Container />} />
           <Route path='/setting' element={<Container/>}/>
           <Route path='/tfa' element={<TfaPage/>}/>
-          <Route path='/waiting' element={<Container/>}/>
           <Route path="/chat" element={<Container />} />
           <Route path="/chat/:roomId?" element={<Container />} />
           <Route path="/training/:id" element={<TrainingApp />} />
 		  <Route path="/game/:id/:mode" element={<GameProvider><GameApp/></GameProvider>} />
+		  <Route path="/game/:mode" element={<GameProvider><MultiApp/></GameProvider>}/>
         </Routes>
     </Router>
     </div>

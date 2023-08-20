@@ -15,7 +15,6 @@ export const GameProvider = ({children}) => {
 	const [isSocketInitialized, setIsSocketInitialized] = useState(false);
 	
 	const updateSocket = (newSocket : Socket) => {
-		console.log("updating socket : ", newSocket);
 		setSocket(newSocket);
 	}
 
