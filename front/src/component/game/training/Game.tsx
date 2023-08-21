@@ -38,8 +38,6 @@ export class Game {
 			leftPlayerScore : 0, 
 			rightPlayerScore : 0
 		};
-		this.rightPlayer = {userName : '', roundScore : 0};
-		this.leftPlayer = {userName : '', roundScore : 0};
 	}
 
 	setTableDimensions(tableWidth: number, tableHeight: number) {

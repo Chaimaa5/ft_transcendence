@@ -44,6 +44,8 @@ export async function useSocketManager(){
 	const Skt = new skt;
 
 	await initializeSocket(Skt);
+
+
 	
     return ({socket : Skt.socket, isSocketInitialized : Skt.isSocketInitialized});
 }

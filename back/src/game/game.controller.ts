@@ -22,9 +22,7 @@ export class GameController{
 
 	@Get('/two-players-game/:id')
 	async getMultiplayerGame(@Param('id') id : string) {
-		console.log("id : |" + id + "|");
 		const gameId : number = parseInt(id);
-		console.log("gameID : |" + gameId + "|");
 		return await this.gameService.getTwoPlayersGame(gameId);
 	}
 

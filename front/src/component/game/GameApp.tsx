@@ -9,26 +9,32 @@ import { useParams } from "react-router-dom";
 
 export const GameApp = () => {
 	const [isSocketInitialized, setIsSocketInitialized] = useState(false);
-	const {updateSocket} = useGameContext();
+	const {socket,updateSocket} = useGameContext();
+	const [username, setUserName]  = useState();
 
 	
 	const init = async() => {
 		await useSocketManager().then((res)=> {
 			setIsSocketInitialized(res.isSocketInitialized);
 			updateSocket(res.socket);
+			res.socket.emit('getUsername');
+
+			res.socket.on("username" , (payload) => {
+				setUserName(payload.username);
+			})
 		})
 	}
-
-
-
+	
+	
+	
 	useEffect(()=>{
 		init();
 	}, []);
 
 	return (
 		<>
-		{(isSocketInitialized == true) ?
-			(<GameComponent/>
+		{(isSocketInitialized === true && username) ? (
+			<GameComponent username={username}/>
 			) : (
 			<h1>Loading</h1>
 			)

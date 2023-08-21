@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { TwoPlayersRoundsBoard } from './RoundsBoard'
 import { useParams } from 'react-router-dom';
 import './Game.css';
-import {PongBoard} from './PongBoard';
+import {MultiPongBoard} from './MultiPongBoard';
 import Waiting from './waiting';
 import {EndGame} from './training/EndGame'
 import Instanse from '../api/api';
@@ -12,38 +12,61 @@ import { Game } from './classes/Game';
 import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
 import Matched from './Matched';
+import { AlreadyJoined } from './AlreadyJoined';
 
 
-export const MultiComponent = () => {
+export const MultiComponent = (username) => {
 	const mode = useParams().mode;
 	const [gamePending, setGamePending] = useState(true);
 	const [gameEnded, setGameEnded] = useState(false);
 	const [gameCorrupted, setGameCorrupted] = useState(false);
 	const [playersMatched, setPlayersMatched] = useState(false);
-	const {socket} = useGameContext();
-	const [username, setUserName] = useState(); 
+	const [alreadyJoined, setAlreadyJoined] = useState(false);
+	const [dataIsLoaded, setDataIsLoaded] = useState(false)
 	const [gameId, setGameId] = useState();
 	const [player2, setPlayer2] = useState();
 	const [renderBoard, setRenderBoard] = useState(false);
-	const roomId = "room_" + gameId;
-
-
+	const {socket} = useGameContext();
+	
 	const gameRef = useRef(new Game(0, 0));
-
+	
 	useEffect(() => {
 		if(socket) {
 			socket.emit('joinQueue');
-
-			socket.on('joinedQueue', (payload) =>{
-				setUserName(payload.username);
-			})
-
+	
 			socket.on('match', (payload) => {
 				setPlayer2(payload.username);
 				setGameId(payload.gameId);
 				setGamePending(false);
 				setPlayersMatched(true);
 			})
+
+			const handleDisconnect = () => {
+				console.log(`socket disconnected`);
+				socket.disconnect();
+			};
+
+			socket.on('disconnect', handleDisconnect);
+
+			return () => {
+				if(gameEnded == false) {
+					if(playersMatched === true) {
+						socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom : true});
+					}
+					else {
+						socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom : false});
+					}
+				}
+				socket.disconnect();
+			};
+		}
+	}, []);
+
+	useEffect(() => {
+		if(socket) {
+			if(gameId) {
+				socket.emit('joinRoom', { roomId: "room_" + gameId});
+			}
 
 			socket.on('joinedRoom', (payload) =>{
 				console.log(" the client has joined the room : " + payload.roomId);
@@ -53,25 +76,51 @@ export const MultiComponent = () => {
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
-				console.log("true");
-				setRenderBoard(true);
 			})
 
-		
+			socket.on('startGame', (payload) => {
+				if(payload.roomId === ("room_" + gameId)) {
+					const myPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
+					const opponentPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
+					// paddle Position 
+					gameRef.current.myPaddle.paddlePosX = myPaddleObj.x;
+					gameRef.current.myPaddle.paddlePosY = myPaddleObj.y;
+					gameRef.current.opponentPaddle.paddlePosX = opponentPaddleObj.x;
+					gameRef.current.opponentPaddle.paddlePosY = opponentPaddleObj.y;
+					// ball position and speed and initial angle
+					gameRef.current.ball.ballPosX = payload.ballPosX;
+					gameRef.current.ball.ballPosY = payload.ballPosY;
+					gameRef.current.ball.speedX = payload.ballSpeedX;
+					gameRef.current.ball.speedY = payload.ballSpeedY;
+					gameRef.current.ball.randomInitialBallDirection = payload.initialBallAngle;
+					gameRef.current.ball.speedRatio = payload.speedRatio;
+					// paddle height 
+					gameRef.current.myPaddle.paddleHeight = payload.paddleHeight;
+					gameRef.current.opponentPaddle.paddleHeight = payload.paddleHeight;
+					Instanse.get('/game/challenge-game/' + gameId).
+					then(response => {
+						gameRef.current.rightPlayer = {userName: "" , roundScore : 0};
+						gameRef.current.leftPlayer = {userName: "" , roundScore : 0};
+						gameRef.current.rightPlayer.userName = response.data.player2.username;
+						gameRef.current.leftPlayer.userName = response.data.player1.username;
+						setDataIsLoaded(true);
+					})
+				}
+			})
+
+			
+			socket.on('alreadyJoined', () => {
+				setAlreadyJoined(true);
+			});
+			
 			socket.on('launchGame', (payload) => {
 				if(payload.gameId = gameId) {
 					setGamePending(false);	
 				}
 			});
-		
-			const handleDisconnect = () => {
-				console.log(`Socket disconnected`);
-				socket.disconnect();
-			};
-			
 			
 			socket.on('endGame', (payload) => {
-				if(payload.roomId === roomId) {
+				if(payload.roomId === ("room_" + gameId) ) {
 					gameRef.current.endGame();
 					setGameEnded(true);
 				}
@@ -82,28 +131,16 @@ export const MultiComponent = () => {
 					setGameCorrupted(true);
 				}
 			})
-
-			socket.on('disconnect', handleDisconnect);
-			
-			return () => {
-				socket.off('disconnect', handleDisconnect);
-				if(gameEnded == false) {
-					socket.emit('leaveRoom', { roomId: "room_" + gameId });
-				}
-				socket.disconnect();
-			};
 		}
-	}, []);
+	}, [gameId]);
+
 	const handleMatchedUnmount = () => {
 		setPlayersMatched(false);
-		if(socket) {
-			socket.emit('joinRoom', { roomId: "room_" + gameId })
-		}
-	  };
+	};
 
   return (
   	<div className="Game">
-		{(gamePending === true && username ) ? (
+		{(gamePending === true) ? (
 			<Waiting username={username} mode={"multi"} />
 		) :(playersMatched === true ) ? (
 			<Matched username={username} player2={player2} onUnmount={handleMatchedUnmount}/>
@@ -111,10 +148,12 @@ export const MultiComponent = () => {
 			<EndGame /> 
 		) : (gameCorrupted === true) ? (
 			<GameCorrupted />
-		) : (
-			<>
+		) : (alreadyJoined === true) ? (
+			<AlreadyJoined/>
+		) : (dataIsLoaded === true  &&
+			 <>
 				<TwoPlayersRoundsBoard  gameMode={mode} gameIdProp={gameId}/>
-				<PongBoard gameProp={gameRef.current} gameIdProp={gameId}/>
+				<MultiPongBoard gameProp={gameRef.current} gameIdProp={gameId}/>
 			</>
 		)
 		}

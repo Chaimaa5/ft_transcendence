@@ -88,7 +88,7 @@ const ModePopUp = ({whichOne}) => {
 	const [paddleSize, setPaddleSize] = useState(2);
 	const [lossLimit, setLossLimit] = useState(6);
 	// challenge settings
-	let isPlayerInvited = false;
+	const [isPlayerInvited, setIsPlayerInvited] = useState(false);
 	const [rounds, setRounds] = useState(3);
 	const [pointsToWin, setPointsToWin] = useState(5);
 	const [isFlashy, setIsFlashy] = useState(false);
@@ -221,10 +221,11 @@ const ModePopUp = ({whichOne}) => {
                             </button>
                             <div onClick={async () => {
 								if(Player) {
-									isPlayerInvited = true;
+									setIsPlayerInvited(true);
 								}
 								await Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
 									setGameId(response.data) ;
+									console.log("response post method : " + response.data);
 									nav('/game/' + response.data + "/challenge");
 								});
                             }}className="flex justify-center h-[10%] w-[80%]">

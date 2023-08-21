@@ -246,8 +246,6 @@ export class GameService {
 
 	addPlayer(roomId : string, playerId : string, username : string) {
 		const room = this.rooms.get(roomId);
-		console.log("rooms : " + JSON.stringify(this.rooms, null, 2));
-		console.log("player Number : " + room?.playersNumber);
 		if(room){
 			const side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
 			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
@@ -278,30 +276,41 @@ export class GameService {
 	}
 
 	createPlayer(username : string, id : string, client : Socket) {
-		const player = new Player()
-		player.id = id;
-		player.username = username;
-		player.socket = client;
-		player.status = 'waiting';
-		this.players.push(player);
-		const matchedPlayers = this.getMatchedPlayers();
-		if(matchedPlayers && matchedPlayers.length === 2) {
-			console.log("am here");
-			const gameId = this.createGame(matchedPlayers);
+		const existingPlayers = this.players.filter(player => player.id === id);
+		if(existingPlayers.length === 0) {
+			const player = new Player()
+			player.id = id;
+			player.username = username;
+			player.socket = client;
+			player.status = 'waiting';
+			this.players.push(player);
+			console.log("player has been created : " + client.id + " username " + username + " id " + id);
+			const matchedPlayers = this.getMatchedPlayers();
+			if(matchedPlayers && matchedPlayers.length === 2) {
+				const gameId = this.createGame(matchedPlayers);
+			}
+		}
+		else{
+			this.eventsEmitter.emit('handleAlreadyJoinedQueue', client);
 		}
 	}
 
 	getMatchedPlayers() {
 		const waitingPlayers = this.players.filter(player => player.status === 'waiting');
 		if(waitingPlayers.length >= 2 && (waitingPlayers[0].id != waitingPlayers[1].id)) {
+			console.log(" waiting players : - " + waitingPlayers[0].id + " - " + waitingPlayers[1].id);
 			const matchedPlayers = waitingPlayers.splice(0,2);
 			matchedPlayers.forEach(player => {
 				this.updateStatus(player.id, 'matched')
 			})
-			this.players = this.players.filter(player => player.status !== 'matched');
+			this.players = this.players.filter(player => player.status === 'waiting');
 			console.log("players length : " + this.players.length);
 			return(matchedPlayers)
 		}
+	}
+
+	removePlayerFromQueue(client : Socket) {
+		this.players = this.players.filter(player => player.id != client.data.payload.id);
 	}
 
 	async joinCreatedGame(user: User, gameId: string) {
@@ -466,13 +475,16 @@ export class GameService {
 		return(game);
 	}
 
-	async deleteGameById(gameId : string) {
+	async deleteGameById(gameId:string) {
 		const id = parseInt(gameId);
-		try {
-			await this.prisma.game.delete({where : {id : id}})
-		}
-		catch(error) {
-			console.error("deleting game by Id failed + |" +  gameId + "|");
+		const game = await this.prisma.game.findUnique({where : {id : id}});
+		if(game){
+			try {
+				await this.prisma.game.delete({where : {id : id}})
+			}
+			catch(error) {
+				console.error("deleting game by Id failed + |" +  gameId + "|");
+			}
 		}
 	}
 }

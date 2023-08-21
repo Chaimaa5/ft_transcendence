@@ -78,7 +78,6 @@ export class Paddle {
 
 	updateMyPaddle(ratio : number) {
 		this.stepsY = this.table.tableWidth/(this.speedRatio-(ratio*3));
-		console.log("steps : " + this.stepsY);
 		if(this.table.p && this.table.socket) {
 			this.paddlePosY += this.stepsY * this.direction;
 			this.paddlePosY = this.table.p.constrain(

@@ -33,6 +33,7 @@ export class GameGateway implements OnGatewayConnection{
 		this.gameService.eventsEmitter.on('handleMatched', (matches : {player1 : Player, player2 : Player, gameId : number}) => {
 			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId});
 			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId});
+
 		})
 
 		this.gameService.eventsEmitter.on('handleUpdateScore', (room : RoomState) => {
@@ -47,12 +48,13 @@ export class GameGateway implements OnGatewayConnection{
 		})
 
 		this.gameService.eventsEmitter.on('handleEndGame', (roomId: string) => {
-			console.log("room id : " + roomId);
 			this.server.emit('endGame', {roomId : roomId});
 		})
 		this.gameService.eventsEmitter.on('startGame', (gameId:number) => {
-			console.log("start game event : " + gameId);
 			this.server.emit('launchGame',{gameId : gameId})
+		})
+		this.gameService.eventsEmitter.on('handleAlreadyJoinedQueue', (player : Socket) => {
+			player.emit('alreadyJoined');
 		})
 	}
 
@@ -69,10 +71,15 @@ export class GameGateway implements OnGatewayConnection{
 				}
                 console.log('WebSocket gateway connected!');
             }
-	}
-
-	handleDisconnection(client : Socket) {
-		console.log("client id  : " + client.id + "disconnected");
+		}
+		
+		handleDisconnection(client : Socket) {
+			console.log("client id  : " + client.id + "disconnected");
+		}
+		
+	@SubscribeMessage("getUsername")
+	async handleGetUserName(client : Socket) {
+		client.emit("username" , {username : client.data.payload.username});
 	}
 
 	@SubscribeMessage("joinQueue")
@@ -80,10 +87,9 @@ export class GameGateway implements OnGatewayConnection{
 		this.gameService.createPlayer(client.data.payload.username, client.data.payload.id, client);
 		client.emit("joinedQueue", {username : client.data.payload.username});
 	}
-	
 	@SubscribeMessage('joinRoom')
 	async handleJoinRoom(client : Socket, payload : {roomId : string}) {
-		console.log("------ roomd id --------- " + payload.roomId);
+		console.log("------ roomd id ----------------------------------------------------------------------- " + payload.roomId);
 		const side = this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username)
 		if(side === PaddleSide.Left)
 		{
@@ -110,15 +116,18 @@ export class GameGateway implements OnGatewayConnection{
 
 
 	@SubscribeMessage('leaveRoom') 
-	async handleLeaveRoom (client : Socket, payload : {roomId : string}){
-		client.leave(payload.roomId);
-		const room = this.gameService.roomsMap.get(payload.roomId);
-		if(room){
-			room.playersNumber--;
-			room.isGameEnded = true;
+	async handleLeaveRoom (client : Socket, payload : {roomId : string, inRoom : boolean}){
+		this.gameService.removePlayerFromQueue(client);
+		if(payload.inRoom === true) {
+			client.leave(payload.roomId);
+			const room = this.gameService.roomsMap.get(payload.roomId);
+			if(room){
+				room.playersNumber--;
+				room.isGameEnded = true;
+			}
+			await this.gameService.deleteGameById(payload.roomId.slice("room_".length));
+			this.server.emit('gameCorrupted', {roomId : payload.roomId});
 		}
-		await this.gameService.deleteGameById(payload.roomId.slice("room_".length));
-		this.server.emit('gameCorrupted', {roomId : payload.roomId});
 	}
 
 	@SubscribeMessage('newPaddlePosition')

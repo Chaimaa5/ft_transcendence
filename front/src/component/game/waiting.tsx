@@ -5,7 +5,7 @@ import Av from "../tools/profile.png"
 import { useGameContext } from "./GameContext";
 
 const Waiting = ({username, mode}) => {
-	const [player1, setPlayer1] = useState(username)
+	const [player1, setPlayer1] = useState(username.username)
 	const [player2, setPlayer2] = useState("waiting for another player");
 
 	const {socket} = useGameContext();

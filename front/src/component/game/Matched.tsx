@@ -8,9 +8,9 @@ const Matched = ({username, player2, onUnmount}) => {
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			onUnmount();
-		}, 2000);
+		}, 1000);
 	
-		return () => clearTimeout(timeout); // Cleanup the timeout when the component unmounts
+		return () => clearTimeout(timeout);
 	  }, [onUnmount]);
 
   return(
@@ -19,7 +19,7 @@ const Matched = ({username, player2, onUnmount}) => {
                 <div className="h-[55%] w-[100%] flex  justify-evenly items-start pt-[2%]">
                     <div className="h-[90%] w-[40%] flex flex-col justify-evenly ">
                         <Avatar src={Av} wd_="5vw"/>
-                        <h1 className="text-LightBlue text-[0.8vw]">{username}</h1>
+                        <h1 className="text-LightBlue text-[0.8vw]">{username.username}</h1>
                     </div>
 					<div className="h-[90%] w-[40%] flex flex-col justify-evenly ">
 						<Avatar src={Av} wd_="5vw"/>

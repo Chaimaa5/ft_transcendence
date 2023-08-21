@@ -11,15 +11,22 @@ import Instanse from "../api/api";
 export const MultiApp = () => {
 	const [isSocketInitialized, setIsSocketInitialized] = useState(false);
 	const {updateSocket} = useGameContext();
+	const [username, setUserName]  = useState();
+	const [socket, setSocket] = useState<Socket>();
+
 
 	
 	const init = async() => {
 		await useSocketManager().then((res)=> {
 			setIsSocketInitialized(res.isSocketInitialized);
 			updateSocket(res.socket);
+			setSocket(res.socket);
+			res.socket.emit('getUsername' );
+			res.socket.on("username" , (payload) => {
+				setUserName(payload.username);
+			})
 		})
 	}
-	const mode = useParams().mode;
 
 
 	useEffect(()=>{
@@ -28,8 +35,8 @@ export const MultiApp = () => {
 
 	return (
 		<>
-		{(isSocketInitialized == true) ?
-			(<MultiComponent/>
+		{(isSocketInitialized == true && username) ? (
+			<MultiComponent username={username}/>
 			) : (
 			<h1>Loading</h1>
 			)

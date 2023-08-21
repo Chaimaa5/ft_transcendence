@@ -24,6 +24,7 @@ export const TwoPlayersRoundsBoard = ({gameMode, gameIdProp}) => {
 			socket.on('updateScore', (payload) => {
 				setPlayedRounds(payload.playedRounds);
 			});
+
 		}
 	},[])
 

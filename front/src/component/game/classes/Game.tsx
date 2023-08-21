@@ -31,7 +31,8 @@ export class Game {
 
 		this.myPaddle = new Paddle(this.table);
 		this.opponentPaddle = new Paddle(this.table);
-
+		this.rightPlayer = {userName: "" , roundScore : 0};
+		this.leftPlayer = {userName: "" , roundScore : 0};
 		this.roundsNumber = 3;
 		this.roundRequiredPoints = 2;
 		this.round = {

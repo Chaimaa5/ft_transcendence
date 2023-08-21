@@ -13,7 +13,7 @@ import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
 
 
-export const GameComponent = () => {
+export const GameComponent = (username) => {
 	const gameId = useParams().id;
 	const mode = useParams().mode;
 	const [gamePending, setGamePending] = useState(true);
@@ -22,7 +22,6 @@ export const GameComponent = () => {
 	const {socket} = useGameContext();
 	const queryParams = new URLSearchParams(location.search);
 	const accepted = queryParams.get('accepted');
-	const [username, setUserName] = useState();
 	const roomId = "room_" + gameId;
 
 	const gameRef = useRef(new Game(0, 0));
@@ -43,7 +42,6 @@ export const GameComponent = () => {
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
-				setUserName(payload.username);
 			})
 		
 			socket.on('launchGame', (payload) => {
@@ -76,7 +74,7 @@ export const GameComponent = () => {
 			return () => {
 				socket.off('disconnect', handleDisconnect);
 				if(gameEnded == false) {
-					socket.emit('leaveRoom', { roomId: "room_" + gameId });
+					socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom: true});
 				}
 				socket.disconnect();
 			};
@@ -85,7 +83,7 @@ export const GameComponent = () => {
 	
   return (
   	<div className="Game">
-		{(gamePending === true && username) ? (
+		{(gamePending === true) ? (
 			<Waiting username={username} mode=""/>
 		) : (gameEnded === true) ? (
 			<EndGame /> 

@@ -10,7 +10,7 @@ export const TrainingComponent = () => {
   const routeProp = useParams();
   const { gameEnded } = useTrainingContext();
   return (
-      <div className="App">
+      <div className="Game">
 		{ gameEnded === false ? (
 			<>
 				<TrainingRoundsBoard gameId={routeProp.id}/>
