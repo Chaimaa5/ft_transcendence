@@ -247,7 +247,6 @@ export class GameService {
 				pointsToWin : pointsToWin,
 			}
 		)
-		console.log("create ROom : " + VIRTUAL_TABLE_HEIGHT/(3 + paddleHeightDecrement))
 		return(roomId);
 	}
 
@@ -259,7 +258,6 @@ export class GameService {
 			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
 				room.players.push({playerId : playerId, username : username, side: side, roundScore: 0, x : x, y : y});
 				room.playersNumber++;
-			console.log("side : " + side + " in room id : " + room.roomId);
 			return(side);
 		}
 	}
@@ -338,8 +336,6 @@ export class GameService {
 	}
 
 	async createGame(matchedPlayers : Player[]) {
-		console.log("player 0 : " + matchedPlayers[0].username);
-		console.log("player 1 : " + matchedPlayers[1].username);
 		const game = await this.prisma.game.create({data : {
 			mode : 'multiplayer',
 			playerId1 : matchedPlayers[0].id,
@@ -358,8 +354,7 @@ export class GameService {
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
 		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
-		console.log("difficulty : " + difficulty);
-		const gameStatus = (body.isPlayerInvited === true) ? "waitingForOtherPlayer" : "pending"
+		const gameStatus = (body.isPlayerInvited === true) ? "pending" : "playing"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
@@ -375,7 +370,6 @@ export class GameService {
 
 		if(body.isPlayerInvited)
 		{
-			console.log('inviting')
 			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
 			if(player) {
 				await this.notification.addGameInvite(user.id, player.id, game.id)

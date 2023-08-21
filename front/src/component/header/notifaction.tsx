@@ -30,6 +30,7 @@ const GameNtf = ({name, gameId, avatar}) => {
             <h2 className="text-[#1D3557] text-[0.5vw]">{name} Challenged You</h2>
             <div className="h-[100%] w-[20%] flex justify-between items-center">
                 <button onClick={async () => {
+					console.log("join game : "  + gameId);
 					await Instanse.post("/game/join-game/" + gameId).then((res) => {
 						nav("/game/" + gameId + "/challenge?accepted=true")
 					});

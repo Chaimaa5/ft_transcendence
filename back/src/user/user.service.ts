@@ -648,7 +648,7 @@ export class UserService {
         const res = await this.prisma.notification.findMany({
             where: {receiverId: id },
             orderBy: {
-                createdAt: 'asc',
+                createdAt: 'desc',
             },
             select:{
                 id: true,
@@ -660,7 +660,8 @@ export class UserService {
                         username: true,
                         avatar: true
                     }
-                }
+                },
+				gameId: true
             }
         });
 
