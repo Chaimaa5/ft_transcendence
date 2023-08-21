@@ -4,7 +4,7 @@ import { RoomState, PaddleState } from "./gameState.interface"
 import { UserService } from 'src/user/user.service';
 import { Logger } from '@nestjs/common';
 import { PaddleSide } from './gameState.interface';
-import { GameService, Player, VIRTUAL_TABLE_HEIGHT, VIRTUAL_TABLE_WIDTH } from './game.service';
+import { GameResults, GameService, Player, VIRTUAL_TABLE_HEIGHT, VIRTUAL_TABLE_WIDTH } from './game.service';
 import { SocketStrategy } from '../auth/jwt/websocket.strategy';
 
 @WebSocketGateway({
@@ -47,8 +47,8 @@ export class GameGateway implements OnGatewayConnection{
 			this.server.emit('updateBallPosition', {roomId : ball.roomId, x: ball.x, y: ball.y, speedRatio : ball.speedRatio});
 		})
 
-		this.gameService.eventsEmitter.on('handleEndGame', (roomId: string) => {
-			this.server.emit('endGame', {roomId : roomId});
+		this.gameService.eventsEmitter.on('handleEndGame', (payload : {roomId: string, gameResult : GameResults}) => {
+			this.server.emit('endGame', {roomId : payload.roomId, gameResult : payload.gameResult});
 		})
 		this.gameService.eventsEmitter.on('startGame', (gameId:number) => {
 			this.server.emit('launchGame',{gameId : gameId})

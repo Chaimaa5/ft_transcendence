@@ -98,7 +98,10 @@ export class GameService {
 				room.players[0].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
 					room.isGameEnded = true;
-					this.events.emit('handleEndGame', room.roomId);
+					this.postGameResult(room).then((res) => {
+						const gameResult : GameResults = res;
+						this.events.emit('handleEndGame', {roomId : room.roomId, gameResults : gameResult});
+					});
 				}
 			}
 		}
@@ -349,19 +352,23 @@ export class GameService {
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
 		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
+		const gameStatus = (body.isPlayerInvited === true) ? "waitingForOtherPlayer" : "pending"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
 			rounds : body.rounds,
 			pointsToWin : body.pointsToWin,
 			difficulty : difficulty,
-			status: 'pending'
+			status: gameStatus
 		}})
 		if(game.rounds && game.pointsToWin && game.difficulty) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
 		}
+		console.log(body.isPlayerInvited)
+
 		if(body.isPlayerInvited)
 		{
+			console.log('inviting')
 			const player = await this.prisma.user.findUnique({where : {username : body.Player}})
 			if(player) {
 				await this.notification.addGameInvite(user.id, player.id, game.id)
@@ -486,5 +493,80 @@ export class GameService {
 				console.error("deleting game by Id failed + |" +  gameId + "|");
 			}
 		}
+	}
+
+	async postGameResult(room : RoomState) {
+		const id = room.roomId.slice("room_".length);
+		const draw : boolean = (room.players[0].roundScore === room.players[1].roundScore) ? true : false;
+		const players = await this.prisma.game.findUnique({where :  {id : id}, select : {
+			player1 :{
+				select : {
+					username : true,
+				}
+			},
+			player2 : {
+				select : {
+					username : true,
+				}
+			}
+		}})
+		const player1 = (room.players[0].username === players.player1.username) ? room.players[0] : room.players[1];
+		const player2 = (room.players[0].username === players.player2.username) ? room.players[0] : room.players[1];
+		const leftPlayer = (room.players[0].side === PaddleSide.Left) ? room.players[0] : room.players[1];
+		const rightPlayer = (room.players[0].side === PaddleSide.Right) ? room.players[0] : room.players[1];
+		if(draw === false) {
+			const winner : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[0] : room.players[1];
+			const loser : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[1] : room.players[0];
+			await this.prisma.game.update({where : {id : id}, data : {
+				winner : winner.username,
+				playerXp1 : player1.roundScore,
+				playerXp2 : player2.roundScore,
+			}});
+			const ret : GameResults = {
+				winner : winner.username,
+				draw : false,
+				leftPlayer : {
+					userName :  leftPlayer.username,
+					roundScore : leftPlayer.roundScore
+				},
+				rightPlayer : {
+					userName :  rightPlayer.username,
+					roundScore : rightPlayer.roundScore
+				}
+			}
+			return(ret);
+		} else {
+			await this.prisma.game.update({where : {id : id}, data : {
+				draw : true,
+				playerXp1 : player1.roundScore,
+				playerXp2 : player2.roundScore,
+			}});
+			const ret : GameResults = {
+				winner : '',
+				draw : false,
+				leftPlayer : {
+					userName :  leftPlayer.username,
+					roundScore : leftPlayer.roundScore
+				},
+				rightPlayer : {
+					userName :  rightPlayer.username,
+					roundScore : rightPlayer.roundScore
+				}
+			}
+			return(ret);
+		}
+	}
+}
+
+export interface GameResults{
+	winner: string,
+	draw : boolean,
+	leftPlayer : {
+		userName: string,
+		roundScore : number,
+	}, 
+	rightPlayer : {
+		userName: string,
+		roundScore : number,
 	}
 }

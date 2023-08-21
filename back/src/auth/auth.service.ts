@@ -44,6 +44,7 @@ export class AuthService {
     signOut(res: Response) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
+		res.cookie('logged', false);
         res.redirect('http://localhost/login');
     } 
 
@@ -111,6 +112,7 @@ export class AuthService {
 
             res.cookie('access_token', Access_Token, {httpOnly: true, secure: true,});
             res.cookie('refresh_token', Refresh_Token, {httpOnly: true, secure: true,});
+			res.cookie('logged', true);
             const encryptedToken = this.encryptToken(Refresh_Token);
             await this.userService.UpdateRefreshToken(user.id , encryptedToken)
             console.log('finished')
