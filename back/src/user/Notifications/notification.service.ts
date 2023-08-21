@@ -7,8 +7,7 @@ export class NotificationService {
     prisma = new PrismaClient();
     private Emitter = new EventEmitter();
     constructor(){}
-   //invite to room
-   //message received
+
    async addNotifications(senderId : string, receiverId: string, type: string, context: string){
     const sender = await this.prisma.user.findUnique({where: {id: senderId}})
     const receiver = await this.prisma.user.findUnique({where: {id: receiverId}})
@@ -54,14 +53,11 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
                 gameId: gameId
             },
         });
-
-		if(notification.gameId) {
-			this.notifEventsEmitter.emit('notifications',notification)
-		}
+        this.Emitter.emit('notifications', notification)
     }
 }
    
-get  notifEventsEmitter() {
+get  eventsEmitter() {
     return(this.Emitter)
 }
 

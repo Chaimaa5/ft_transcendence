@@ -21,7 +21,6 @@ export class MuteService {
     @Cron('*/1 * * * *')
     async  updateMutes(){
         const time = new Date();
-
         const expiredMute = await this.prisma.membership.findMany({
             where: {
                 isMuted: true,
@@ -30,7 +29,6 @@ export class MuteService {
                 }
             }
         })
-
 
 
         for (const muted of expiredMute){

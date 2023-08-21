@@ -12,6 +12,8 @@ import { MuteService } from './chat/mute.service';
 import { ChatModule } from './chat/chat.module';
 import { NotificationsGateway } from './user/Notifications/notifications.gateway';
 import { GameModule } from './game/game.module';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './auth/exception.filter';
 // import { GameGateway } from './game/game.gateway';
 // import { GameService } from './game/game.service';
 @Module({
@@ -23,7 +25,7 @@ import { GameModule } from './game/game.module';
     }), ChatModule, GameModule
   ],
   controllers: [],
-  providers: [ChatGateway, MuteService],
+  providers: [ChatGateway, MuteService, {provide: APP_FILTER, useClass: HttpExceptionFilter}],
 
   })
 export class AppModule {}

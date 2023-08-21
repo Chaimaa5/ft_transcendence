@@ -43,9 +43,9 @@ export const PongBoard = ({gameProp ,gameIdProp}) => {
 				const html5Canvas = canvas.elt;
 				ctx = html5Canvas.getContext('2d');
 				gameProp.table.initTable(tableCanvasSizeRef.current.width, tableCanvasSizeRef.current.height, ctx, p, socket);
-				gameProp.ball.initBall();
 				gameProp.myPaddle.initPaddle(color1, color2);
 				gameProp.opponentPaddle.initPaddle(color1, color2);
+				gameProp.ball.initBall();
 			};
 	
 			p.draw = () => {
@@ -106,8 +106,8 @@ export const PongBoard = ({gameProp ,gameIdProp}) => {
 					gameProp.round.rightPlayerScore = payload.rightScore;
 					gameProp.myPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
 					gameProp.opponentPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
-					gameProp.myPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
-					gameProp.opponentPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
+					gameProp.myPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
+					gameProp.opponentPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableWidth, gameProp.table.tableWidth); 
 				}
 			})
 

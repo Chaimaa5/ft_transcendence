@@ -61,7 +61,7 @@ export class Paddle {
 		this.prevPaddlePosY = this.paddlePosY;
 		this.paddleWidth = this.table.tableWidth*0.02;
 		this.paddleHeight = this.table.mapValue(this.paddleHeight, this.table.serverTableWidth, this.table.tableWidth);
-		this.stepsY = this.table.tableWidth/this.speedRatio;
+		this.stepsY = this.table.tableWidth/this.speedRatio;	
 	}
 
 	show() {

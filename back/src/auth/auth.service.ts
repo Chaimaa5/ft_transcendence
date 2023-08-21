@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Achievement, PrismaClient, User } from '@prisma/client';
 import { JwtPayload, VerifyOptions } from 'jsonwebtoken';
@@ -30,12 +30,13 @@ export class AuthService {
         
 
     async signIn(res: Response, req: Request) {
-        const find = this.userService.FindUser(req.user);
+        const find = await this.userService.FindUser(req.user);
         const check = await this.userService.GetUser(req.user);
         const Access_Token = this.generateToken(req.user);
         const Refresh_Token = this.generateRefreshToken(req.user);
         res.cookie('access_token', Access_Token, {httpOnly: true});
         res.cookie('refresh_token', Refresh_Token, {httpOnly: true});
+        res.cookie('logged', true);
         const encryptedToken = this.encryptToken(Refresh_Token);
         this.userService.UpdateRefreshToken(check.id, encryptedToken)
         return find
@@ -44,7 +45,7 @@ export class AuthService {
     signOut(res: Response) {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-		res.cookie('logged', false);
+        res.cookie('logged', false);
         res.redirect('http://localhost/login');
     } 
 
@@ -96,39 +97,42 @@ export class AuthService {
 
  
     async RefreshTokens(req: Request, res: Response) {
-
-        const users: any = req.user;
-        const user = await this.userService.GetUser(users);
-        if (!user)
-            throw new ForbiddenException('User Does not exist');
-        const decryptedToken = this.decryptToken(user.refreshToken);
-        const decodedToken = this.jwtService.verify(decryptedToken) ;
-        const cookieToken = this.jwtService.verify(req.cookies['refresh_token']);
-
-        if (decryptedToken == req.cookies['refresh_token'])
-        {
-            const Access_Token = this.generateToken(user);
-            const Refresh_Token = this.generateRefreshToken(user);
-
-            res.cookie('access_token', Access_Token, {httpOnly: true, secure: true,});
-            res.cookie('refresh_token', Refresh_Token, {httpOnly: true, secure: true,});
-			res.cookie('logged', true);
-            const encryptedToken = this.encryptToken(Refresh_Token);
-            await this.userService.UpdateRefreshToken(user.id , encryptedToken)
-            console.log('finished')
-        }
-        else{
-            throw new ForbiddenException('Access Denied');
+        try{
+            const users: any = req.user;
+            const user = await this.userService.GetUser(users);
+            if (!user)
+                throw new ForbiddenException('User Does not exist');
+            const decryptedToken = this.decryptToken(user.refreshToken);
+            const decodedToken = this.jwtService.verify(decryptedToken) ;
+            const cookieToken = this.jwtService.verify(req.cookies['refresh_token']);
+    
+            if (decryptedToken == req.cookies['refresh_token'])
+            {
+                const Access_Token = this.generateToken(user);
+                const Refresh_Token = this.generateRefreshToken(user);
+    
+                res.cookie('access_token', Access_Token, {httpOnly: true, secure: true,});
+                res.cookie('refresh_token', Refresh_Token, {httpOnly: true, secure: true,});
+                const encryptedToken = this.encryptToken(Refresh_Token);
+                await this.userService.UpdateRefreshToken(user.id , encryptedToken)
+            }
+            else{
+                throw new ForbiddenException('Access Denied');
+            }
+        }catch(e){
+            throw new HttpException('User Not Granted Full Access', HttpStatus.FORBIDDEN)
         }
     }
 
     //TwoFactorAuth
     
-    async generateQRCode(id: string){
+    async generateQRCode(user: User){
+        try{
+        const id = user.id
         if(id){
             const secret = authenticator.generateSecret();
-            const app = "Trans";
-            const account = "celmhan";
+            const app = "Transcendence";
+            const account = user.username;
     
             //update secret in database
             await this.prisma.user.update({
@@ -139,50 +143,67 @@ export class AuthService {
             return (authUrl);
         }
         else
-            throw new UnauthorizedException('User  not found')
+            throw new UnauthorizedException('User Does Not Exist')
+    }catch(e){
+        throw new HttpException('User Does Not Exist', HttpStatus.FORBIDDEN)
+
+    }
     }
 
  
     async verifyTFA(user: any, code: string) {
-        // check if user exist
-        if(user){
-            return await authenticator.verify({
-                token: code,
-                secret: user.TwoFacSecret
-            });
+        try{
+            if(user){
+                return await authenticator.verify({
+                    token: code,
+                    secret: user.TwoFacSecret
+                });
+            }
+            else
+                throw new UnauthorizedException('User  not found')
+        }catch(e){
+            throw new HttpException('User Does Not Exist', HttpStatus.FORBIDDEN)
         }
-        else
-            throw new UnauthorizedException('User  not found')
     }
 
     async activateTFA(id: string){
-        if(id){
-            await this.prisma.user.update({
-                where: {id: id}, 
-                data: {isTwoFacEnabled: true}
-            });
+        try{
+            if(id){
+                await this.prisma.user.update({
+                    where: {id: id}, 
+                    data: {isTwoFacEnabled: true}
+                });
+            }
+            else
+                throw new UnauthorizedException('User  not found')
+        }catch(e){
+            throw new HttpException('User Does Not Exist', HttpStatus.FORBIDDEN)
         }
-        else
-            throw new UnauthorizedException('User  not found')
     }
 
     async disableTFA(id: string) {
-        if (id){
-            await this.prisma.user.update({
-            where: {id: id},
-            data: {isTwoFacEnabled: false}
-            })
+        try{
+            if (id){
+                await this.prisma.user.update({
+                where: {id: id},
+                data: {isTwoFacEnabled: false}
+                })
+            }
+            else
+                throw new UnauthorizedException('User  not found')
+        }catch(e){
+            throw new HttpException('User Does Not Exist', HttpStatus.FORBIDDEN)
         }
-        else
-            throw new UnauthorizedException('User  not found')
     }
 
     async isEnabled(id: string) {
-        const user = await this.prisma.user.findUnique({
-            where: {id:id}
-        })
-        if(user)
-            return user?.isTwoFacEnabled
-        throw new UnauthorizedException('User Not Found')
+        try{
+            const user = await this.prisma.user.findUnique({
+                where: {id:id}
+            })
+            if(user)
+                return user?.isTwoFacEnabled
+            throw new UnauthorizedException('User Not Found')
+        }catch(e){throw new HttpException('User Does Not Exist', HttpStatus.FORBIDDEN) }
     }
 }

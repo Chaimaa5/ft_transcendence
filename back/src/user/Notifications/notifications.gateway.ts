@@ -9,7 +9,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
     @WebSocketServer()
     server: Server;
-    constructor(private readonly notificationService: NotificationService){}
+    constructor(private notificationService: NotificationService){}
 
   
     clients: Map<string, Socket> = new Map<string, Socket>()
@@ -19,16 +19,18 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 
     async afterInit(server: Socket) {
-		console.log('WebSocket gateway initialized!');
-        this.notificationService.notifEventsEmitter.on('notifications',( notification : any)=>{
+        console.log('WebSocket gateway initialized!');
+        this.notificationService.eventsEmitter.on('notifications', notification =>{
             const socket = this.clients.get(notification.receiverId)
             if(socket){
+                console.log(socket,"  " ,notification)
                 this.server.to(socket.id).emit('notifications', notification)
             }
         })
     }
     
     async handleDisconnect(client: Socket){
+        
         this.clients.forEach((socket, key) =>{
             if(socket === socket){
                 this.clients.delete(key);
@@ -52,7 +54,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
                     this.server.to(client.id).emit('notifications', notifications);
                     // this.server.emit('connectionSuccess', { message: 'Connected successfully!' });
                 }
-                console.log('WebSocket gateway connected!');
+                console.log('WebSocket gateway connected!' );
             }
         }
 

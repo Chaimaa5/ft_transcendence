@@ -247,6 +247,7 @@ export class GameService {
 				pointsToWin : pointsToWin,
 			}
 		)
+		console.log("create ROom : " + VIRTUAL_TABLE_HEIGHT/(3 + paddleHeightDecrement))
 		return(roomId);
 	}
 
@@ -337,6 +338,8 @@ export class GameService {
 	}
 
 	async createGame(matchedPlayers : Player[]) {
+		console.log("player 0 : " + matchedPlayers[0].username);
+		console.log("player 1 : " + matchedPlayers[1].username);
 		const game = await this.prisma.game.create({data : {
 			mode : 'multiplayer',
 			playerId1 : matchedPlayers[0].id,
@@ -355,6 +358,7 @@ export class GameService {
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
 		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
+		console.log("difficulty : " + difficulty);
 		const gameStatus = (body.isPlayerInvited === true) ? "waitingForOtherPlayer" : "pending"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
@@ -428,9 +432,6 @@ export class GameService {
 					game.player1.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + '/api' + game.player1.avatar 
 			}
 		}
-			// return {
-				 
-			// }
 
 		return(pendingGames);
 	}

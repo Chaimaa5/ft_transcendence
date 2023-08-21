@@ -1,7 +1,7 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy} from "@nestjs/passport";
 import { PrismaClient, User } from "@prisma/client";
-import { Request } from "express";
+import { Request, response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import * as jwt from 'jsonwebtoken';
@@ -18,14 +18,14 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt'){
           });
     }
 
+
     prisma = new PrismaClient();
     async validate(payload: JwtPayload){
-
         try{
             jwt.verify(payload.token, process.env.JWT_ACCESS_SECRET as jwt.Secret)
         }catch(err){
             if(err instanceof jwt.TokenExpiredError )
-                throw  new UnauthorizedException('Expired Token Exception');
+                throw  new UnauthorizedException('Expired Token Exception');                
         }
         const user = await this.prisma.user.findUnique({
             where:{id: payload.id,},

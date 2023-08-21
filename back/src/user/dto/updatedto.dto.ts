@@ -1,16 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsOptional } from "class-validator"
 
 export class UpdateUserDTO{ 
-  @ApiProperty()             
+  @ApiProperty()   
+  @IsOptional()
   username?  :String
   @ApiProperty()
-  fullname?  :String
-  @ApiProperty()
   avatar?    :String
-  @ApiProperty()
-  TFA?       :Boolean
-  @ApiProperty()
-  TFASecret? :String
   @ApiProperty()
   XP?        :number
   @ApiProperty()

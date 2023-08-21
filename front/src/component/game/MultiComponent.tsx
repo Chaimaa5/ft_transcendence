@@ -13,6 +13,8 @@ import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
 import Matched from './Matched';
 import { AlreadyJoined } from './AlreadyJoined';
+import GameOver from './GameOver';
+import { GameResults } from './GameComponent';
 
 
 export const MultiComponent = (username) => {
@@ -27,6 +29,7 @@ export const MultiComponent = (username) => {
 	const [player2, setPlayer2] = useState();
 	const [renderBoard, setRenderBoard] = useState(false);
 	const {socket} = useGameContext();
+	const [gameResult, setGameResult] = useState<GameResults>();
 	
 	const gameRef = useRef(new Game(0, 0));
 	
@@ -35,6 +38,8 @@ export const MultiComponent = (username) => {
 			socket.emit('joinQueue');
 	
 			socket.on('match', (payload) => {
+				gameRef.current.myPaddle.side = payload.side;
+				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 				setPlayer2(payload.username);
 				setGameId(payload.gameId);
 				setGamePending(false);
@@ -71,8 +76,6 @@ export const MultiComponent = (username) => {
 			socket.on('joinedRoom', (payload) =>{
 				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
-				gameRef.current.myPaddle.side = payload.side;
-				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
@@ -122,6 +125,8 @@ export const MultiComponent = (username) => {
 			socket.on('endGame', (payload) => {
 				if(payload.roomId === ("room_" + gameId) ) {
 					gameRef.current.endGame();
+					console.log("game result  : ", payload.gameResult)
+					setGameResult(payload.gameResult);
 					setGameEnded(true);
 				}
 			})
@@ -145,7 +150,7 @@ export const MultiComponent = (username) => {
 		) :(playersMatched === true ) ? (
 			<Matched username={username} player2={player2} onUnmount={handleMatchedUnmount}/>
 		) : (gameEnded === true) ? (
-			<EndGame /> 
+			<GameOver username={username} side={gameRef.current.myPaddle.side} results={gameResult}/> 
 		) : (gameCorrupted === true) ? (
 			<GameCorrupted />
 		) : (alreadyJoined === true) ? (

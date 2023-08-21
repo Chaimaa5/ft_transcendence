@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator"
 
 export class CreateRoom{ 
   @ApiProperty()             
@@ -11,16 +12,18 @@ export class CreateRoom{
 
 export class AddMember{ 
   @ApiProperty()
+  @IsNotEmpty() 
   roomId: number
-  @ApiProperty()             
+  @ApiProperty()  
+  @IsString()   
+  @IsNotEmpty()        
   userId  : String
-  // @ApiProperty()
-  // role  : String
-
 }
 
 export class CreateChannel{ 
-  @ApiProperty()             
+  @ApiProperty()  
+  @IsNotEmpty()  
+  @IsString()          
   name  :String
   @ApiProperty()
   image?  :String
@@ -36,7 +39,7 @@ export class CreateChannel{
 
 export class UpdateChannel{ 
   @ApiProperty()             
-  roomId?  :number
+  roomId?  :String
   @ApiProperty()             
   name?  :String
   @ApiProperty()
@@ -44,5 +47,12 @@ export class UpdateChannel{
   @ApiProperty()
   type?  : String
   @ApiProperty()
+  @IsOptional()
   password?  : String
+}
+
+export class PasswordDTO{
+  @IsNotEmpty()
+  @MaxLength(60)
+  password  : String
 }

@@ -31,8 +31,8 @@ export class GameGateway implements OnGatewayConnection{
 	afterInit(){
 		this.logger.log('game server initialized');
 		this.gameService.eventsEmitter.on('handleMatched', (matches : {player1 : Player, player2 : Player, gameId : number}) => {
-			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId});
-			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId});
+			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId, side : PaddleSide.Left});
+			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId, side : PaddleSide.Right});
 
 		})
 
@@ -47,8 +47,8 @@ export class GameGateway implements OnGatewayConnection{
 			this.server.emit('updateBallPosition', {roomId : ball.roomId, x: ball.x, y: ball.y, speedRatio : ball.speedRatio});
 		})
 
-		this.gameService.eventsEmitter.on('handleEndGame', (payload : {roomId: string, gameResult : GameResults}) => {
-			this.server.emit('endGame', {roomId : payload.roomId, gameResult : payload.gameResult});
+		this.gameService.eventsEmitter.on('handleEndGame', (payload : {roomId: string, gameResults : GameResults}) => {
+			this.server.emit('endGame', {roomId : payload.roomId, gameResult : payload.gameResults});
 		})
 		this.gameService.eventsEmitter.on('startGame', (gameId:number) => {
 			this.server.emit('launchGame',{gameId : gameId})

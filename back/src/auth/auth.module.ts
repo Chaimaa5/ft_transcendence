@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { ConfigModule } from 'src/config/config.module';
 import { RefreshStrategy } from './jwt/refresh.strategy';
 import { JWTStrategy } from './jwt/jwt.strategy';
+import { GoogleStrategy } from './google.strategy';
 
 
 @Module({
@@ -17,7 +18,7 @@ import { JWTStrategy } from './jwt/jwt.strategy';
       secretOrPrivateKey: process.env.JWT_ACCESS_SECRET,
       signOptions: { expiresIn: '1h' },
     }), ConfigModule],
-  providers: [FortyTwoStrategy, AuthService, JwtModule, UserService, JWTStrategy, RefreshStrategy],
+  providers: [FortyTwoStrategy, AuthService, JwtModule, UserService, JWTStrategy, RefreshStrategy, GoogleStrategy],
   controllers: [AuthController]
 })
 export class AuthModule {}
