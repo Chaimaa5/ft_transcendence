@@ -5,6 +5,20 @@
     background-color: rgb(29, 53, 87, 0.8);
 }
 
+.popUpbg
+{
+    background: linear-gradient(135deg, #457B9D 0%, #1D3557 100%);
+    box-shadow: 0.8333vw 3.2806vw 7.4306vw 0vw rgba(9, 18, 31, 0.44);
+
+}
+
+.pupUpInputShadow
+{   background-color: #1D3557;
+    box-shadow:
+    0.6944vw 0.5556vw 0.7639vw 0vw rgba(0, 0, 0, 0.25) inset,
+    0.3472vw 0.5556vw 0.6944vw 0vw rgba(29, 53, 87, 0.48);
+}
+
 .icon_{
     width: 1vw;
     fill: var(--lightBlue);

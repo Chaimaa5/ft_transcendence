@@ -29,9 +29,7 @@ class skt {
 export const socket_ =  async  (endpoint: string) => {
     const Skt = new skt
     await Instanse.get("/access")
-                  .then((res) => {Skt.setToken(res.data)}
-				  
-				  );
+                  .then((res) => {Skt.setToken(res.data)});
     const socket =  sk(`http://localhost:3000/${endpoint}`, {
         extraHeaders: {
             Authorization: `Bearer ${Skt.token}`

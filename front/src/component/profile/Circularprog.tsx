@@ -1,34 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./index.scss"
 import { useRef } from "react";
+import { Progress } from "antd";
+import Instanse from "../api/api";
 
-type circle = {
-    size: string
-    pct: number
+interface circle {
+    name: string
 }
 
-const CircularProg = ({size, pct}:circle) => {
-    const windowSize = useRef([window.innerWidth, window.innerHeight]);
-    const p = (1 - pct / 100 ) * (2 * (22 / 7) * ((windowSize.current[0] * 5) / 100));
-    const x = (2 * (22 / 7) * ((windowSize.current[0] * 5) / 100));
+const CircularProg = (name: string) => {
+    const [data, SetData] = useState<{win:number, loss:number}>()
+    useEffect(() => {
+        Instanse.get("/profile/statistics/" + name)
+                .then((res) => {
+                    SetData(res.data)
+                })
+    })
+
+
     return(
-        <div style={{width: size , height: size}} className="svg_circle">
-            <svg className="h-[75%] w-[100%]">
-                <circle  className="h-[100%] w-[100%] circle-line" cx={'50%'} cy={'55%'} r={'5vw'}> </circle>
-                <circle style={{width: size,height: size, strokeDashoffset: p, strokeDasharray: x}} 
-                    className="circular" cx={'50%'} cy={'55%'} r={'5vw'}> </circle>
-            </svg>
+        <>
+            <Progress type="circle" percent={data?.win}
+                    className="flex justify-center items-center w-[100%] text-[5vw] h-[75%]"
+                    strokeColor="#A8DADC"
+                    trailColor="#E63946"
+                    />
             <div className="prog h-[20%] w-[100%]">
                 <div className=" h-[100%] w-[40%] cr-prog">
-                    <div className="cr bg-[#A8DADC]"></div>
-                    <h5 className="text-[0.8vw] text-[#F1FAEE]">{pct}% Wins</h5>
+                    <div className="w-[1vw] h-[1vw] rounded-[50%] self-center bg-[#A8DADC]"></div>
+                    <h4 className="text-[0.8vw] text-[#F1FAEE]">{data?.win}% Wins</h4>
                 </div>
                 <div className=" h-[100%] w-[40%] cr-prog">
-                    <div className="cr bg-[#E63946]"></div>
-                    <h5 className="text-[0.8vw] text-[#F1FAEE]">{100 - pct}% Losses</h5>
+                    <div className="w-[1vw] h-[1vw] rounded-[50%] self-center bg-[#E63946]"></div>
+                    <h4 className="text-[0.8vw] text-[#F1FAEE]">{data?.loss}% Losses</h4>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

@@ -3,17 +3,25 @@ import cancel_icon from '../../tools/btnsIcons/cancelIcon.svg'
 import { ReactSVG } from 'react-svg'
 import useNewchannelCreate from '../ChatStore/useNewChannelCreate'
 import useChannelData from '../ChatStore/useChannelData'
+import useProtectedOn from '../ChatStore/useProtectedOn'
+import useChannelAvatar from '../ChatStore/usechannelAvatar'
+import avatar_img from '../../tools/sign/avatar.png'
+
 
 export const CancelForm = () => {
+  const {setImg} = useChannelAvatar();
     const {updateAddNewChannel} = useNewchannelCreate();
     const {updateChannelName,  updateChannelPwd, updateChannelType, updateChannelAvatar } = useChannelData();
+    const { setProtectedOn} = useProtectedOn();
 
     const handleClick = () => {
       updateAddNewChannel(false);
       updateChannelName("");
       updateChannelPwd("");
-      updateChannelType("");
-      updateChannelAvatar("");      
+      updateChannelType('public');
+      updateChannelAvatar("");    
+      setProtectedOn(false);
+      setImg(avatar_img);
     }
 
   return (

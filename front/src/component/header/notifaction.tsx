@@ -96,15 +96,15 @@ const Notification = () => {
 
                 if(value.type == "Friendship invite")
                     return (
-                        <FriendNtf key={key} name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
+                        <FriendNtf  name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
                     )
                 else if(value.type == "Friendship acceptance")
 					return (
-						<FriendNtfAc key={key} name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
+						<FriendNtfAc  name={value.sender.username} avatar={value.sender.avatar} id={value.sender.id}/>
 					)
 					else if(value.type == "Game")
 					return (
-						<GameNtf key={key} name={value.sender.username} gameId={value.gameId} avatar={value.sender.avatar}/>
+						<GameNtf  name={value.sender.username} gameId={value.gameId} avatar={value.sender.avatar}/>
 						)
 			})
             }

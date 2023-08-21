@@ -23,7 +23,6 @@ const OfforOn = () => {
             .then((res) => {
                 SetData(res.data);
                 setStatus(res.data.status)
-                console.log("fff")
             })
     },[])
 

@@ -36,16 +36,16 @@ const TopPlayers = ()=> {
     const [data, setData] = useState(useContext<cntx>(CrContext))
     const [response, setResponse] = useState<home_[]>([]);
     const HandleLogin = () => {
-    return Instanse
-            .get<home_[]>('/home/bestRanked')
-            .then((res) => {
-                setResponse(res.data)
-            })
-            .catch((err) => console.log(err))
+       Instanse.get<home_[]>('/home/bestRanked')
+                .then((res) => {
+                    setResponse(res.data)
+                })
     };
+
     useEffect(() => {
-      HandleLogin();
+        HandleLogin();
     },[]);
+
     const plyrs = [1,2,3,4,5]
     return(
         <motion.div /*animate={{x: "-43%", y: "-50%"}}*/ className="players w-[45%] pos">

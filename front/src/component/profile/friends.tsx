@@ -27,7 +27,6 @@ const Friends = () => {
         Instanse.get<friends_[]>('/profile/friends/' + routProp.username)
         .then((res) => {
             setResponse(res.data)
-            console.log(res.data)
         });
     }
     
@@ -37,18 +36,19 @@ const Friends = () => {
     ,[routProp.username]);
 
     if(!response[0]){
-        const addFriends = [1,2,3,4,]
         return(
             <>
                 <h4 className="text-[#A8DADC]">Friends</h4>
-                <div className="h-[95%] w-[100%] Friend flex justify-center
+                <div className="h-[95%] w-[100%] pt-[0%] Friend flex justify-start
                 items-center flex-col">
                     {
-                        addFriends.map( (value, key) =>
-                            <motion.div whileHover={{scale: 1.2, opacity: 0}}
-                                 key={key} className="opacity-[30%] flex h-[3vw] w-[100%] m-[2%] rounded-[2vw] friends-bar bg-black">
-                            </motion.div>
-                        )
+                        Array(10).fill(null).map((v, k) => {
+                            return(
+                            <div key={k} className="opacity-[30%] m-[1%] flex h-[3vw] p-[2%] w-[100%] rounded-[2vw] friends-bar">
+                                    <div className="h-[2.5vw] w-[2vw]"></div>
+                            </div>
+                        
+                        )})
                     }
                 </div>
             </>

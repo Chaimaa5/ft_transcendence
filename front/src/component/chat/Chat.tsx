@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Rooms } from './Rooms/Rooms';
 import { UserContent } from './UserContent';
 import { ChatContent } from './ChatContent';
@@ -12,18 +12,17 @@ import { RoomSettings } from './Rooms/RoomSettings';
 import useDisplayRoomSettings from './ChatStore/useDisplayRoomSettings';
 import { DefaultRoomsContent } from './Rooms/DefaultRoomsContent';
 import { DefaultChatContent } from './DefaultChatContent';
-import axios from 'axios';
 import useAllRooms from './ChatStore/useAllRooms';
 import { RoomObj } from './ChatStore/useAllRooms';
 import Instanse, { socket_ } from '../api/api';
 import { useParams } from 'react-router-dom';
 import useSocket from './ChatStore/useSocket';
-
+import useReload from './ChatStore/useReload';
 
 
 export const Chat = () => {
+  const {reloadJoinedRooms, reloadUnjoined} = useReload();
   const {joinedRooms, updateCurrentRooms} = useRooms();
-  const [error, setError] = useState(" ");
   const {On} = useDisplayRoomSettings();
   const {addNewChannel} = useNewchannelCreate();
   const {myRooms, setJoinedRooms, setUnjoinedRooms} = useAllRooms();
@@ -36,11 +35,10 @@ export const Chat = () => {
   let style4: string = "w-[50%] h-[80%]  text-[0.7vw] rounded-[2vw]  ";
   
   
-  console.log("CHAT.tsx  reeendeeered")
   useEffect(()=>{
-    console.log("connection")
+    
       socket_("chat")
-      .then(s => {setChatsocket(s); console.log(s)})
+      .then(s => {setChatsocket(s)})
   },[])
 
   useEffect(()=>{
@@ -48,52 +46,35 @@ export const Chat = () => {
     {
       Instanse.get<RoomObj[]>("/chat/joinedChannels" , {withCredentials: true})
       .then(res => {
-        setJoinedRooms(res.data);
-        console.log(res.data)
+        setJoinedRooms(res?.data);
       })
-      .catch(err => setError(err.message));
+      
     }
     else
     {
       Instanse.get<RoomObj[]>("/chat/channels" , {withCredentials: true})
       .then(res => {
-        setUnjoinedRooms(res.data);
-        console.log("chaaaaanneeels: ", res.data)
+        setUnjoinedRooms(res?.data);
       })
-      .catch(err => setError(err.message));     
+        
     }
-  }, [joinedRooms]);
+  }, [joinedRooms, reloadJoinedRooms, reloadUnjoined]);
 
-  // const handleYourRoomsClick = () => {
-  //   updateCurrentRooms(true);
-  //   useEffect(()=>{
-  //     Instanse.get<RoomObj[]>("/chat/rooms")
-  //     .then(res => {
-  //       setJoinedRooms(res.data);
-  //       console.log(res.data)
-  //     })
-  //     .catch(err => setError(err.message));
-  //   })
-  // }
 
   if (joinedRooms)
   {
-    
     style3 += style1;
     style4 += style2;
   }
   else
   {
-    
     style3 += style2;
     style4 += style1;    
   }
 
- 
-
   return (
     
-    <div className={"flex flex-row justify-center items-center w-[100%] h-[44vw]"}>
+    <div className={"flex flex-row justify-center items-center w-[100%] h-[100%]"}>
         
         <div className={"w-[40%] h-[100%] pb-[1vw]  flex flex-col justify-center items-center gap-[1.5vw]"}>   
           <DmsList/>
@@ -102,14 +83,11 @@ export const Chat = () => {
               <button onClick={() => updateCurrentRooms(false)} className={[Style.font3, style4].join(" ")}>{"Other Rooms"}</button>
               <button onClick={() => updateCurrentRooms(true)} className={[Style.font3,  style3].join(" ")}>{"Your Rooms"}</button>
             </div>
-              {((joinedRooms && myRooms.length &&  <Rooms/>) || (joinedRooms && !myRooms.length  &&  <DefaultRoomsContent/>) ) || ( !joinedRooms && <OtherRooms/>)}
-              {/* <DefaultRoomsContent/> */}
-             
+              {((joinedRooms && myRooms?.length &&  <Rooms/>) || (joinedRooms && !myRooms?.length  &&  <DefaultRoomsContent/>) ) || ( !joinedRooms && <OtherRooms/>)}
           </div>
         </div>
 
         <div className={"w-[60%] h-[100%] p-[2vw] flex flex-col  "}>
-            {/* {chatId ?  <UserContent/>  <ChatContent/> : <DefaultChatContent/>}  */}
             {chatId && <UserContent/>}
             {chatId && <ChatContent/>}
            { !chatId && <DefaultChatContent/>}

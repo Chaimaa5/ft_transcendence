@@ -7,7 +7,12 @@ export interface memberObj{
     avatar: string,
     role: string,
     isBanned: boolean,
-    isMuted: boolean
+    isMuted: boolean,
+    isFriend: boolean,
+    isSender: boolean,
+    isReceiver: boolean,
+    isBlocked: boolean,
+    DmroomId: string
 }
 
 interface MembersStore{

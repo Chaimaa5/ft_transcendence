@@ -3,7 +3,7 @@ import { create } from "zustand"
 
 interface ChannelFormInput
 {
-    channelAvatar: any,
+    channelAvatar: string,
     channelName: string,
     channelPwd: string,
     channelType: string,

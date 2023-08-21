@@ -18,41 +18,35 @@ const Match = () => {
     let icon = up_icon
     const username = useParams().username;
     const [data, setData] = useState<Match_[]>();
-    const random: Match_[] = [{isWin: true, player1: "", player2: ""},
-                            {isWin: true, player1: "", player2: ""},
-                            {isWin: true, player1: "", player2: ""},
-                            {isWin: true, player1: "", player2: ""},
-                            {isWin: true, player1: "", player2: ""}]
     useEffect(() => {
         Instanse.get("/profile/history/" + username)
                 .then((res) => {
                     setData(res.data);
                 })
-    },[data])
-    // if(data){
+    },[])
+    // if(!data?.length){
     //     return(
     //         <>
-    //         { data.map(() => {
-    //             <div className="h-[3vw] w-[100%] m-[5%] match">
+    //         { Array(4).fill(null).map((v, key) => {
+    //             return(
+    //             <div key={key} className="h-[3vw] w-[100%] opacity-[30%] m-[5%] match">
     //                 <ReactSVG className="w-[2vw] match-icon" src={icon}></ReactSVG>
     //             </div>
-    //             })
+    //         )})
     //         }
     //         </>
     //     )
     // }
-    // if(!isWin) icon = down_icon
     return(
         <>
         {
             <div className="h-[3vw] w-[100%] m-[5%] match">
                 <ReactSVG className="w-[2vw] match-icon" src={icon}></ReactSVG>
-                {false && <>
-                    <h4 className="text-[1vw] text-[#F1FAEE]">hkhalil</h4>
-                    <h3 className="text-[1.2vw] text-[#F1FAEE]">VS</h3>
-                    <h4 className="text-[1vw] text-[#F1FAEE]">hkhalil</h4>
-                </>
-                }
+                <h1 className="w-[33%] text-[0.8vw] text-[#F1FAEE]">mmoutawa</h1>
+                <h1 className="text-[1vw] text-DarkBlue">9</h1>
+                <h3 className="text-[1.2vw] text-[#F1FAEE]">VS</h3>
+                <h1 className="text-[1vw] text-DarkBlue">2</h1>
+                <h1 className="w-[33%] text-[0.8vw] text-[#F1FAEE]">mmoutawa</h1>
             </div>
         }
         </>

@@ -81,7 +81,6 @@ const Modes = () => {
                         </div>
                         <button onClick={() =>{
                             setPop(true);
-                            console.log(isPop)
                                
                         }} className="relative outline-0">
                             <Button_ option="Start"/>
@@ -131,7 +130,6 @@ const Modes = () => {
                         </div>
                         <button onClick={() =>{
                             setPop(true);
-                            console.log(isPop)
                                
                         }} className="relative outline-0">
                             <Button_ option="Start"/>

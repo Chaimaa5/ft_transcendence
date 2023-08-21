@@ -112,7 +112,10 @@ export class GameService {
 				room.players[1].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
 					room.isGameEnded = true;
-					this.events.emit('handleEndGame', room.roomId);
+					this.postGameResult(room).then((res) => {
+						const gameResult : GameResults = res;
+						this.events.emit('handleEndGame', {roomId : room.roomId, gameResults : gameResult});
+					});
 				}
 			}
 		}
@@ -495,66 +498,86 @@ export class GameService {
 		}
 	}
 
+	async updatePlayerXp(playerXp : number, id : string, endGameStatus : string) {
+		let addedXp = (endGameStatus === "winner") ? 100 : (playerXp  < 10) ? 0 : -10;
+		await this.prisma.user.update({
+			where : {id : id}, data : {
+				XP : playerXp + addedXp,
+			}
+
+		})
+
+	}
+
 	async postGameResult(room : RoomState) {
-		const id = room.roomId.slice("room_".length);
+		const gameId = room.roomId.slice("room_".length);
+		const id = parseInt(gameId);
 		const draw : boolean = (room.players[0].roundScore === room.players[1].roundScore) ? true : false;
 		const players = await this.prisma.game.findUnique({where :  {id : id}, select : {
 			player1 :{
 				select : {
+					id : true,
 					username : true,
+					XP : true,
 				}
 			},
 			player2 : {
 				select : {
+					id : true,
 					username : true,
+					XP : true,
 				}
 			}
 		}})
-		const player1 = (room.players[0].username === players.player1.username) ? room.players[0] : room.players[1];
-		const player2 = (room.players[0].username === players.player2.username) ? room.players[0] : room.players[1];
-		const leftPlayer = (room.players[0].side === PaddleSide.Left) ? room.players[0] : room.players[1];
-		const rightPlayer = (room.players[0].side === PaddleSide.Right) ? room.players[0] : room.players[1];
-		if(draw === false) {
-			const winner : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[0] : room.players[1];
-			const loser : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[1] : room.players[0];
-			await this.prisma.game.update({where : {id : id}, data : {
-				winner : winner.username,
-				playerXp1 : player1.roundScore,
-				playerXp2 : player2.roundScore,
-			}});
-			const ret : GameResults = {
-				winner : winner.username,
-				draw : false,
-				leftPlayer : {
-					userName :  leftPlayer.username,
-					roundScore : leftPlayer.roundScore
-				},
-				rightPlayer : {
-					userName :  rightPlayer.username,
-					roundScore : rightPlayer.roundScore
+		let ret : GameResults = {winner : '', draw : true, leftPlayer : {userName:'', roundScore:0}, rightPlayer:{userName:'',roundScore:0}};
+		if(players && players.player2) {
+			const player1 : PaddleState = (room.players[0].username === players.player1.username) ? room.players[0] : room.players[1];
+			const player2 : PaddleState = (room.players[0].username === players.player2.username) ? room.players[0] : room.players[1];
+			const leftPlayer = (room.players[0].side === PaddleSide.Left) ? room.players[0] : room.players[1];
+			const rightPlayer = (room.players[0].side === PaddleSide.Right) ? room.players[0] : room.players[1];
+			if(draw === false) {
+				const winner : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[0] : room.players[1];
+				const loser : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[1] : room.players[0];
+				await this.prisma.game.update({where : {id : id}, data : {
+					winner : winner.username,
+					playerXp1 : player1.roundScore,
+					playerXp2 : player2.roundScore,
+				}});
+				ret = {
+					winner : winner.username,
+					draw : false,
+					leftPlayer : {
+						userName :  leftPlayer.username,
+						roundScore : leftPlayer.roundScore
+					},
+					rightPlayer : {
+						userName :  rightPlayer.username,
+						roundScore : rightPlayer.roundScore
+					}
+				}
+				this.updatePlayerXp(players.player1.XP, players.player1.id, (player1.username === winner.username ) ? "winner" : "loser");
+				this.updatePlayerXp(players.player2.XP, players.player2.id, (player2.username === winner.username ) ? "winner" : "loser")
+			} else {
+				await this.prisma.game.update({where : {id : id}, data : {
+					draw : true,
+					playerXp1 : player1.roundScore,
+					playerXp2 : player2.roundScore,
+				}});
+				ret = {
+					winner : '',
+					draw : false,
+					leftPlayer : {
+						userName :  leftPlayer.username,
+						roundScore : leftPlayer.roundScore
+					},
+					rightPlayer : {
+						userName :  rightPlayer.username,
+						roundScore : rightPlayer.roundScore
+					}
 				}
 			}
-			return(ret);
-		} else {
-			await this.prisma.game.update({where : {id : id}, data : {
-				draw : true,
-				playerXp1 : player1.roundScore,
-				playerXp2 : player2.roundScore,
-			}});
-			const ret : GameResults = {
-				winner : '',
-				draw : false,
-				leftPlayer : {
-					userName :  leftPlayer.username,
-					roundScore : leftPlayer.roundScore
-				},
-				rightPlayer : {
-					userName :  rightPlayer.username,
-					roundScore : rightPlayer.roundScore
-				}
-			}
-			return(ret);
-		}
+		}	
+		return(ret);
 	}
 }
 

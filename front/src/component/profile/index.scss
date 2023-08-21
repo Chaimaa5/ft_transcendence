@@ -3,12 +3,8 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 44vw;
+    height: 100%;
     width: 100%;
-}
-
-.usr{
-    // font
 }
 
 .half-container{
@@ -68,7 +64,7 @@
 }
 
 .Friend{
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     padding-right: 3%;
 }
@@ -121,7 +117,7 @@
 }
 
 .achievement{
-    width: 50%;
+    width: 40%;
     height: 30%;
     padding: 1%;
     display: flex;
@@ -143,9 +139,6 @@
     align-items: center;
 }
 
-.stateq{
-    display: flex;
-}
 
 .circle{
     display: flex;
@@ -155,13 +148,14 @@
     padding: 3% 3% 0 3%;
 }
 
+.ant-progress-inner{
+    width: 13vw !important;
+    height: 13vw !important; 
+}
+
 .svg_circle{
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background: linear-gradient(90deg, var(--blue) 0%, var(--darkBlue) 100%);
     border-radius: 2vw;
-    flex-direction: column;
 }
 
 .circular{
@@ -208,6 +202,12 @@
     height: 1vw;
     border-radius: 50%;
     align-self: center;
+}
+
+.ant-progress-text{
+    font-size: 2vw;
+    font-family: Myfont_m;
+    color: var(--lightBlue) !important;
 }
 
 .cr-prog{

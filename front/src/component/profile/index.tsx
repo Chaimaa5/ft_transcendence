@@ -22,19 +22,20 @@ import UserBtns from "./userBtns";
 import Instanse from "../api/api";
 import CrContext from "../context/context"
 import { useParams } from "react-router-dom";
+import { Progress } from "antd";
+import { cntx } from "../app";
 
 type achiev_ = {
     img: string,
     opty: boolean,
 }
 const achve: { isAchieved: boolean; imagePath: string }[] = [
-    { isAchieved: true, imagePath: achv1_img  },
-    { isAchieved: false, imagePath: achv4_img },
+    { isAchieved: false, imagePath: achv1_img  },
+    { isAchieved: false, imagePath: achv2_img },
     { isAchieved: false, imagePath: achv5_img },
     { isAchieved: true, imagePath: achv3_img },
-    { isAchieved: true, imagePath: achv2_img },
-    { isAchieved: false, imagePath: achv1_img },
-    { isAchieved: false, imagePath: achv3_img },
+    { isAchieved: false, imagePath: achv4_img },
+
 ];
 
 const Statisteque = ({svg, info, title}) => {
@@ -52,7 +53,7 @@ const Statisteque = ({svg, info, title}) => {
     }
 
 
-type profile_ = {
+interface profile_ {
     username:  string,
     losses:  number,
     wins:  number,
@@ -66,13 +67,10 @@ type profile_ = {
     isSender: boolean,
     isReceiver: boolean,
     isBlocked: boolean,
-    progress: string
+    progress: string,
 }
 
-type cntx = {
-    username: string,
-    avatar: string
-}
+
 
 const Profile = () => {
     const [response, setResponse] = useState<profile_>();
@@ -83,9 +81,11 @@ const Profile = () => {
         .then((res) => {
             setResponse(res.data)
         });
-    },[response]);
+    },[username]);
     
     if(response?.isBlocked) return
+
+    
     return(
         <div className="Profile">
             <div className="half-container">
@@ -106,32 +106,31 @@ const Profile = () => {
                         </div>
                     </div>
                     <div className="w-[100%] h-[50%] user-btns">
-                        {!response?.isOwner && <UserBtns username={response?.username}/>}
+                        {!response?.isOwner && <UserBtns username={username}/>}
                     </div>
                 </div>
+
                 <div className="lv-profile">
                     <h4 className="text-[#A8DADC]">Lv {response?.level}</h4>
                     <div className="w-[80%] h-[23%] sp-lv">
-                        <div style={{width: response?.progress}} className=" h-[100%] main-lv"></div>
+                        <div style={{width: response?.progress}} className="w-[60%] h-[100%] main-lv"></div>
                     </div>
                     <h4 className="text-[#A8DADC]">{response?.xp} Xp</h4>
                 </div>
+
                 <div className="achievement">
-                    {
-                        achve.map((arr, key) => 
-                        <Achievement key={key} imagePath={arr.imagePath} isAchieved={arr.isAchieved}/>)
-                    }
+                        <Achievement name={username}/>
                 </div>
             </div>
             <div className="w-[100%] h-[50%] flex p-right-[1%]">
                 <div className="h-[100%] w-[50%] flex items-center flex-col">
                     <Friends/>
                 </div>
-                <div className="h-[100%] w-[50%] stateq">
-                    <div className="w-[65%] h-[100%] circle">
-                        <Circularprog size={"21vw"} pct={50}/>
+                <div className="h-[100%] w-[50%] flex justify-between items-center">
+                    <div className="w-[45%] h-[90%] flex justify-center items-center svg_circle flex-col">
+                        <Circularprog name={response?.progress}/>
                     </div>
-                    <div className="w-[35%] h-[100%] pt-[1%] pr-[3%] matchs">
+                    <div className="w-[55%] h-[100%] pr-[3%] matchs">
                         <Match/>
                     </div>
                 </div>

@@ -53,7 +53,6 @@ const ProfileSt = () => {
      axios.post('http://localhost:3000/api/user/setup', UpdateUserDTO, header)
         .then((res) => {
             // if(res.data)
-            console.log("dddd")
                 SetDone("done");
         })
     //   nav('/home')

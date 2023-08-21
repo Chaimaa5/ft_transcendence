@@ -13,36 +13,56 @@
 
 .font3
 {
-    font-family: Myfont_m;
+  font-family: Myfont_m;
     
 }
 
 .st::placeholder
 {
-    color: #457B9D;
-    font-size: 0.8vw;
+  color: #457B9D;
+  font-size: 0.8vw;
 }
 
 .shdw
 {
-    box-shadow: 0.2vw 0.2vw 0.15vw rgba(29, 53, 87, 0.48), inset 0.4vw 0.3vw 0.7vw rgba(0, 0, 0, 0.25);
+  box-shadow: 0.2vw 0.2vw 0.15vw rgba(29, 53, 87, 0.48), inset 0.4vw 0.3vw 0.7vw rgba(0, 0, 0, 0.25);
 }
+
+
 
 
 
 .checkbox input
 {
-    visibility: hidden;
+  visibility: hidden;
 }
 
-  .checkbox {
+.checkbox {
+  width: 2vw;
+  height: 0.9vw;
+  background: #1D3557;
+  position: relative;
+  border-radius: 2vw;
+  box-shadow:
+  0.833vw 0.667vw 0.917vw 0vw rgba(0, 0, 0, 0.25) inset,
+  0.417vw 0.667vw 0.833vw 0vw rgba(29, 53, 87, 0.48);
+}
+
+  .checkedClass
+  {
     width: 2vw;
     height: 0.9vw;
     background: #F0B5B5;
     position: relative;
     border-radius: 2vw;
+  
+    
   }
 
+  .checkedClass input{
+    visibility: hidden;
+  }
+  
 .checkmark
 {
     display: block;
@@ -55,12 +75,15 @@
     top: 5%;
     left: 4%;
     margin: auto;
-    background: #E63946;
+    background: #457B9D;
 
 }
 
-  .checkbox input:checked + .checkmark {
+  .checkedClass input:checked + .checkmark {
     left: 55%;
-
+    background: #E63946
   }
 
+
+
+ 

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import "./index.scss"
+import "../navbar/index.scss"
 import { ReactSVG } from "react-svg";
 import home_icon from "../tools/navbar/home.svg"
 import chat_icon from "../tools/navbar/chat.svg"
@@ -26,7 +26,7 @@ interface nav {
     games: number,
     win: number,
     loss: number,
-    progress: number
+    progress: string,
 }
 
 const Navbar = () => {
@@ -45,7 +45,6 @@ const Navbar = () => {
     const [Chat_ic, SetChat_ic] = useState({fill: "#A8DADC"})
     const [Stt_ic, SetStt_ic] = useState({fill: "#A8DADC"})
     const location = useLocation();  
-    console.log(location.pathname)
     const i = "18%";
     useEffect(() => {
 
@@ -74,7 +73,7 @@ const Navbar = () => {
                             <h5 className="value">{Data?.level}</h5>
                         </div>
                         <div className="lv bg-[#A8DADC]">
-                            <div style={{height: i}} className="lv-status h-[63%]">
+                            <div style={{height: Data?.progress}} className="lv-status">
                             </div>
                         </div>
                         <div className="info">
@@ -105,7 +104,7 @@ const Navbar = () => {
                 <Link to={"/leaderboord"}>
                     <ReactSVG style={Leader_ic} className="icon-svg w-[1.5vw]" src={leader_icon}/>
                 </Link>
-                <Link to="/chat">
+                <Link to="/chat/">
                     <ReactSVG style={Chat_ic} className="icon-svg w-[1.5vw]" src={chat_icon}/>
                 </Link>
                 <Link to="/setting">

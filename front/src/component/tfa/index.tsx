@@ -28,7 +28,6 @@ const TfaPage = () => {
             <button onClick={() => {
                 Instanse.post("/enable",{code: code})
                 .then((res) => {
-                    console.log(res)
                     if(!res.data)
                         setholder("try again !")
                     else nav("/home")

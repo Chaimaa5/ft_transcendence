@@ -8,10 +8,24 @@ import {EndGame} from './training/EndGame'
 import Instanse from '../api/api';
 import  {io, Socket }from 'socket.io-client';
 import { useGameContext } from './GameContext';
-import { Game } from './classes/Game';
+import { Game, Player } from './classes/Game';
 import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
+import GameOver from './GameOver';
 
+
+export interface GameResults{
+    winner: string,
+    draw : boolean,
+    leftPlayer : {
+        userName: string,
+        roundScore : number,
+    }, 
+    rightPlayer : {
+        userName: string,
+        roundScore : number,
+    }
+}
 
 export const GameComponent = (username) => {
 	const gameId = useParams().id;
@@ -23,6 +37,7 @@ export const GameComponent = (username) => {
 	const queryParams = new URLSearchParams(location.search);
 	const accepted = queryParams.get('accepted');
 	const roomId = "room_" + gameId;
+	const [gameResult, setGameResult] = useState<GameResults>();
 
 	const gameRef = useRef(new Game(0, 0));
 
@@ -59,6 +74,8 @@ export const GameComponent = (username) => {
 			socket.on('endGame', (payload) => {
 				if(payload.roomId === roomId) {
 					gameRef.current.endGame();
+					console.log("game result  : ", payload.gameResult)
+					setGameResult(payload.gameResult);
 					setGameEnded(true);
 				}
 			})
@@ -85,8 +102,8 @@ export const GameComponent = (username) => {
   	<div className="Game">
 		{(gamePending === true) ? (
 			<Waiting username={username} mode=""/>
-		) : (gameEnded === true) ? (
-			<EndGame /> 
+		) : (gameEnded === true && gameResult) ? (
+			<GameOver username={username} side={gameRef.current.myPaddle.side} results={gameResult}/> 
 		) : (gameCorrupted === true) ? (
 			<GameCorrupted />
 		) : (

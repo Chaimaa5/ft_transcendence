@@ -4,6 +4,7 @@ import Avatar from "../avatar/index";
 import Button_ from "../button/index";
 import topaz_img from "../tools/home/Topaz.png"
 import Instanse from "../api/api";
+import { Link } from "react-router-dom";
 
 type topplayer = [
     {
@@ -17,25 +18,32 @@ type topplayer = [
     }
 ]
 
-
-
 const TopPlayers = () => {
     const [data, SetData] = useState<topplayer>();
     useEffect(() => {
         Instanse.get("/leaderboard/players")
                 .then((res) => {
                     SetData(res.data);
-                    console.log(res.data)
                 });
     }, [])
-
+    if(!data?.length)
+        return(
+            <>
+                {Array(8).fill(null).map((vl, key) => {
+                    return(
+                        <div key={key} className="w-[100%] h-[3vw] m-[1%] rounded-[5vw] bg-Blue opacity-[40%]"></div>)
+                })}
+            </>
+            )
     return(
         <>{
             data?.map((value, key) => {
                 <div key={key} className="h-[3vw] w-[100%] mt-[1%] rounded-[2vw] topplayers">
                     <div className="flex flex-calum items-center w-[20%] justify-evenly">
                         <h4 className="text-[0.8vw] text-[#F1FAEE]">1</h4>
-                        <Avatar src={value.avatar} wd_="2.5vw"/>
+                        <Link to={"/profile" + value.username}  >
+                            <Avatar src={value.avatar} wd_="2.5vw"/>
+                        </Link>
                         <h4 className="text-[0.8vw] text-[#F1FAEE]">{value.username}</h4>
                     </div>
                     <h4 className="text-[0.8vw] text-[#F1FAEE]">{value.level} Lv</h4>

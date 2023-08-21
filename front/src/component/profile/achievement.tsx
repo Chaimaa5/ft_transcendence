@@ -1,18 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Instanse from "../api/api";
 
-type achiev = {
-    isAchieved: boolean,
-    imagePath: string,
+interface achiev {
+    id: number,
+    Achievement: string,
+    Achieved: boolean,
+    Image: string,
 }
 
-const Achievement = ({imagePath, isAchieved}:achiev) => {
+
+
+const Achievement =  ({name}) => {
     let opc = "100%";
-    if(!isAchieved) opc = "20%"; 
+    const [data, SetData] = useState<achiev[]>()
+    async function achievData (){
+        Instanse.get("/profile/acheivments/" + name)
+                .then((res) => {
+                    SetData(res.data)
+                })
+    }
+    useEffect(() => {
+          achievData()
+    },[])
     return(
-        <div style={{opacity: opc}} className="w-[13%] h-[100%] bg-[#1D3557] 
-                       flex items-center justify-center rounded-[1.5vw] p-[1%]">
-            <img className="h-[90%]" src={imagePath}/>
-        </div>
+        <>
+        {data?.map((value, key) => {
+    if(!value.Achieved) opc = "20%"; 
+        return(
+            <div key={key} style={{opacity: opc}} className="w-[5vw] h-[5vw] bg-[#1D3557] 
+                flex items-center justify-center rounded-[1.5vw] p-[1%]">
+                <img className="h-[90%]" src={value.Image}/>
+            </div>
+            )
+        })}
+        </>
     )
 }
 

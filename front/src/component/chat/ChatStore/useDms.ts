@@ -6,7 +6,8 @@ export  interface DmObj
     id: number,
     name: string,
     image: string,
-    messages: string[]
+    message: string,
+    userId: string
 }
 
 interface MyDms

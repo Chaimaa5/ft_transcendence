@@ -18,25 +18,23 @@
     align-items: center;
 }
 
-.btn-container{
-    margin: 1vh;
+canvas{
+    width: 95vw !important;
+    height: 45vw !important;
 }
 
 .sign-btn{
     border: #1D3557 solid 2px;
-    height: 100%;
-    width: 100%;
     padding: 1%;
-    border-radius: 5vh;
+    border-radius: 2vw;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .-btn{
-    width: 20vw;
     background-color: #1D3557;
-    border-radius: 5vh;
+    border-radius: 2vw;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -104,6 +102,5 @@ button:hover{
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 40px;
 }
 

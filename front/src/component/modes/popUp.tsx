@@ -79,7 +79,7 @@ const ModePopUp = ({whichOne}) => {
     const [input, setValue] = useState("");
     const [response, setResponse] = useState<{username: string, avatar: string}[]>([]);
     const [Player, SetPlayer] = useState("");
-    const nav = useNavigate();
+	const nav = useNavigate();
 
 	// let gameId : number;
 	const [gameId, setGameId] = useState(0);
@@ -111,7 +111,7 @@ const ModePopUp = ({whichOne}) => {
 			setPendingGames(res.data);
 		})
 	},[])
-
+    
     if(whichOne){
         return(
             <>
@@ -137,7 +137,7 @@ const ModePopUp = ({whichOne}) => {
 							setLossLimit(value);
                         }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                     </div>
-                    <div onClick={async () => {
+					<div onClick={async () => {
                             await Instanse.post('/game/training-settings', {ballSpeed, paddleSize, lossLimit}).then((response) => {
 								setGameId(response.data);
 								nav('/training/' + response.data);
@@ -180,6 +180,7 @@ const ModePopUp = ({whichOne}) => {
                 </div>
 
                 <div onClick={() => {
+					if(Create || Join)
                         GoToNext(true);
                 }} className="flex justify-center h-[20%] w-[80%]">
                     <Button_ option="continue"/>
@@ -189,7 +190,7 @@ const ModePopUp = ({whichOne}) => {
                         <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Rounds</h1>
-                            <Slider max={4} min={1} defaultValue={3} onChange={(value) => {
+							<Slider max={4} min={1} defaultValue={3} onChange={(value) => {
                                 setRounds(value);
 								console.log("value : " + value + " rounds : " + rounds);
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
@@ -198,7 +199,6 @@ const ModePopUp = ({whichOne}) => {
                             <h1 className=" text-[0.7vw] text-[#A8DADC]">Points</h1>
                             <Slider max={6} min={3} defaultValue={5} onChange={(value) => {
 								setPointsToWin(value);
-								console.log("value : " + value + " pointToWin : " + pointsToWin);
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="radio flex justify-between items-center h-[10%] w-[80%]">
@@ -216,18 +216,17 @@ const ModePopUp = ({whichOne}) => {
                             }} name="create" className="popup-input" type="radio"/>
                         </div>
                         <div className="flex w-[100%] justify-evenly">
-                            <button onClick={() => {SetInvite(true)}} className="flex justify-center h-[10%] w-[80%]">
+                            <button onClick={() => {SetInvite(true)
+								}} className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="Invite"/>
                             </button>
-                            <div onClick={async () => {
-								if(Player) {
-									setIsPlayerInvited(true);
-								}
-								await Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
+							<div onClick={() => {
+								if(isFlashy || isDecreasingPaddle){
+									Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
 									setGameId(response.data) ;
 									console.log("response post method : " + response.data);
 									nav('/game/' + response.data + "/challenge");
-								});
+								});}
                             }}className="flex justify-center h-[10%] w-[80%]">
                                  <Button_ option="continue"/>
                             </div>
@@ -252,6 +251,7 @@ const ModePopUp = ({whichOne}) => {
                                         return(
                                             <button key={key} onClick={() => {
                                                 SetPlayer(value.username);
+												setIsPlayerInvited(true);
                                                 setResponse([]);
                                                 }} className="flex m-[2%] h-[28%] w-[95%] justify-evenly rounded-[2vw] items-center border-[0.1vw] border-[#F1FAEE]">
                                                 <Avatar src={value.avatar} wd_="2vw"/>
@@ -267,19 +267,18 @@ const ModePopUp = ({whichOne}) => {
                             }
                         </div>
                         <button onClick={() => {
-							
                             GoToNext(true); SetInvite(false)
                         }} className="">
-                    	  <Button_ option="Back"/>
+                            <Button_ option="Back"/>
                         </button>
                     </div>
                 }
                 {Next && Join && 
                     <div className="flex flex-col  items-center justify-evenly h-[100%] w-[100%]">
                         <h1 className="text-[1vw] text-[#A8DADC]">Challenge Mode</h1>
-                        <h5 className="text-[0.8vw] text-[#A8DADC]">Games List</h5>	
-							<div className="flex flex-col h-[80%] w-[100%] justify-bteween items-center overflow-y-scroll">
-									{pendingGames.map((value, key) => {
+                        <h5 className="text-[0.8vw] text-[#A8DADC]">Games List</h5>
+                        <div className="flex flex-col h-[80%] w-[100%] justify-bteween items-center overflow-y-scroll">
+						{pendingGames.map((value, key) => {
 										return(
 											<div className="flex justify-between items-center h-[20%] p-[5%] border-LightBlue border-[0.15vw] w-[80%] rounded-[2vw] m-[1%]">
 												<Avatar src={value.player1.avatar} wd_="2.3vw"/>
@@ -296,7 +295,6 @@ const ModePopUp = ({whichOne}) => {
 									})
 								}
 							</div>
-						{/* } */}
                 </div>
                 }
             </div>
