@@ -61,10 +61,10 @@ export const MultiComponent = (username) => {
 				if(gameEnded === false) {
 					if(playersMatched === true) {
 						console.log("leaving room");
-						socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom : true});
+						socket.emit('leaveRoom');
 					}
 					else {
-						socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom : false});
+						socket.emit('leaveRoom');
 					}
 				}
 				socket.disconnect();

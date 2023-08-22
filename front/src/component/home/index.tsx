@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import Instanse, { socket_ } from "../api/api"
 import CrContext from "../context/context"
 import Profile from "../profile/index";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 type home_ =  {
@@ -47,6 +47,7 @@ const TopPlayers = ()=> {
     },[]);
 
     const plyrs = [1,2,3,4,5]
+
     return(
         <motion.div /*animate={{x: "-43%", y: "-50%"}}*/ className="players w-[45%] pos">
             <div className="titels_ pl-[5%]">
@@ -108,6 +109,8 @@ const Home = () => {
             setanimation(first)
         else setanimation([])
     }
+	
+	const nav = useNavigate();
     return(
         <div className=" flex flex-col  w-[100%] h-[100%] justify-between align-center">
             <div className="w-[100%] h-[50%] flex  justify-evenly items-start">
@@ -117,7 +120,10 @@ const Home = () => {
                     </div>                   
                     <div className="flex flex-col h-[75%] pl-[12%] justify-evenly">
                         <h5 className="dsc">To The <br /> Ultimate<br /> Pong<br /> Experience!</h5>
-                        <button className="start_">
+                        {/* multiplayer  */}
+						<button onClick={async () => {
+							nav("/game/multi");
+						}} className="start_">
                             <Button_ option="Start"/>
                         </button>
                     </div>

@@ -122,17 +122,17 @@ export class GameGateway implements OnGatewayConnection{
 
 
 	@SubscribeMessage('leaveRoom') 
-	async handleLeaveRoom (client : Socket, payload : {roomId : string, inRoom : boolean}){
+	async handleLeaveRoom (client : Socket){
 		this.gameService.removePlayerFromQueue(client);
-		if(payload.inRoom === true) {
-			client.leave(payload.roomId);
-			const room = this.gameService.roomsMap.get(payload.roomId);
+		const roomId = this.gameService.isInRoom(client.data.payload.id)
+		if(roomId) {
+			const room = this.gameService.roomsMap.get(roomId);
 			if(room){
 				room.playersNumber--;
 				room.isGameEnded = true;
 			}
-			await this.gameService.deleteGameById(payload.roomId.slice("room_".length));
-			this.server.emit('gameCorrupted', {roomId : payload.roomId});
+			await this.gameService.deleteGameById(roomId.slice("room_".length));
+			this.server.emit('gameCorrupted', {roomId : roomId});
 		}
 	}
 

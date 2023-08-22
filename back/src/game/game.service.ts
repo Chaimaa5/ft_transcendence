@@ -328,6 +328,16 @@ export class GameService {
 		}
 	}
 
+	isInRoom(clientId : string) {
+		for (const roomState of this.rooms.values()) {
+			const player = roomState.players.find(player => player.playerId === clientId);
+			if (player) {
+			  return roomState.roomId;
+			}
+		}
+		return undefined;
+	}
+
 	removePlayerFromQueue(client : Socket) {
 		this.players = this.players.filter(player => player.id != client.data.payload.id);
 	}
