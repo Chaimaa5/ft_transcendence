@@ -586,7 +586,7 @@ export class GameService {
 				}});
 				ret = {
 					winner : '',
-					draw : false,
+					draw : true,
 					leftPlayer : {
 						userName :  leftPlayer.username,
 						roundScore : leftPlayer.roundScore
