@@ -16,56 +16,74 @@ export class GameController{
     
 	@Get('/auth')
 	async GetAuthAccess(@Req() req: Request){
-		const user : User = req.user as User;
-		return await this.authService.generateToken(user);
+		try {
+			const user : User = req.user as User;
+			return await this.authService.generateToken(user);
+		}catch(error){}
 	}
 
 	@Get('/two-players-game/:id')
 	async getMultiplayerGame(@Param('id') id : string) {
-		const gameId : number = parseInt(id);
-		return await this.gameService.getTwoPlayersGame(gameId);
+		try {
+			const gameId : number = parseInt(id);
+			return await this.gameService.getTwoPlayersGame(gameId);
+		} catch(error) {}
 	}
 
 	@Post('/create-challenge-game')
 	async postChallengeGame(@Req() settings : Request, @Body() body : any) {
-		const user : User = settings.user as User;
-		return await this.gameService.postChallengeGame(user, body)
+		try {
+			const user : User = settings.user as User;
+			return await this.gameService.postChallengeGame(user, body)
+		} catch(error);
 	}
 
 	@Get('/challenge-game/:id')
 	async getChallengeGame(@Param('id') id : string) {
-		const gameId : number = parseInt(id);
-		return await this.gameService.getChallengeGame(gameId);
+		try {
+			const gameId : number = parseInt(id);
+			return await this.gameService.getChallengeGame(gameId);
+		} catch(error) {}
 	}
 
 	@Get('/pending-games')
 	async getPendingGames(@Req() Req : Request) {
-		const user : User = Req.user as User;
-		return await this.gameService.getPendingGames(user.id);
+		try {	
+			const user : User = Req.user as User;
+			return await this.gameService.getPendingGames(user.id);
+		} catch (error) {}
 	}
 
 
 	@Post('/join-game/:id')
 	async handleJoingGame(@Req() req : Request, @Param('id') id : string){
-		const user : User = req.user as User;
-		return await this.gameService.joinCreatedGame(user,id);
+		try {
+			const user : User = req.user as User;
+			return await this.gameService.joinCreatedGame(user,id);
+		} catch(error) {}
 	}
 
 	@Post('/training-settings')
 	async postTrainingSettings(@Req() settings : Request, @Body() body : any) {
-		const user : User = settings.user as User;
-		return await this.gameService.postTrainingSettings(user, body);
+		try {
+			const user : User = settings.user as User;
+			return await this.gameService.postTrainingSettings(user, body);
+		} catch(error) {}
 	}
 
 	@Get('/training-settings/:id')
 	async getTrainingSettings(@Param('id') id : string) {
-		const gameId : number = parseInt(id);
-		return await this.gameService.getTrainingSettings(gameId);
+		try {
+			const gameId : number = parseInt(id);
+			return await this.gameService.getTrainingSettings(gameId);
+		} catch(error) {}
 	}
 
 	@Get('/training-game/:id')
 	async getTrainingGame(@Param('id') id : string) {
+		try {
 		const gameId : number = parseInt(id);
-		return await this.gameService.getTrainingGame(gameId);
+			return await this.gameService.getTrainingGame(gameId);
+		} catch(error) {}
 	}
 }
