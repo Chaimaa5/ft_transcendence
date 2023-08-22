@@ -99,6 +99,8 @@ export const MultiComponent = (username) => {
 				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
+				gameRef.current.myPaddle.stepsY = payload.serverTableWidth/100;
+				gameRef.current.opponentPaddle.stepsY = payload.serverTableWidth/100;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
 			})
@@ -110,6 +112,7 @@ export const MultiComponent = (username) => {
 					// paddle Position 
 					gameRef.current.myPaddle.paddlePosX = myPaddleObj.x;
 					gameRef.current.myPaddle.paddlePosY = myPaddleObj.y;
+
 					gameRef.current.opponentPaddle.paddlePosX = opponentPaddleObj.x;
 					gameRef.current.opponentPaddle.paddlePosY = opponentPaddleObj.y;
 					// ball position and speed and initial angle

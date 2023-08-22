@@ -16,7 +16,7 @@ const initializeSocket = async (Skt : skt) => {
 	await Instanse.get("/access")
 	.then((res) => {Skt.setToken(res.data)});
 
-	const socketInstance = io('http://10.14.10.10:8080/game', {
+	const socketInstance = io('http://localhost:3000/game', {
 		extraHeaders: {
 			Authorization: `Bearer ${Skt.token}`
 		}

@@ -54,6 +54,8 @@ export const GameComponent = (username) => {
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.myPaddle.side = payload.pSide;
 				gameRef.current.opponentPaddle.side = (payload.pSide === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
+				gameRef.current.myPaddle.stepsY = payload.serverTableWidth/100;
+				gameRef.current.opponentPaddle.stepsY = payload.serverTableWidth/100;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;

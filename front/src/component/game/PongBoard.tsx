@@ -113,7 +113,6 @@ export const PongBoard = ({gameProp ,gameIdProp}) => {
 
 	
 			socket.on('updatePaddlePosition', (payload) => {
-				console.log("am here : " +  payload.roomId + " " + gameIdProp);
 				if(payload.roomId === "room_" + gameIdProp) {
 					gameProp.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
 				}

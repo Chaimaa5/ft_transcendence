@@ -6,6 +6,7 @@ import { useSocketManager } from "./socket";
 import { useGameContext } from './GameContext';
 import { useParams } from "react-router-dom";
 import Instanse from "../api/api";
+import {Loading} from './Loading'
 
 
 export const MultiApp = () => {
@@ -38,7 +39,7 @@ export const MultiApp = () => {
 		{(isSocketInitialized == true && username) ? (
 			<MultiComponent username={username}/>
 			) : (
-			<h1>Loading</h1>
+				<Loading/>
 			)
 		}
 		</>

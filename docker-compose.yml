@@ -23,40 +23,40 @@ services:
     volumes:
       - ./back/src:/src
     ports:
-      - '3000:8080'
+      - '3000:3000'
     networks:
       - app-network
-  reverse_proxy:
-    container_name: reverse_proxy
-    build: 
-     context: ./nginx
-    restart: always
-    env_file:
-        - .env
-    volumes:
-      - ./back/src:/src
-    ports:
-      - '8080:8080'
-    networks:
-      - app-network
-  frontend:
-    build: 
-     context: ./front
-    env_file:
-        - .env
-    volumes:
-      - ./front/:/app
-    ports:
-      - '8000:8080'
-    networks:
-      - app-network
+  # reverse_proxy:
+  #   container_name: reverse_proxy
+  #   build: 
+  #    context: ./nginx
+  #   restart: always
+  #   env_file:
+  #       - .env
+  #   volumes:
+  #     - ./back/src:/src
+  #   ports:
+  #     - '8080:8080'
+  #   networks:
+      # - app-network
+  # frontend:
+  #   build: 
+  #    context: ./front
+  #   env_file:
+  #       - .env
+  #   volumes:
+  #     - ./front/:/app
+  #   ports:
+  #     - '8000:8080'
+  #   networks:
+  #     - app-network
 volumes:
   postgres:
    driver: local
   backend:
    driver: local
-  frontend:
-    driver: local
+  # frontend:
+  #   driver: local
 networks:
   app-network:
    driver: bridge

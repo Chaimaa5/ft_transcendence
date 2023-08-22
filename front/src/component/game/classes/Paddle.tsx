@@ -60,8 +60,8 @@ export class Paddle {
 		this.paddlePosY = this.table.mapValue(this.paddlePosY, this.table.serverTableHeight, this.table.tableHeight);
 		this.prevPaddlePosY = this.paddlePosY;
 		this.paddleWidth = this.table.tableWidth*0.02;
-		this.paddleHeight = this.table.mapValue(this.paddleHeight, this.table.serverTableHeight, this.table.tableHeight);
-		this.stepsY = this.table.tableWidth/this.speedRatio;
+		this.paddleHeight = this.table.mapValue(this.paddleHeight, this.table.serverTableWidth, this.table.tableWidth);
+		this.stepsY = this.table.mapValue(this.stepsY, this.table.serverTableWidth, this.table.tableWidth);
 	}
 
 	show() {
@@ -76,8 +76,8 @@ export class Paddle {
 		}
 	}
 
-	updateMyPaddle(ratio : number) {
-		this.stepsY = this.table.tableWidth/(this.speedRatio-(ratio));
+	updateMyPaddle(speed : number) {
+		// this.stepsY = this.table.tableWidth/(this.speedRatio);
 		if(this.table.p && this.table.socket) {
 			this.paddlePosY += this.stepsY * this.direction;
 			this.paddlePosY = this.table.p.constrain(

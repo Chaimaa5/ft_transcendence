@@ -25,7 +25,7 @@ const paddleSizeMap: { [key: number]: string } = {
 
 export const VIRTUAL_TABLE_WIDTH = 1000;
 export const VIRTUAL_TABLE_HEIGHT = 500;
-const VIRTUAL_SPEED_RATIO = 200;
+const VIRTUAL_SPEED_RATIO = 150;
 const VIRTUAL_PADDLE_WIDTH = VIRTUAL_TABLE_WIDTH*0.02;
 const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
@@ -74,7 +74,7 @@ export class GameService {
 		const room = this.rooms.get(roomId);
 		if(room) {
 			const intervalId = setInterval(async () => {
-				this.moveBall(room.ball, roomId, (room.thisRound.roundNumber*room.speedIncrement));
+				this.moveBall(room.ball, roomId, ((room.thisRound.roundNumber+1)*room.speedIncrement));
 				await this.checkEdges(room);
 				if(room.isGameEnded === true) {
 					clearInterval(intervalId);
@@ -144,8 +144,8 @@ export class GameService {
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
-			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
+			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((room.thisRound.roundNumber+1) * room.speedIncrement)) *  Math.cos(angle));
+			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((room.thisRound.roundNumber+1) * room.speedIncrement)) *  Math.sin(angle);
 			await this.updateScore(room, PaddleSide.Left);
 			this.events.emit('handleUpdateScore', room);
 		}
@@ -153,8 +153,8 @@ export class GameService {
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
-			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
+			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((room.thisRound.roundNumber+1) * room.speedIncrement)) *  Math.cos(angle));
+			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((room.thisRound.roundNumber + 1) * room.speedIncrement)) *  Math.sin(angle);
 			await this.updateScore(room, PaddleSide.Right);
 			this.events.emit('handleUpdateScore',room);
 		}
@@ -180,8 +180,8 @@ export class GameService {
 			if(ball.x < player.x) {
 				const diff = ball.y - player.y;
 				angle = this.mapRange(diff, 0, paddleHeight, this.radians(225), this.radians(135));
-				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.cos(angle);
-				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.sin(angle);
+				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((roundNumber +1)* speedIncrement)) *  Math.cos(angle);
+				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((roundNumber+1) * speedIncrement)) *  Math.sin(angle);
 				ball.x = player.x - radius;
 			}
 		}
@@ -190,8 +190,8 @@ export class GameService {
 			if(ball.x > player.x){
 				const diff = ball.y - player.y;
 				angle = this.mapRange(diff, 0, paddleHeight, -this.radians(45), this.radians(45));
-				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.cos(angle);
-				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (roundNumber * speedIncrement)) *  Math.sin(angle);
+				ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((roundNumber+1) * speedIncrement)) *  Math.cos(angle);
+				ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - ((roundNumber+1) * speedIncrement)) *  Math.sin(angle);
 				ball.x = player.x + VIRTUAL_PADDLE_WIDTH + radius;
 			}
 		}
@@ -210,7 +210,7 @@ export class GameService {
 		const minSpeedRatio : number = 0;
 		const maxSpeedRatio : number = 500;
 		let speedIncrement : number = 0;
-		if(difficulty === 'flashy') {
+		if(difficulty === 'flashy' || difficulty === 'decreasingPaddle') {
 			speedIncrement = (maxSpeedRatio - minSpeedRatio)/rounds;
 		}
 		return(speedIncrement);

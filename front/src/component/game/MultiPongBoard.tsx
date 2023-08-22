@@ -106,8 +106,8 @@ export const MultiPongBoard = ({gameProp ,gameIdProp}) => {
 					gameProp.round.rightPlayerScore = payload.rightScore;
 					gameProp.myPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
 					gameProp.opponentPaddle.borderRadius = gameProp.table.mapValue(gameProp.myPaddle.prevBorderRadius, gameProp.myPaddle.paddleHeight, payload.paddleHeight);
-					gameProp.myPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
-					gameProp.opponentPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableHeight, gameProp.table.tableHeight);
+					gameProp.myPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
+					gameProp.opponentPaddle.paddleHeight = gameProp.table.mapValue(payload.paddleHeight, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
 				}
 			})
 
