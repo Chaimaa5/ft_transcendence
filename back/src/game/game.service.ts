@@ -25,7 +25,7 @@ const paddleSizeMap: { [key: number]: string } = {
 
 export const VIRTUAL_TABLE_WIDTH = 1000;
 export const VIRTUAL_TABLE_HEIGHT = 500;
-const VIRTUAL_SPEED_RATIO = 150;
+const VIRTUAL_SPEED_RATIO = 200;
 const VIRTUAL_PADDLE_WIDTH = VIRTUAL_TABLE_WIDTH*0.02;
 const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
@@ -240,7 +240,6 @@ export class GameService {
 			speedIncrement = this.calculateSpeedIncrement(rounds*pointsToWin, difficulty);
 			paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds*pointsToWin, difficulty);
 		}
-		console.log("am here : " + speedIncrement);
 		this.rooms.set(
 			roomId,
 			{

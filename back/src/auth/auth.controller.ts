@@ -33,11 +33,11 @@ export class AuthController {
                 const user = req.user as User
                 const isTwoFA = await this.authservice.isEnabled(user.id)
                 if(isTwoFA)
-                    return res.redirect('http://10.14.10.6:8080/tfa');
-                return res.redirect('http://10.14.10.6:8080/home');
+                    return res.redirect('http://10.14.10.10:8080/tfa');
+                return res.redirect('http://10.14.10.10:8080/home');
             }
             else
-                return res.redirect('http://10.14.10.6:8080/setup');
+                return res.redirect('http://10.14.10.10:8080/setup');
         // }catch(e){}
     }
 
@@ -51,11 +51,11 @@ export class AuthController {
                 const user = req.user as User
                 const isTwoFA = await this.authservice.isEnabled(user.id)
                 if(isTwoFA)
-                    return res.redirect('http://10.14.10.6:8080/tfa');
-                return res.redirect('http://10.14.10.6:8080/home');
+                    return res.redirect('http://10.14.10.10:8080/tfa');
+                return res.redirect('http://10.14.10.10:8080/home');
             }
             else
-                return res.redirect('http://10.14.10.6:8080/setup');
+                return res.redirect('http://10.14.10.10:8080/setup');
         }catch(e){}
     }
 

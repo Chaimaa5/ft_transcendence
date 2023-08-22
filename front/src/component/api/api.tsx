@@ -4,7 +4,7 @@ import sk from "socket.io-client"
 
 const Instanse = axios.create(
     {
-        baseURL: "http://10.14.10.6:8080/api",
+        baseURL: "http://10.14.10.10:8080/api",
         withCredentials: true,
     }
 )
@@ -30,7 +30,7 @@ export const socket_ =  async  (endpoint: string) => {
     const Skt = new skt
     await Instanse.get("/access")
                   .then((res) => {Skt.setToken(res.data)});
-    const socket =  sk(`http://10.14.10.6:8080/${endpoint}`, {
+    const socket =  sk(`http://10.14.10.10:8080/${endpoint}`, {
         extraHeaders: {
             Authorization: `Bearer ${Skt.token}`
         }
