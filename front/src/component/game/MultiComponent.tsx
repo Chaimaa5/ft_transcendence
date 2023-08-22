@@ -30,6 +30,7 @@ export const MultiComponent = (username) => {
 	const [renderBoard, setRenderBoard] = useState(false);
 	const {socket} = useGameContext();
 	const [gameResult, setGameResult] = useState<GameResults>();
+	const [side, setSide] = useState<PaddleSide>();
 	
 	const gameRef = useRef(new Game(0, 0));
 	
@@ -40,19 +41,21 @@ export const MultiComponent = (username) => {
 			socket.on('match', (payload) => {
 				gameRef.current.myPaddle.side = payload.side;
 				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
+				setSide(payload.side);
 				setPlayer2(payload.username);
 				setGameId(payload.gameId);
 				setGamePending(false);
 				setPlayersMatched(true);
+				
 			})
-
+			
 			const handleDisconnect = () => {
 				console.log(`socket disconnected`);
 				socket.disconnect();
 			};
-
+			
 			socket.on('disconnect', handleDisconnect);
-
+			
 			return () => {
 				if(gameEnded == false) {
 					if(playersMatched === true) {
@@ -66,15 +69,15 @@ export const MultiComponent = (username) => {
 			};
 		}
 	}, []);
-
+	
 	useEffect(() => {
 		if(socket) {
-			if(gameId) {
-				socket.emit('joinRoom', { roomId: "room_" + gameId});
-			}
-
-			socket.on('joinedRoom', (payload) =>{
-				console.log(" the client has joined the room : " + payload.roomId);
+				if(gameId) {
+						socket.emit('joinRoom', { roomId: "room_" + gameId, mode : "multi", side : side});
+				}
+				
+				socket.on('joinedRoom', (payload) =>{
+					console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;

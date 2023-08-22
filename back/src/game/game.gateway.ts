@@ -88,9 +88,15 @@ export class GameGateway implements OnGatewayConnection{
 		client.emit("joinedQueue", {username : client.data.payload.username});
 	}
 	@SubscribeMessage('joinRoom')
-	async handleJoinRoom(client : Socket, payload : {roomId : string}) {
+	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side : PaddleSide}) {
 		console.log("------ roomd id ----------------------------------------------------------------------- " + payload.roomId);
-		const side = this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username)
+		let side;
+		if(payload.mode === "multi") {
+			this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username, "multi", payload.side)
+			side = payload.side;
+		} else {
+			this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username, "challenge", 0);
+		}
 		if(side === PaddleSide.Left)
 		{
 			console.log("left");
@@ -98,19 +104,21 @@ export class GameGateway implements OnGatewayConnection{
 			this.logger.log("waiting for another player in room " + payload.roomId)
 			this.logger.log("client socket : " + client.id);
 			client.emit('joinedRoom', {roomId : payload.roomId, side : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT, userId : client.data.payload.id, username : client.data.payload.username});
+			console.log("client : " + client.data.payload.username + " is side : " + side);
 		}
-		else {
+		else if(side === PaddleSide.Right) {
 			console.log("right");
 			client.join(payload.roomId);
 			this.logger.log("joined an already created game in room " + payload.roomId);
 			this.logger.log("client socket : " + client.id);
 			client.emit('joinedRoom', {roomId : payload.roomId, side : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
-			const room = this.gameService.roomsMap.get(payload.roomId);
-			if(room && room.playersNumber === 2) {
-				this.logger.log("game is starting now...");
-				this.gameService.startGameLoop(payload.roomId)
-				this.server.emit('startGame', {roomId: payload.roomId, initialBallAngle : this.gameService.randomInitialDirection(), leftPlayerObj :  room.players[0], rightPlayerObj: room.players[1], ballPosX : room.ball.x , ballPosY : room.ball.y, ballSpeedX: room.ball.ballSpeedX, ballSpeedY : room.ball.ballSpeedY, paddleHeight : room.paddleHeight});
-			}
+			console.log("client : " + client.data.payload.username + " is side : " + side);
+		}
+		const room = this.gameService.roomsMap.get(payload.roomId);
+		if(room && room.playersNumber === 2) {
+			this.logger.log("game is starting now...");
+			this.gameService.startGameLoop(payload.roomId)
+			this.server.emit('startGame', {roomId: payload.roomId, initialBallAngle : this.gameService.randomInitialDirection(), leftPlayerObj :  room.players[0], rightPlayerObj: room.players[1], ballPosX : room.ball.x , ballPosY : room.ball.y, ballSpeedX: room.ball.ballSpeedX, ballSpeedY : room.ball.ballSpeedY, paddleHeight : room.paddleHeight});
 		}
 	}
 

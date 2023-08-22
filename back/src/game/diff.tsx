@@ -52,9 +52,9 @@ export class GameService {
 		const minValue = -Math.PI/4;
 		const maxValue = Math.PI/4;
 
+		// generate a random number between 0 and 1
 		const randomZeroToOne = Math.random();
-
-
+		// scale and shift the random number to fit the desired rane
 		const randomValueInRange = randomZeroToOne * (maxValue - minValue) + minValue;
 
 		return(randomValueInRange);
@@ -250,16 +250,10 @@ export class GameService {
 		return(roomId);
 	}
 
-	addPlayer(roomId : string, playerId : string, username : string, mode : string, pside : PaddleSide) {
+	addPlayer(roomId : string, playerId : string, username : string) {
 		const room = this.rooms.get(roomId);
 		if(room){
-			let side: PaddleSide;
-			if(mode === "multi") {
-				side = pside;
-			}
-			else {
-				side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
-			}
+			const side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
 			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
 			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
 				room.players.push({playerId : playerId, username : username, side: side, roundScore: 0, x : x, y : y});
@@ -329,7 +323,7 @@ export class GameService {
 		const game = await this.prisma.game.findUnique({where : {id: id}, select : {
 			status : true,
 		}})
-		if(game?.status === 'pending' || game?.status === "waiting for another player") {
+		if(game?.status === 'pending') {
 			const game = await this.prisma.game.update({where :  {id : id}, data : {
 				playerId2 : user.id,
 				status : 'created'
@@ -360,7 +354,7 @@ export class GameService {
     async postChallengeGame(user: User, body: any) {
 		let game : Game;
 		const difficulty = (body.isFlashy === true) ? "flashy" : "decreasingPaddle"
-		const gameStatus = (body.isPlayerInvited === true) ? "waiting for another player" : "pending"
+		const gameStatus = (body.isPlayerInvited === true) ? "pending" : "playing"
 		game = await this.prisma.game.create({data : {
 			mode : 'challenge',
 			playerId1 : user.id,
