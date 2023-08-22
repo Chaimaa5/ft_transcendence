@@ -15,21 +15,18 @@ export class SocketStrategy extends PassportStrategy(Strategy, 'Websocket'){
             secretOrKey: process.env.JWT_ACCESS_SECRET,
           });
     }
-    // prisma = new PrismaClient();
+    prisma = new PrismaClient();
     async validate(token: string){
 
         
 
-        // try{
+        try{
             const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as jwt.Secret)
-        // }catch(err){
-        //     if(err instanceof jwt.TokenExpiredError )
-        //         throw  new UnauthorizedException('Expired Token Exception');
-        // }
+            return payload;
+        }catch(err){
+            if(err instanceof jwt.TokenExpiredError )
+                throw  new UnauthorizedException('Expired Token Exception');
+        }
 
-        // const user = await this.prisma.user.findUnique({
-        //     where:{id: client.data.payload.id,},
-        // });
-        return payload;
     }
 }

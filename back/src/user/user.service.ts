@@ -298,18 +298,19 @@ export class UserService {
             {
                 const exist = await this.FindbyID(Id)
                 if (exist){
-                   
-    
                     const room = await this.prisma.room.findFirst({
                         where:{
                             AND: [
                                 {membership: {
                                     some: {
-                                        userId: {
-                                            in: [id, Id]
-                                        }
-                                    }
-                                },},
+                                      userId: id,
+                                    },
+                                  },},
+                                  {membership: {
+                                    some: {
+                                      userId: Id,
+                                    },
+                                  },},
                                 {isChannel: false}
                             ]
                         },
@@ -344,7 +345,6 @@ export class UserService {
         }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
 
     }
-
     async acceptFriend(id : string, Id: string){
         try{
             if (id){
@@ -372,6 +372,7 @@ export class UserService {
         }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
 
+  
     async blockFriend(id : string, Id: string){
         try{
 
@@ -392,22 +393,31 @@ export class UserService {
                                 AND: [
                                     {membership: {
                                         some: {
-                                            userId: {
-                                                in: [id, Id]
-                                            }
-                                        }
-                                    },},
+                                          userId: id,
+                                        },
+                                      },},
+                                      {membership: {
+                                        some: {
+                                          userId: Id,
+                                        },
+                                      },},
                                     {isChannel: false}
                                 ]
                             },
                             include: {
                                 membership: true}
                         })
+                        console.log('returned room: ' ,room?.id)
                         if(room){
-                            await this.prisma.membership.updateMany({where: {roomId: room.id},
-                            data:{
-                                isBanned: true
-                            }})
+                            await this.chatService.deleteMessages(room.id, id)
+                            await this.chatService.deleteMessages(room.id, Id)
+                            if(room.membership){
+                                for(const membership of room.membership){
+                                    await this.chatService.deleteMembership(membership.id)
+                                }
+                            }
+                            await this.prisma.room.delete({where: {id: room.id}})
+    
                         }
                         await this.prisma.friendship.updateMany({
                             where: {
@@ -661,16 +671,18 @@ export class UserService {
                         avatar: true
                     }
                 },
-				gameId: true
+                gameId: true
             }
         });
 
             const notifications = res.map((notification) =>{
                 if (notification){
-                    if (notification.sender.avatar)
-                    {
-                        if (!notification.sender.avatar.includes('cdn.intra') && !notification.sender.avatar.includes('https://lh3.googleusercontent.com')){
-                            notification.sender.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' + notification.sender.avatar
+                    if(notification.sender){
+                        if (notification.sender.avatar)
+                        {
+                            if (!notification.sender.avatar.includes('cdn.intra') && !notification.sender.avatar.includes('https://lh3.googleusercontent.com')){
+                                notification.sender.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' + notification.sender.avatar
+                            }
                         }
                     }
                 }

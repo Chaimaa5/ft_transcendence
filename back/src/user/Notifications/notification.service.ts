@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { EventEmitter } from 'events';
 @Injectable()
 export class NotificationService {
+	
   
     prisma = new PrismaClient();
     private Emitter = new EventEmitter();
@@ -43,6 +44,7 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
     const receiver = await this.prisma.user.findUnique({where: {id: receiverId}})
 
     if(sender && receiver){
+
         const notification = await this.prisma.notification.create({
             data: {
                 sender: {connect: {id: senderId}},
@@ -53,11 +55,29 @@ async addGameInvite(senderId : string, receiverId: string, gameId: number){
                 gameId: gameId
             },
         });
-		console.log("game iddd " + notification.gameId);
         this.Emitter.emit('notifications', notification)
     }
 }
    
+async addAchievementNotification(id: string, achievement: string) {
+    try{
+        const content = id + " has successefuly achieved " + achievement
+        const notificationCheck = await this.prisma.notification.findFirst({where: {content: content}})
+        if(content){
+            const notification = await this.prisma.notification.create({
+                data:{
+                    sender:  {connect:{id: id}},
+                    receiver: {connect:{id: id}},
+                    status: false,
+                    type: 'Achievement',
+                    content: content,
+    
+                }
+            })
+            this.Emitter.emit('notifications', notification)
+        }
+    }catch(e){}
+}
 get  eventsEmitter() {
     return(this.Emitter)
 }

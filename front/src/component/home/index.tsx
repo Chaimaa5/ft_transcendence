@@ -134,17 +134,10 @@ const Home = () => {
                 </motion.div>
             </div>
             <div className="w-[100%] h-[50%] flex justify-evenly items-center">
-                <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream w-[45%] h-[90%] flex justify-evenly flex-col pos">
-                    <div className="h-[25%] w-[100%] flex items-center justify-center">
-                        <h3 className="title title_stream">WATCH</h3>
-                    </div>
-                    <div className="h-[23%] w-[100%] flex flex-col justify-between items-center">
-                        <h5 className="text-LightBlue">The Game In Action</h5>
-                        <button className=" h-[25%] w-[100%] flex justify-center items-center">
-                            <Button_ option="Watch"/>
-                        </button>
-                    </div>
-                    <motion.img whileHover={{scale: 1.06}} className="h-[33%]" src={table_img}/>
+                <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream w-[45%] h-[90%] flex justify-evenly flex-col rounded-[1.7vw]">
+                        <h3 className="title title_stream text-[3vw] leading-[1.25]">Embrace <br/>the Challenge</h3>
+                        <h5 className="text-LightBlue text-[1.5vw]">it's paddle time!</h5>
+                <motion.img whileHover={{scale: 1.06}} className="h-[40%]" src={table_img}/>
                 </motion.div>
                 {/* <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
                         <Modes/>

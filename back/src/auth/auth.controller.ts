@@ -26,32 +26,37 @@ export class AuthController {
     @Get('/auth')
     @UseGuards(AuthGuard('42'))
     async handleAuth(@Req() req: Request, @Res() res: Response){
-        const check = await this.authservice.signIn(res, req);
-        if (check == 1){
-            const user = req.user as User
-            const isTwoFA = await this.authservice.isEnabled(user.id)
-            if(isTwoFA)
-                return res.redirect('http://localhost:8000/tfa');
-            return res.redirect('http://localhost:8000/home');
-        }
-        else
-            return res.redirect('http://localhost:8000/setup');
+        // try{
+            console.log(req.user)
+            const check = await this.authservice.signIn(res, req);
+            if (check == 1){
+                const user = req.user as User
+                const isTwoFA = await this.authservice.isEnabled(user.id)
+                if(isTwoFA)
+                    return res.redirect('http://10.14.10.6:8080/tfa');
+                return res.redirect('http://10.14.10.6:8080/home');
+            }
+            else
+                return res.redirect('http://10.14.10.6:8080/setup');
+        // }catch(e){}
     }
 
      
     @Get('/google')
     @UseGuards(AuthGuard('google'))
     async handleGoogleAuth(@Req() req: Request, @Res() res: Response){
-        const check = await this.authservice.signIn(res, req);
-        if (check == 1){
-            const user = req.user as User
-            const isTwoFA = await this.authservice.isEnabled(user.id)
-            if(isTwoFA)
-                return res.redirect('http://localhost:8000/tfa');
-            return res.redirect('http://localhost:8000/home');
-        }
-        else
-            return res.redirect('http://localhost:8000/setup');
+        try{
+            const check = await this.authservice.signIn(res, req);
+            if (check == 1){
+                const user = req.user as User
+                const isTwoFA = await this.authservice.isEnabled(user.id)
+                if(isTwoFA)
+                    return res.redirect('http://10.14.10.6:8080/tfa');
+                return res.redirect('http://10.14.10.6:8080/home');
+            }
+            else
+                return res.redirect('http://10.14.10.6:8080/setup');
+        }catch(e){}
     }
 
 

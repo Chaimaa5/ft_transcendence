@@ -46,7 +46,7 @@ export class AuthService {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
         res.cookie('logged', false);
-        res.redirect('http://localhost/login');
+        res.redirect('http://10.14.10.6:8080/login');
     } 
 
 

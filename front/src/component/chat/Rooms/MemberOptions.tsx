@@ -81,14 +81,22 @@ export const MemberOptions = ({name_, usrId_, avatar_, DmroomId_}: Props) => {
     const handleBlock = () => {
         if (!memberInfo.isBlocked)
         {
+            
             Instanse.get(`/user/block/${usrId_}`)
             .then(() => {setFetchChange(fetch + 1); setReloadMembers(); setOff()})
         }
-        else
-        {
-            Instanse.get(`/user/unblock/${usrId_}`)
-            .then(() => setFetchChange(fetch + 1))
-        }
+        // else
+        // {
+        //     Instanse.get(`/user/unblock/${usrId_}`)
+        //     .then(() => setFetchChange(fetch + 1))
+        // }
+    }
+
+    const inviteToPlay = () => {
+        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: usrId_}).then((response) => {
+            
+            nav('/game/' + response.data + "/challenge");
+        }); 
     }
 
   return (
@@ -103,9 +111,12 @@ export const MemberOptions = ({name_, usrId_, avatar_, DmroomId_}: Props) => {
         <h3 className={[Style.font2, "text-[0.8vw] text-[#F1FAEE] w-[30%]"].join(" ")}>{name_}</h3>
 
         <div className={'flex justify-evenly items-center w-[35%] h-[100%]'}>
-            <button className="w-[1.5vw]  bg-[#457B9D] h-[1.5vw] rounded-full flex justify-center items-center">
+
+            <button     onClick={inviteToPlay} 
+                        className="w-[1.5vw]  bg-[#457B9D] h-[1.5vw] rounded-full flex justify-center items-center">
                 <ReactSVG className="w-[0.8vw]" src={icon1}/>
             </button>
+
             {
                 memberInfo?.isFriend &&
                 <button onClick={removeFriend}

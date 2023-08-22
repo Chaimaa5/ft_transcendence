@@ -12,12 +12,15 @@
 .Game {
 	background: linear-gradient(225deg, var(--dark-blue) 0%, var(--blue) 100%);
 	display: flex;
-	height: 100vh;
+	height: 60vw;
 	width: 100vw;
 	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .rounds-board {
+	width: 100%;
 	height: 10%;
 	display: flex;
 	justify-content: space-between;
@@ -27,8 +30,9 @@
 
 .rounds-container {
 	height: 70%;
-	width : 70vw;
+	width : 100%;
 	text-align: center;
+
 }
 
 .rounds-board span {
@@ -67,7 +71,7 @@
 .pong-board {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: center;
 	height: 90%;
 }
@@ -81,4 +85,12 @@
 	background: linear-gradient(135deg, #162F52 0%, #091930 94%);
 	box-shadow: 34px 34px 80px 0px rgba(11, 28, 53, 0.70);
 	position: relative;
+	top: 2vw;
+	width: 82vw !important;
+	height: 41vw !important;
+}
+
+#defaultCanvas0{
+	width: 82vw !important;
+	height: 41vw !important;
 }

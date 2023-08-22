@@ -10,7 +10,7 @@ import { SocketStrategy } from '../auth/jwt/websocket.strategy';
 @WebSocketGateway({
 	namespace:'/game',
 	cors: {
-		origin: ['http://localhost:8000'],
+		origin: ['http://localhost:8080', 'http://10.14.10.6:8080', 'http://10.14.10.6:8000', 'http://10.14.10.6:3000'],
 		methods: ['GET', 'POST'],
 		credentials: true,
 	},

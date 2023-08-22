@@ -50,7 +50,7 @@ const Setup = () => {
     UpdateUserDTO.append('username', username_);
     UpdateUserDTO.append('avatar', avatar);
 
-     axios.post('http://localhost:3000/api/user/setup', UpdateUserDTO, header)
+     axios.post('http://10.14.10.6:8080/api/user/setup', UpdateUserDTO, header)
       nav('/home')
 
 
@@ -94,7 +94,7 @@ const Setup = () => {
           handleSubmit
        
           }>
-          <Button_ option="coninue" />
+          <Button_ option="continue" />
         </button>
       </div>
       </div>

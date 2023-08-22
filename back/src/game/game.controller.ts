@@ -35,7 +35,7 @@ export class GameController{
 		try {
 			const user : User = settings.user as User;
 			return await this.gameService.postChallengeGame(user, body)
-		} catch(error);
+		} catch(error){}
 	}
 
 	@Get('/challenge-game/:id')

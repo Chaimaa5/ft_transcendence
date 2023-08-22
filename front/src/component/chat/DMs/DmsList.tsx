@@ -33,7 +33,8 @@ export const DmsList = () => {
                                         id={e.id} 
                                         image={e.image} 
                                         name={e.name} 
-                                        lastMsg={e.message ?  extractSlice(e.message) : "No messages"}/>}
+                                        lastMsg={e.message ?  extractSlice(e.message) : "No messages"}
+                                        userId={e.userId}/>}
                                         )}
             </div>
         

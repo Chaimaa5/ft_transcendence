@@ -68,7 +68,22 @@ export class LeaderboardService {
                   badge: true,
               }
           });
-  
+          const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}});
+          const ModifiedObject = res.map((user) =>{
+            if (user){
+                if (user.avatar)
+                {
+                    if (!user.avatar.includes('cdn.intra')  &&  !user.avatar.includes('https://lh3.googleusercontent.com')){
+                        user.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' +  user.avatar
+                    }
+                }
+                if(user.rank){
+                  let name = user?.username
+                  user.rank = users.findIndex(instance => user.username === name) + 1;
+                }
+            }
+            return user
+        })
           res = await this.userService.updateAvatar(res);
           return res;
         }

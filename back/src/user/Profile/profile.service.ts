@@ -20,21 +20,17 @@ export class ProfileService {
                 let isReceiver = false;
                 let isBlocked = false;
                 let roomId = 0 ;
+                let rank = 0;
                 const owner = await this.prisma.user.findUnique({where:{id : id},})
                 const friends = await this.CountFriends(username);
-                const user = await this.prisma.user.findUnique({where:{username : username},
-                    select: {
-                        id: true,
-                        username: true,
-                        level: true,
-                        XP: true,
-                        rank: true,
-                        avatar: true,
-                        loss: true,
-                        win: true
-                    }
-                });
+                const user = await this.prisma.user.findUnique({where:{username : username},});
+                const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}});
+                if(user){
+                    let name = user?.username
+                    rank = users.findIndex(instance => instance.username === name) + 1;
+                }
                 if (user?.id != owner?.id)
+
                     isOwner = false;
                     let progress = "";
                     if (user){
@@ -109,7 +105,7 @@ export class ProfileService {
                     'level':user?.level,
                     'progress': progress,
                     'xp': user?.XP,
-                    'rank': user?.rank,
+                    'rank': rank,
                     'avatar': user?.avatar,
                     'friend':friends,
                     'isOwner': isOwner,
@@ -468,7 +464,7 @@ export class ProfileService {
                         }
                         let gameResult = ''
                         if(game.winner){
-                            if(game.winner === id)
+                            if(game.winner === username)
                                 gameResult = 'win'
                             else
                                 gameResult = 'loss'

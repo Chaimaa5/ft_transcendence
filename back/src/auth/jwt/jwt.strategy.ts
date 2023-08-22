@@ -25,11 +25,13 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt'){
             jwt.verify(payload.token, process.env.JWT_ACCESS_SECRET as jwt.Secret)
         }catch(err){
             if(err instanceof jwt.TokenExpiredError )
-                throw  new UnauthorizedException('Expired Token Exception');                
+                throw  new UnauthorizedException('Expired Token Exception');  
+            else{
+                const user = await this.prisma.user.findUnique({
+                    where:{id: payload.id,},
+                });
+                return{...user} as User;
+            }              
         }
-        const user = await this.prisma.user.findUnique({
-            where:{id: payload.id,},
-        });
-        return{...user} as User;
     }
 }
