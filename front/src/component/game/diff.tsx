@@ -39,10 +39,9 @@ export const MultiComponent = (username) => {
 			socket.emit('joinQueue');
 	
 			socket.on('match', (payload) => {
-				console.log("my side on match event : " + payload.side);
 				gameRef.current.myPaddle.side = payload.side;
 				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
-				setSide (payload.side);
+				setSide(payload.side);
 				setPlayer2(payload.username);
 				setGameId(payload.gameId);
 				setGamePending(false);
@@ -58,9 +57,8 @@ export const MultiComponent = (username) => {
 			socket.on('disconnect', handleDisconnect);
 			
 			return () => {
-				if(gameEnded === false) {
+				if(gameEnded == false) {
 					if(playersMatched === true) {
-						console.log("leaving room");
 						socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom : true});
 					}
 					else {
@@ -74,22 +72,22 @@ export const MultiComponent = (username) => {
 	
 	useEffect(() => {
 		if(socket) {
-			if(gameId) {
-				socket.emit('joinRoom', { roomId: "room_" + gameId, mode : "multi", side : side});
-			}
-			
-			socket.on('joinedRoom', (payload) => {
-				console.log(" the client has joined the room : " + payload.roomId);
+				if(gameId) {
+						socket.emit('joinRoom', { roomId: "room_" + gameId, mode : "multi"});
+				}
+				
+				socket.on('joinedRoom', (payload) => {
+					console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;
 			})
 
-			socket.on('startGame', async (payload) => {
-				if(payload.roomId === ("room_" + gameId) ) {
-					const myPaddleObj = (side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
-					const opponentPaddleObj = (side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
+			socket.on('startGame', (payload) => {
+				if(payload.roomId === ("room_" + gameId)) {
+					const myPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.leftPlayerObj : payload.rightPlayerObj;
+					const opponentPaddleObj = (gameRef.current.myPaddle.side === PaddleSide.Left) ? payload.rightPlayerObj : payload.leftPlayerObj;
 					// paddle Position 
 					gameRef.current.myPaddle.paddlePosX = myPaddleObj.x;
 					gameRef.current.myPaddle.paddlePosY = myPaddleObj.y;
@@ -137,8 +135,7 @@ export const MultiComponent = (username) => {
 			})
 			
 			socket.on('gameCorrupted', (payload) => {
-				console.log("corrupted");
-				if(payload.roomId === ("room_" + gameId)){
+				if(payload.roomId){
 					setGameCorrupted(true);
 				}
 			})
@@ -164,7 +161,7 @@ export const MultiComponent = (username) => {
 		) : (dataIsLoaded === true  &&
 			 <>
 				<TwoPlayersRoundsBoard  gameMode={mode} gameIdProp={gameId}/>
-				<MultiPongBoard gameProp={gameRef.current} gameIdProp={gameId} side={side}/>
+				<MultiPongBoard gameProp={gameRef.current} gameIdProp={gameId}/>
 			</>
 		)
 		}

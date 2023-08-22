@@ -60,6 +60,16 @@ export class GameService {
 		return(randomValueInRange);
 	}
 
+	randomSign = () : number => {
+		// Generate a random number between 0 and 1
+		const randomValue = Math.random();
+
+		// Map the random value to 1 or -1
+		const randomSign = randomValue < 0.5 ? 1 : -1;
+
+		return(randomSign);
+	}
+
 	startGameLoop(roomId : string) {
 		const room = this.rooms.get(roomId);
 		if(room) {
@@ -125,6 +135,7 @@ export class GameService {
 	checkEdges(room : RoomState) {
 		const radius = (VIRTUAL_TABLE_WIDTH*0.02)/2;
 		const angle = this.randomInitialDirection();
+		const randomSign = this.randomSign();
 		if((room.ball.y - radius) <= 0 || (room.ball.y + radius) >= VIRTUAL_TABLE_HEIGHT)
 		{
 			room.ball.ballSpeedY *= -1;
@@ -133,7 +144,7 @@ export class GameService {
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
+			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
 			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
 			this.updateScore(room, PaddleSide.Left);
 			this.events.emit('handleUpdateScore', room);
@@ -142,7 +153,7 @@ export class GameService {
 		{
 			room.ball.x = VIRTUAL_TABLE_WIDTH/2;
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
-			room.ball.ballSpeedX = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle);
+			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
 			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
 			this.updateScore(room, PaddleSide.Right);
 			this.events.emit('handleUpdateScore',room);
@@ -187,10 +198,10 @@ export class GameService {
 	}
 	}
 
-	updatePaddlePosition(roomId : string, playerId : string, paddlePosY : number) {
+	updatePaddlePosition(roomId : string, side : PaddleSide, paddlePosY : number) {
 		const room = this.rooms.get(roomId);
 		if(room) {
-			const player = room.players.find(p => p.playerId === playerId);
+			const player = room.players.find(p => p.side === side);
 			if(player) {
 				player.y = paddlePosY;
 			}
@@ -225,8 +236,12 @@ export class GameService {
 
 	createRoom(gameId : number, rounds : number, pointsToWin : number, difficulty : string) : string {
 		const roomId = "room_" + gameId;
-		const speedIncrement = this.calculateSpeedIncrement(rounds*pointsToWin, difficulty);
-		const paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds*pointsToWin, difficulty);
+		let speedIncrement = 0;
+		let paddleHeightDecrement = 0;
+		if(difficulty != "multiplayer") {
+			speedIncrement = this.calculateSpeedIncrement(rounds*pointsToWin, difficulty);
+			paddleHeightDecrement = this.calculatePaddleHeightDecrement(rounds*pointsToWin, difficulty);
+		}
 		this.rooms.set(
 			roomId,
 			{
@@ -250,16 +265,12 @@ export class GameService {
 		return(roomId);
 	}
 
-	addPlayer(roomId : string, playerId : string, username : string, mode : string, pside : PaddleSide) {
+	addPlayer(roomId : string, playerId : string, username : string) {
 		const room = this.rooms.get(roomId);
 		if(room){
 			let side: PaddleSide;
-			if(mode === "multi") {
-				side = pside;
-			}
-			else {
-				side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
-			}
+			side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
+			console.log("player : " + username +  " side : " + side);
 			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
 			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
 				room.players.push({playerId : playerId, username : username, side: side, roundScore: 0, x : x, y : y});
@@ -273,8 +284,6 @@ export class GameService {
 	}
 
 	// game endpoints methods
-
-
 
 	private players : Player[] = [];
 
@@ -352,8 +361,10 @@ export class GameService {
 		}})
 		if(game.rounds && game.pointsToWin) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, 'multiplayer');
+			const side1 = this.addPlayer("room_" + game.id, matchedPlayers[0].id, matchedPlayers[0].username);
+			const side2 = this.addPlayer("room_"+game.id, matchedPlayers[1].id, matchedPlayers[1].username);
+			this.eventsEmitter.emit("handleMatched", {player1 : matchedPlayers[0], player1Side : side1, player2 : matchedPlayers[1], player2Side : side2, gameId : game.id});
 		}
-		this.eventsEmitter.emit("handleMatched", {player1 : matchedPlayers[0], player2 : matchedPlayers[1], gameId : game.id});
 		return(game.id)
 	}
 

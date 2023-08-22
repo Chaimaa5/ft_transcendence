@@ -26,6 +26,7 @@ export function drawPAddle(paddle : Paddle,) {
 		setShadowParam("#0F1E33", 15, 10, 10, paddle.table.ctx);
 		// save the current state of the context
 		paddle.table.ctx.save();
+		
 
 		const gradient = paddle.table.ctx.createLinearGradient(
 			paddle.paddlePosX,

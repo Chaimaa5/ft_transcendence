@@ -88,7 +88,7 @@ export const MultiPongBoard = ({gameProp ,gameIdProp}) => {
 
 	useEffect(() => {
 		if(socket) {
-			
+
 			socket.on('updateBallPosition', (payload) => {
 				if(payload.roomId === ("room_" + gameIdProp)) {
 					gameProp.ball.ballPosX = gameProp.table.mapValue(payload.x, gameProp.table.serverTableWidth, gameProp.table.tableWidth);
@@ -115,9 +115,6 @@ export const MultiPongBoard = ({gameProp ,gameIdProp}) => {
 			socket.on('updatePaddlePosition', (payload) => {
 					gameProp.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
 			})
-	
-			
-	
 	
 			return() => {
 				socket.off('connect', () => {

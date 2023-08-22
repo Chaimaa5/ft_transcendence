@@ -30,9 +30,11 @@ export class GameGateway implements OnGatewayConnection{
 
 	afterInit(){
 		this.logger.log('game server initialized');
-		this.gameService.eventsEmitter.on('handleMatched', (matches : {player1 : Player, player2 : Player, gameId : number}) => {
-			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId, side : PaddleSide.Left});
-			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId, side : PaddleSide.Right});
+		this.gameService.eventsEmitter.on('handleMatched', (matches : {player1 : Player, player1Side : PaddleSide, player2 : Player, player2Side : PaddleSide, gameId : number}) => {
+			console.log("player 1 : " + matches.player1.username + " is " + matches.player1Side);
+			console.log("player 2  : " + matches.player2.username + " is " + matches.player2Side);
+			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId, side : matches.player1Side});
+			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId, side : matches.player2Side});
 
 		})
 
@@ -85,38 +87,35 @@ export class GameGateway implements OnGatewayConnection{
 	@SubscribeMessage("joinQueue")
 	async handleJoinedQueue(client : Socket, payload : {id : number}) {
 		this.gameService.createPlayer(client.data.payload.username, client.data.payload.id, client);
-		client.emit("joinedQueue", {username : client.data.payload.username});
 	}
 	@SubscribeMessage('joinRoom')
-	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side : PaddleSide}) {
+	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side: PaddleSide}) {
 		console.log("------ roomd id ----------------------------------------------------------------------- " + payload.roomId);
-		let side;
-		if(payload.mode === "multi") {
-			this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username, "multi", payload.side)
-			side = payload.side;
-		} else {
-			this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username, "challenge", 0);
+		let pSide : PaddleSide = payload.side;
+		if(payload.mode != "multi") {
+			const sd = this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username);
+			if(sd) {
+				pSide = sd;
+			}
 		}
-		if(side === PaddleSide.Left)
+		if(pSide === PaddleSide.Left)
 		{
 			console.log("left");
 			client.join(payload.roomId);
 			this.logger.log("waiting for another player in room " + payload.roomId)
 			this.logger.log("client socket : " + client.id);
-			client.emit('joinedRoom', {roomId : payload.roomId, side : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT, userId : client.data.payload.id, username : client.data.payload.username});
-			console.log("client : " + client.data.payload.username + " is side : " + side);
+			client.emit('joinedRoom', {roomId : payload.roomId, pSide : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT, userId : client.data.payload.id, username : client.data.payload.username});
 		}
-		else if(side === PaddleSide.Right) {
+		else if(pSide === PaddleSide.Right) {
 			console.log("right");
 			client.join(payload.roomId);
 			this.logger.log("joined an already created game in room " + payload.roomId);
 			this.logger.log("client socket : " + client.id);
-			client.emit('joinedRoom', {roomId : payload.roomId, side : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
-			console.log("client : " + client.data.payload.username + " is side : " + side);
+			client.emit('joinedRoom', {roomId : payload.roomId, pSide : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
 		}
 		const room = this.gameService.roomsMap.get(payload.roomId);
 		if(room && room.playersNumber === 2) {
-			this.logger.log("game is starting now...");
+			this.logger.log("game is starting now... ");
 			this.gameService.startGameLoop(payload.roomId)
 			this.server.emit('startGame', {roomId: payload.roomId, initialBallAngle : this.gameService.randomInitialDirection(), leftPlayerObj :  room.players[0], rightPlayerObj: room.players[1], ballPosX : room.ball.x , ballPosY : room.ball.y, ballSpeedX: room.ball.ballSpeedX, ballSpeedY : room.ball.ballSpeedY, paddleHeight : room.paddleHeight});
 		}
@@ -139,8 +138,8 @@ export class GameGateway implements OnGatewayConnection{
 	}
 
 	@SubscribeMessage('newPaddlePosition')
-	handleNewPaddlePosition(client : Socket, payload : {roomId: string, paddlePosY:number}) : void {
-		this.gameService.updatePaddlePosition(payload.roomId, client.id, payload.paddlePosY);
+	handleNewPaddlePosition(client : Socket, payload : {side : PaddleSide, roomId: string, paddlePosY:number}) : void {
+		this.gameService.updatePaddlePosition(payload.roomId, payload.side, payload.paddlePosY);
 		client.to(payload.roomId).emit('updatePaddlePosition', { playerId : client.id ,paddlePosY : payload.paddlePosY});
 	}
 }

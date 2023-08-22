@@ -61,7 +61,7 @@ export class Paddle {
 		this.prevPaddlePosY = this.paddlePosY;
 		this.paddleWidth = this.table.tableWidth*0.02;
 		this.paddleHeight = this.table.mapValue(this.paddleHeight, this.table.serverTableWidth, this.table.tableWidth);
-		this.stepsY = this.table.tableWidth/this.speedRatio;	
+		this.stepsY = this.table.tableWidth/this.speedRatio;
 	}
 
 	show() {
@@ -86,7 +86,7 @@ export class Paddle {
 				this.table.tableHeight - this.paddleHeight);
 			if(	this.prevPaddlePosY != this.paddlePosY ) {
 				this.prevPaddlePosY = this.paddlePosY
-				this.table.socket.emit('newPaddlePosition', {roomId: this.table.roomId, paddlePosY : this.table.mapValue(this.paddlePosY, this.table.tableHeight, this.table.serverTableHeight)});
+				this.table.socket.emit('newPaddlePosition', {side : this.side, roomId: this.table.roomId, paddlePosY : this.table.mapValue(this.paddlePosY, this.table.tableHeight, this.table.serverTableHeight)});
 			}
 		}
 	}
