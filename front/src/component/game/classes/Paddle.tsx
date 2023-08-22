@@ -86,7 +86,7 @@ export class Paddle {
 				this.table.tableHeight - this.paddleHeight);
 			if(	this.prevPaddlePosY != this.paddlePosY ) {
 				this.prevPaddlePosY = this.paddlePosY
-				this.table.socket.emit('newPaddlePosition', {side : this.side, roomId: this.table.roomId, paddlePosY : this.table.mapValue(this.paddlePosY, this.table.tableHeight, this.table.serverTableHeight)});
+				this.table.socket.emit('newPaddlePosition', {side : this.side, roomId: this.table.roomId, paddlePosY : this.table.mapValue(this.paddlePosY, this.table.tableHeight, this.table.serverTableHeight), paddlePosX : this.table.mapValue(this.paddlePosX, this.table.tableWidth, this.table.serverTableWidth)});
 			}
 		}
 	}

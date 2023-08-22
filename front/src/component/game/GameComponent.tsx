@@ -47,13 +47,13 @@ export const GameComponent = (username) => {
 		}
 
 		if(socket) {
-			socket.emit('joinRoom', { roomId: "room_" + gameId });
+			socket.emit('joinRoom', { roomId: "room_" + gameId , mode : "challenge"});
 			
 			socket.on('joinedRoom', (payload) =>{
 				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
-				gameRef.current.myPaddle.side = payload.side;
-				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
+				gameRef.current.myPaddle.side = payload.pSide;
+				gameRef.current.opponentPaddle.side = (payload.pSide === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.table.serverTableHeight = payload.serverTableHeight;
 				gameRef.current.myPaddle.username = payload.username;

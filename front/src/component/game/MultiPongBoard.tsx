@@ -113,7 +113,9 @@ export const MultiPongBoard = ({gameProp ,gameIdProp}) => {
 
 	
 			socket.on('updatePaddlePosition', (payload) => {
+				if(payload.roomId === "room_" + gameIdProp) {
 					gameProp.opponentPaddle.updateOpponentPaddle(payload.paddlePosY);
+				}
 			})
 	
 			return() => {

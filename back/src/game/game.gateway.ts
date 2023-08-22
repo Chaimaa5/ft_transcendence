@@ -91,12 +91,11 @@ export class GameGateway implements OnGatewayConnection{
 	@SubscribeMessage('joinRoom')
 	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side: PaddleSide}) {
 		console.log("------ roomd id ----------------------------------------------------------------------- " + payload.roomId);
-		let pSide : PaddleSide = payload.side;
-		if(payload.mode != "multi") {
-			const sd = this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username);
-			if(sd) {
-				pSide = sd;
-			}
+		let pSide;
+		if(payload.mode === "multi") {
+			pSide = payload.side;
+		} else {
+			pSide = this.gameService.addPlayer(payload.roomId, client.id, client.data.payload.username);
 		}
 		if(pSide === PaddleSide.Left)
 		{
@@ -138,8 +137,8 @@ export class GameGateway implements OnGatewayConnection{
 	}
 
 	@SubscribeMessage('newPaddlePosition')
-	handleNewPaddlePosition(client : Socket, payload : {side : PaddleSide, roomId: string, paddlePosY:number}) : void {
+	handleNewPaddlePosition(client : Socket, payload : {side : PaddleSide, roomId: string, paddlePosY:number, paddlePosX : number}) : void {
 		this.gameService.updatePaddlePosition(payload.roomId, payload.side, payload.paddlePosY);
-		client.to(payload.roomId).emit('updatePaddlePosition', { playerId : client.id ,paddlePosY : payload.paddlePosY});
+		client.to(payload.roomId).emit('updatePaddlePosition', { roomId : payload.roomId,paddlePosY : payload.paddlePosY});
 	}
 }
