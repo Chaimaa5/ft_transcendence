@@ -73,9 +73,9 @@ export class GameService {
 	startGameLoop(roomId : string) {
 		const room = this.rooms.get(roomId);
 		if(room) {
-			const intervalId = setInterval(() => {
+			const intervalId = setInterval(async () => {
 				this.moveBall(room.ball, roomId, (room.thisRound.roundNumber*room.speedIncrement));
-				this.checkEdges(room);
+				await this.checkEdges(room);
 				if(room.isGameEnded === true) {
 					clearInterval(intervalId);
 					return;
@@ -100,7 +100,7 @@ export class GameService {
 		room.paddleHeight = VIRTUAL_TABLE_HEIGHT/(3 + ((room.thisRound.roundNumber+1) * room.paddleHeightDecrement));
 	}
 
-	updateScore(room : RoomState, side : PaddleSide) {
+	async updateScore(room : RoomState, side : PaddleSide) {
 		if(side === PaddleSide.Left) {
 			room.thisRound.leftPlayerScore++;
 			if(room.thisRound.leftPlayerScore === room.pointsToWin) {
@@ -108,7 +108,7 @@ export class GameService {
 				room.players[0].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
 					room.isGameEnded = true;
-					this.postGameResult(room).then((res) => {
+					await this.postGameResult(room).then((res) => {
 						const gameResult : GameResults = res;
 						this.events.emit('handleEndGame', {roomId : room.roomId, gameResults : gameResult});
 					});
@@ -122,7 +122,7 @@ export class GameService {
 				room.players[1].roundScore++;
 				if(room.thisRound.roundNumber === room.rounds) {
 					room.isGameEnded = true;
-					this.postGameResult(room).then((res) => {
+					await this.postGameResult(room).then((res) => {
 						const gameResult : GameResults = res;
 						this.events.emit('handleEndGame', {roomId : room.roomId, gameResults : gameResult});
 					});
@@ -132,7 +132,7 @@ export class GameService {
 		this.events.emit('handleUpdateScore', room);
 	}
 
-	checkEdges(room : RoomState) {
+	async checkEdges(room : RoomState) {
 		const radius = (VIRTUAL_TABLE_WIDTH*0.02)/2;
 		const angle = this.randomInitialDirection();
 		const randomSign = this.randomSign();
@@ -146,7 +146,7 @@ export class GameService {
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
 			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
 			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
-			this.updateScore(room, PaddleSide.Left);
+			await this.updateScore(room, PaddleSide.Left);
 			this.events.emit('handleUpdateScore', room);
 		}
 		if((room.ball.x - radius) <= 0)
@@ -155,7 +155,7 @@ export class GameService {
 			room.ball.y = VIRTUAL_TABLE_HEIGHT/2;
 			room.ball.ballSpeedX = randomSign * (VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.cos(angle));
 			room.ball.ballSpeedY = VIRTUAL_TABLE_WIDTH/(VIRTUAL_SPEED_RATIO - (room.thisRound.roundNumber * room.speedIncrement)) *  Math.sin(angle);
-			this.updateScore(room, PaddleSide.Right);
+			await this.updateScore(room, PaddleSide.Right);
 			this.events.emit('handleUpdateScore',room);
 		}
 	}
@@ -208,7 +208,7 @@ export class GameService {
 
 	calculateSpeedIncrement(rounds : number, difficulty : string)  : number{
 		const minSpeedRatio : number = 0;
-		const maxSpeedRatio : number = 200;
+		const maxSpeedRatio : number = 500;
 		let speedIncrement : number = 0;
 		if(difficulty === 'flashy') {
 			speedIncrement = (maxSpeedRatio - minSpeedRatio)/rounds;
@@ -294,7 +294,7 @@ export class GameService {
 		}
 	}
 
-	createPlayer(username : string, id : string, client : Socket) {
+	async createPlayer(username : string, id : string, client : Socket) {
 		const existingPlayers = this.players.filter(player => player.id === id);
 		if(existingPlayers.length === 0) {
 			const player = new Player()
@@ -306,7 +306,7 @@ export class GameService {
 			console.log("player has been created : " + client.id + " username " + username + " id " + id);
 			const matchedPlayers = this.getMatchedPlayers();
 			if(matchedPlayers && matchedPlayers.length === 2) {
-				const gameId = this.createGame(matchedPlayers);
+				const gameId = await this.createGame(matchedPlayers);
 			}
 		}
 		else{
@@ -576,8 +576,8 @@ export class GameService {
 						roundScore : rightPlayer.roundScore
 					}
 				}
-				this.updatePlayerXp(players.player1.XP, players.player1.id, (player1.username === winner.username ) ? "winner" : "loser");
-				this.updatePlayerXp(players.player2.XP, players.player2.id, (player2.username === winner.username ) ? "winner" : "loser")
+				await this.updatePlayerXp(players.player1.XP, players.player1.id, (player1.username === winner.username ) ? "winner" : "loser");
+				await this.updatePlayerXp(players.player2.XP, players.player2.id, (player2.username === winner.username ) ? "winner" : "loser")
 			} else {
 				await this.prisma.game.update({where : {id : id}, data : {
 					draw : true,

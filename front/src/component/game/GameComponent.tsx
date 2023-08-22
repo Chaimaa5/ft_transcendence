@@ -86,12 +86,25 @@ export const GameComponent = (username) => {
 				}
 			})
 
+			const handleBeforeUnload = (event) => {
+				socket.off('disconnect', handleDisconnect);
+				socket.emit('leaveRoom', { roomId: "room_" + gameId, mode : "challenge"});
+				socket.disconnect();
+				event.preventDefault();
+				// This message is usually ignored by modern browsers but can be helpful for legacy browsers
+				event.returnValue = '';
+			  };
+
 			socket.on('disconnect', handleDisconnect);
 			
+			window.addEventListener('beforeunload', handleBeforeUnload);
+
 			return () => {
+				window.removeEventListener('beforeunload', handleBeforeUnload);
+
 				socket.off('disconnect', handleDisconnect);
 				if(gameEnded == false) {
-					socket.emit('leaveRoom', { roomId: "room_" + gameId , inRoom: true});
+					socket.emit('leaveRoom', { roomId: "room_" + gameId, mode : "challenge"});
 				}
 				socket.disconnect();
 			};

@@ -86,7 +86,7 @@ export class GameGateway implements OnGatewayConnection{
 
 	@SubscribeMessage("joinQueue")
 	async handleJoinedQueue(client : Socket, payload : {id : number}) {
-		this.gameService.createPlayer(client.data.payload.username, client.data.payload.id, client);
+		await this.gameService.createPlayer(client.data.payload.username, client.data.payload.id, client);
 	}
 	@SubscribeMessage('joinRoom')
 	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side: PaddleSide}) {
@@ -122,17 +122,28 @@ export class GameGateway implements OnGatewayConnection{
 
 
 	@SubscribeMessage('leaveRoom') 
-	async handleLeaveRoom (client : Socket){
-		this.gameService.removePlayerFromQueue(client);
-		const roomId = this.gameService.isInRoom(client.data.payload.id)
-		if(roomId) {
-			const room = this.gameService.roomsMap.get(roomId);
-			if(room){
+	async handleLeaveRoom (client : Socket, payload : {roomId : string, mode : string}){
+		if(payload.mode === 'challenge') {
+			const room = this.gameService.roomsMap.get(payload.roomId);
+			if(room) {
 				room.playersNumber--;
 				room.isGameEnded = true;
+			await this.gameService.deleteGameById(room.roomId.slice("room_".length));
+			this.server.emit('gameCorrupted', {roomId : room.roomId});
 			}
-			await this.gameService.deleteGameById(roomId.slice("room_".length));
-			this.server.emit('gameCorrupted', {roomId : roomId});
+		}
+		else {
+			this.gameService.removePlayerFromQueue(client);
+			const roomId = this.gameService.isInRoom(client.data.payload.id)
+			if(roomId) {
+				const room = this.gameService.roomsMap.get(roomId);
+				if(room){
+					room.playersNumber--;
+					room.isGameEnded = true;
+				}
+				await this.gameService.deleteGameById(roomId.slice("room_".length));
+				this.server.emit('gameCorrupted', {roomId : roomId});
+			}
 		}
 	}
 

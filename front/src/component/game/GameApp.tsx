@@ -5,6 +5,7 @@ import { Socket } from "socket.io-client";
 import { useSocketManager } from "./socket";
 import { useGameContext } from './GameContext';
 import { useParams } from "react-router-dom";
+import { Loading } from "./Loading";
 
 
 export const GameApp = () => {
@@ -36,7 +37,7 @@ export const GameApp = () => {
 		{(isSocketInitialized === true && username) ? (
 			<GameComponent username={username}/>
 			) : (
-			<h1>Loading</h1>
+			<Loading/>
 			)
 		}
 		</>
