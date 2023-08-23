@@ -23,7 +23,7 @@ export const InputMessage = () => {
 
 
   return (
-        <div className={"w-[95%] h-[8%] bg-[#457B9D] rounded-[2vw] mb-[1vw] drop-shadow-xl flex justify-between "} >
+        <form className={"w-[95%] h-[8%] bg-[#457B9D] rounded-[2vw] mb-[1vw] drop-shadow-xl flex justify-between "} >
             <input 
                 ref={inputRef}
                 type={"text"} 
@@ -32,7 +32,7 @@ export const InputMessage = () => {
                 className={[ style.font1 , "text-[0.8vw] w-[80%] text-[white] h-[100%] caret-[#1D3557]  outline-none bg-[#457B9D] rounded-[2vw]  pl-[0.8vw]"].join(" ")}
                 onChange={(e)=> {e?.preventDefault; setMessagedata(e?.target?.value)}}/>
                 
-            <button 
+            <button type={'submit'} 
                     className={[style.font2, style.st, "w-[20%]  h-[90%] rounded-[2vw] flex justify-center items-center gap-[0.5vw]"].join(" ")}
                     onClick={(e) => {
                                         e.preventDefault();
@@ -45,6 +45,6 @@ export const InputMessage = () => {
                 <ReactSVG className="w-[0.7vw]" src={icon}/>
                 <p className={"text-[0.7vw] text-[#A8DADC] "}>Send</p>
             </button>
-        </div>
+        </form>
   )
 }

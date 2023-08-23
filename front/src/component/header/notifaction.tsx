@@ -30,14 +30,14 @@ const GameNtf = ({name, gameId, avatar}) => {
             <h2 className="text-[#1D3557] text-[0.5vw]">{name} Challenged You</h2>
             <div className="h-[100%] w-[20%] flex justify-between items-center">
                 <button onClick={async () => {
-					console.log("join game : "  + gameId);
 					await Instanse.post("/game/join-game/" + gameId).then((res) => {
 						nav("/game/" + gameId + "/challenge?accepted=true")
 					});
                 }} className="flex justify-center items-center h-[1vw] w-[1vw] rounded-[50%] bg-[#1D3557]">
                     <ReactSVG src={incon4} className="w-[70%]"/>
                 </button>
-                <button className=" flex justify-center items-center h-[1vw] w-[1vw] rounded-[50%] bg-[#E63946]">
+                <button onClick={async () =>  {await Instanse.post("/game/remove-notif/" + gameId)} }
+                className=" flex justify-center items-center h-[1vw] w-[1vw] rounded-[50%] bg-[#E63946]">
                     <ReactSVG className="w-[55%]" src={incon6}/>
                 </button>
             </div>
@@ -81,7 +81,6 @@ const Notification = () => {
         sk.connect()
         sk.on("notifications", (data) => {
            SetData(data);
-           console.log("notificaation data : ", data)
         });
     })
     }

@@ -32,6 +32,7 @@ export class ProfileController {
 
     @Get('/statistics/:username')
     async UserStatistics(@Param('username') username: string, @Req() req: Request){
+       
         return await this.profile.CalculatePercentage(username);
     }
 

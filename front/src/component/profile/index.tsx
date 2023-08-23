@@ -74,7 +74,6 @@ interface profile_ {
 
 const Profile = () => {
     const [response, setResponse] = useState<profile_>();
-    const data = useContext<cntx>(CrContext)
     const username = useParams().username
     useEffect(() => {
         Instanse.get<profile_>('profile/' + username)
@@ -83,9 +82,16 @@ const Profile = () => {
         });
     },[username]);
     
-    if(response?.isBlocked) return
+    if(!response || response?.isBlocked || username != response.username)
+    return(
+        <div className="h-[100%] w-[100%] flex justify-center items-center ">
+            <h1 className="text-LightBlue text-[4vw] ">
+            <span className="text-[5vw] text-Red">!</span>
+            <br/>User Not Found</h1>
+        </div>
+    )
 
-    
+    else
     return(
         <div className="Profile">
             <div className="half-container">
@@ -128,7 +134,7 @@ const Profile = () => {
                 </div>
                 <div className="h-[100%] w-[50%] flex justify-between items-center">
                     <div className="w-[45%] h-[90%] flex justify-center items-center svg_circle flex-col">
-                        <Circularprog name={response?.progress}/>
+                        <Circularprog name={response?.username}/>
                     </div>
                     <div className="w-[55%] h-[100%] pr-[3%] matchs">
                         <Match/>

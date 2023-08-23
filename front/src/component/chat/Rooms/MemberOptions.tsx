@@ -93,7 +93,7 @@ export const MemberOptions = ({name_, usrId_, avatar_, DmroomId_}: Props) => {
     }
 
     const inviteToPlay = () => {
-        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: usrId_}).then((response) => {
+        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: name_}).then((response) => {
             
             nav('/game/' + response.data + "/challenge");
         }); 

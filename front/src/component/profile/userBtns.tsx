@@ -17,7 +17,7 @@ type profile_btn = {
     isSender: boolean,
     isReceiver: boolean,
     isBlocked: boolean,
-    DM: number
+    roomId: number
 }
 
 const UserBtns = ({username}) => {
@@ -32,13 +32,14 @@ const UserBtns = ({username}) => {
             })
     },[count])
     const invite = () => {
-        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: data?.id}).then((response) => {
+        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: username}).then((response) => {
             nav('/game/' + response.data + "/challenge");
         });
     }
 
     const directMessage = () =>{
-            nav('/chat/' + data?.DM );
+        if(data?.roomId)
+            nav('/chat/' + data.roomId );
     }
     return(
         <div className="flex h-[100%] w-[100%] userBtns">
@@ -57,7 +58,7 @@ const UserBtns = ({username}) => {
                 </div>
             }
             <div className="flex h-[100%] w-[50%] justify-end items-end">
-                {/* game */}
+                
                 <button onClick={invite} className="hover:bg-DarkBlue w-[1.8vw] mr-[1%] bg-[#457B9D] h-[1.8vw] rounded-full flex justify-center items-center">
                     <ReactSVG className="relative fill-White left-[5%] w-[0.8vw]" src={incon1}/>
                 </button>

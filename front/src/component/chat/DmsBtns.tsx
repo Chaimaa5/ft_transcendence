@@ -51,15 +51,23 @@ const handleBlock = () => {
   
     if (!memberInfo?.isBlocked && myDms?.length)
     {
-      console.log('oo: ',myDms[0].userId)
+      
         Instanse.get(`/user/block/${myDms[0].userId}`)
         .then(() => {nav('/chat'); setReloadDm()})
     }
 }
 
+const invite = () => {
+  
+    Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: name_}).then((response) => {
+        nav('/game/' + response.data + "/challenge");
+    });
+}
+
   return (
     <div className={" w-[50%] flex justify-center items-center gap-[0.5vw]"}>
-            <button className="w-[1.3vw]  bg-[#457B9D] h-[1.3vw] rounded-full flex justify-center items-center">
+            <button onClick={invite}
+                    className="w-[1.3vw]  bg-[#457B9D] h-[1.3vw] rounded-full flex justify-center items-center">
                 <ReactSVG className="w-[0.6vw]" src={incon1}/>
             </button>
       { !memberInfo?.isBlocked &&
@@ -70,13 +78,7 @@ const handleBlock = () => {
         </button>
       }
 
-      { memberInfo?.isBlocked &&
 
-        <button onClick={handleBlock} 
-                className="w-[1.3vw]  bg-[#15B86A] h-[1.3vw] rounded-full flex justify-center items-center">
-            <ReactSVG className="w-[0.7vw]" src={incon3}/>
-        </button>
-      } 
     </div>
   )
 }

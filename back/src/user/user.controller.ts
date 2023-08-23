@@ -64,7 +64,6 @@ export class UserController{
     @Get('/block/:id')
     async blockFriend(@Req() req: Request, @Param('id') id: string){
         const user : User = req.user as User;
-        console.log('block')
         await this.userservice.blockFriend(user.id, id);
         return {message: 'friend blocked'};
     }

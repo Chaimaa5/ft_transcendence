@@ -28,30 +28,6 @@ class skt {
     token:string;
 }
 
-// export const Skt = new skt
-
-// export const socket_ =  async  (endP: string) => {
-//     await Instanse.get("/access")
-//                   .then((res) => {Skt.setToken(res.data)
-//     });
-//     const socket =  sk("http://localhost:3000/notfications", {
-//         // autoConnect : false,
-//         extraHeaders: {
-//             Authorization: `Bearer ${Skt.token}`,
-            
-//         }
-//     });
-//     // console.log(Skt.token)
-//     socket.on("disconnect", (reason: string) => {
-//       console.log("WebSocket disconnected:", reason);
-//     });
-//     socket.connect()
-//     return socket
-// };
-
-// socket_("").then((sk) => {
-//     Skt.SetSk(sk)
-// })
 
 
 

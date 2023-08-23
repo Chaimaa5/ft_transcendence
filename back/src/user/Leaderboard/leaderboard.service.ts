@@ -77,15 +77,12 @@ export class LeaderboardService {
                         user.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' +  user.avatar
                     }
                 }
-                if(user.rank){
                   let name = user?.username
-                  user.rank = users.findIndex(instance => user.username === name) + 1;
-                }
+                  user.rank = users.findIndex(instance => instance.username === name) + 1;
             }
             return user
         })
-          res = await this.userService.updateAvatar(res);
-          return res;
+          return ModifiedObject;
         }
         else
             throw new UnauthorizedException('User  not found')
@@ -175,8 +172,22 @@ export class LeaderboardService {
               topaz: true,
             }
          });
-         players = await this.userService.updateAvatar(players);
-         return players;
+
+         const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}});
+
+         const ModifiedObject = players.map((player) =>{
+          if (player){
+              if (player.avatar)
+              {
+                  if (!player.avatar.includes('cdn.intra')  &&  !player.avatar.includes('https://lh3.googleusercontent.com')){
+                      player.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +  '/api' +  player.avatar
+                  }
+              }
+                let name = player.username
+                player.rank = users.findIndex(instance => instance.username === name) + 1;
+          }
+          return player})
+          return ModifiedObject
         }
         else
               throw new UnauthorizedException('User  not found')

@@ -302,7 +302,7 @@ export class ChatService {
         try{
             const hashed =  await bcrypt.hash(password, 10);
             return hashed;
-        }catch(e){throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR) }
+        }catch(e){throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST) }
     }
     
     
@@ -659,7 +659,6 @@ export class ChatService {
                     let count = await this.prisma.membership.count({
                         where: {roomId: channel.id, isBanned: false}
                     }) 
-                    console.log(count)
                     return {'id': channel.id,
                             'name': channel.name,
                             'type': channel.type,
@@ -815,6 +814,7 @@ export class ChatService {
         try{
             const roomData = await this.prisma.room.findUnique({where: {id: roomId},
                 select:{
+                    id: true,
                     name: true,
                     image: true,
                     type: true,
@@ -823,91 +823,95 @@ export class ChatService {
                 }
             }) 
             if(roomData){
-    
-                if(!roomData.isChannel){
-                    if(roomData.membership){
-                        for (const member of roomData.membership) {
-                            if(member.userId == id){
-                                if(member.roomImage)
-                                    roomData.image = member.roomImage;
-                                roomData.name = member.roomName as string;
-                            }
-                          }
-                    }
-                }
-                if (roomData.image){
+                const isBanned  = await this.checkBan(roomData.id, id) 
+                if(!isBanned){
+
                     if(!roomData.isChannel){
-                    let members = roomData.membership
-                    for (const member of members) {
-                        if(member.userId != id){
-                            const user = await this.prisma.user.findUnique({where: {id: member.userId}})
-                            if(user){
-                                if(user.avatar){
-                                    if(!user.avatar.includes('cdn.intra') && !user.avatar.includes('https://lh3.googleusercontent.com')){
-                                        roomData.image = 'http://' + process.env.HOST + ':' + process.env.BPORT +'/api'+ user.avatar;
-                                    }
-                                    else
-                                        roomData.image = user.avatar;
+                        if(roomData.membership){
+                            for (const member of roomData.membership) {
+                                if(member.userId == id){
+                                    if(member.roomImage)
+                                        roomData.image = member.roomImage;
+                                    roomData.name = member.roomName as string;
                                 }
-                                roomData.name = user.username as string;
-                            }
-                        }
+                              }
                         }
                     }
-                    else{
-                        if(!roomData.image.includes('cdn.intra') && !roomData.image.includes('https://lh3.googleusercontent.com'))
-                            roomData.image = 'http://' + process.env.HOST +':' + process.env.BPORT +'/api' + roomData.image                
-                    }
-                }
-                let message = await this.prisma.message.findMany({
-                    where: {roomId: roomId},
-                    orderBy: {
-                        createdAt: 'asc',
-                    },
-                    select: {
-                        user:{
-                            select:{
-                                id: true,
-                                username: true,
-                                avatar: true,
+                    if (roomData.image){
+                        if(!roomData.isChannel){
+                        let members = roomData.membership
+                        for (const member of members) {
+                            if(member.userId != id){
+                                const user = await this.prisma.user.findUnique({where: {id: member.userId}})
+                                if(user){
+                                    if(user.avatar){
+                                        if(!user.avatar.includes('cdn.intra') && !user.avatar.includes('https://lh3.googleusercontent.com')){
+                                            roomData.image = 'http://' + process.env.HOST + ':' + process.env.BPORT +'/api'+ user.avatar;
+                                        }
+                                        else
+                                            roomData.image = user.avatar;
+                                    }
+                                    roomData.name = user.username as string;
+                                }
                             }
+                            }
+                        }
+                        else{
+                            if(!roomData.image.includes('cdn.intra') && !roomData.image.includes('https://lh3.googleusercontent.com'))
+                                roomData.image = 'http://' + process.env.HOST +':' + process.env.BPORT +'/api' + roomData.image                
+                        }
+                    }
+                    let message = await this.prisma.message.findMany({
+                        where: {roomId: roomId},
+                        orderBy: {
+                            createdAt: 'asc',
                         },
-                        content: true,
-                    }
-               })
-               let Blocked = await this.getBlocked(id);
-               message = message.filter(message => {
-                const id = message.user.id;
-                return  !Blocked.some(user => user.id === id);
-            })
-                let messages = await Promise.all(
-                message.map(async(message) => {
-                    if (message.user.avatar){
-                        if(!message.user.avatar.includes('cdn.intra')  && !message.user.avatar.includes('https://lh3.googleusercontent.com'))
-                            message.user.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +'/api' + message.user.avatar
-                    }
-                       
-                        return {'id': message.user.id,
-                                'username': message.user.username,
-                                'avatar': message.user.avatar,
-                                'content': message.content}
-                    })
-        
-                );
-        
-               const membership = await this.prisma.membership.findFirst({
-                where: {
-                    AND:[
-                        {roomId: roomId},
-                        {userId: id}
-                    ]
-                    },
-                    select:{
-                        role: true
-                    }
-               })
-               return {...roomData, ...membership, messages}
-            }
+                        select: {
+                            user:{
+                                select:{
+                                    id: true,
+                                    username: true,
+                                    avatar: true,
+                                }
+                            },
+                            content: true,
+                        }
+                   })
+                   let Blocked = await this.getBlocked(id);
+                   message = message.filter(message => {
+                    const id = message.user.id;
+                    return  !Blocked.some(user => user.id === id);
+                })
+                    let messages = await Promise.all(
+                    message.map(async(message) => {
+                        if (message.user.avatar){
+                            if(!message.user.avatar.includes('cdn.intra')  && !message.user.avatar.includes('https://lh3.googleusercontent.com'))
+                                message.user.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT +'/api' + message.user.avatar
+                        }
+                           
+                            return {'id': message.user.id,
+                                    'username': message.user.username,
+                                    'avatar': message.user.avatar,
+                                    'content': message.content}
+                        })
+            
+                    );
+            
+                   const membership = await this.prisma.membership.findFirst({
+                    where: {
+                        AND:[
+                            {roomId: roomId},
+                            {userId: id}
+                        ]
+                        },
+                        select:{
+                            role: true
+                        }
+                   })
+                   return {...roomData, ...membership, messages}
+                }
+                }
+    
         }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
 

@@ -63,6 +63,15 @@ export class GameController{
 		} catch(error) {}
 	}
 
+
+
+	@Post('/remove-notif/:id')
+	async handleRemoveNotif(@Param('id') id : string){
+		try {
+			const gameId = parseInt(id)
+			return await this.gameService.handleRemoveNotif(gameId);
+		} catch(error) {}
+	}
 	@Post('/training-settings')
 	async postTrainingSettings(@Req() settings : Request, @Body() body : any) {
 		try {

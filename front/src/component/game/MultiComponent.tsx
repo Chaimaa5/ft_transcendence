@@ -39,7 +39,6 @@ export const MultiComponent = (username) => {
 			socket.emit('joinQueue');
 	
 			socket.on('match', (payload) => {
-				console.log("my side on match event : " + payload.side);
 				gameRef.current.myPaddle.side = payload.side;
 				gameRef.current.opponentPaddle.side = (payload.side === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
 				setSide (payload.side);
@@ -51,7 +50,6 @@ export const MultiComponent = (username) => {
 			})
 			
 			const handleDisconnect = () => {
-				console.log(`socket disconnected`);
 				socket.disconnect();
 			};
 			
@@ -77,7 +75,6 @@ export const MultiComponent = (username) => {
 				socket.off('disconnect', handleDisconnect);
 				if(gameEnded === false) {
 					if(playersMatched === true) {
-						console.log("leaving room");
 						socket.emit('leaveRoom', {mode : "multi"});
 					}
 					else {
@@ -96,7 +93,6 @@ export const MultiComponent = (username) => {
 			}
 			
 			socket.on('joinedRoom', (payload) => {
-				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.table.serverTableWidth = payload.serverTableWidth;
 				gameRef.current.myPaddle.stepsY = payload.serverTableWidth/100;
@@ -150,14 +146,12 @@ export const MultiComponent = (username) => {
 			socket.on('endGame', (payload) => {
 				if(payload.roomId === ("room_" + gameId) ) {
 					gameRef.current.endGame();
-					console.log("game result  : ", payload.gameResult)
 					setGameResult(payload.gameResult);
 					setGameEnded(true);
 				}
 			})
 			
 			socket.on('gameCorrupted', (payload) => {
-				console.log("corrupted");
 				if(payload.roomId === ("room_" + gameId)){
 					setGameCorrupted(true);
 				}
@@ -184,7 +178,7 @@ export const MultiComponent = (username) => {
 		) : (dataIsLoaded === true  &&
 			 <>
 				<TwoPlayersRoundsBoard  gameMode={mode} gameIdProp={gameId}/>
-				<MultiPongBoard gameProp={gameRef.current} gameIdProp={gameId} side={side}/>
+				<MultiPongBoard gameProp={gameRef.current} gameIdProp={gameId}/>
 			</>
 		)
 		}

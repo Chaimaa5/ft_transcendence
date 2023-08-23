@@ -108,7 +108,7 @@ const Modes = () => {
                             <h6 className="text-center text-[#F1FAEE] text-[0.7vw]" >Compete in Intense Multiplayer Matches!</h6>
                         </div>
                         <button onClick={async () => {
-							nav("/game/multi");
+							nav("/game");
 						}} className="relative ">
                             <Button_ option="Start"/>
                         </button>

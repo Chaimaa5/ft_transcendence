@@ -192,7 +192,6 @@ const ModePopUp = ({whichOne}) => {
                             <h1 className="text-[0.7vw] text-[#A8DADC]">Rounds</h1>
 							<Slider max={4} min={1} defaultValue={3} onChange={(value) => {
                                 setRounds(value);
-								console.log("value : " + value + " rounds : " + rounds);
                             }} className="w-[60%] flex justify-center items-center" trackStyle={{height: "60%", borderRadius: "2vw"}} railStyle={{background: "#A8DADC", height: "60%", borderRadius: "2vw"}}/>
                         </div>
                         <div className="flex h-[10%] w-[80%] justify-between items-center">
@@ -224,7 +223,6 @@ const ModePopUp = ({whichOne}) => {
 								if(isFlashy || isDecreasingPaddle){
 									Instanse.post('/game/create-challenge-game', {isPlayerInvited, rounds, pointsToWin, isFlashy, isDecreasingPaddle, Player}).then((response) => {
 									setGameId(response.data) ;
-									console.log("response post method : " + response.data);
 									nav('/game/' + response.data + "/challenge");
 								});}
                             }}className="flex justify-center h-[10%] w-[80%]">

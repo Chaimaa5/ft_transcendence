@@ -34,18 +34,18 @@ export class ProfileService {
                     isOwner = false;
                     let progress = "";
                     if (user){
-                        if(user.level){
-                            let percentage = parseFloat((user.level % 1).toFixed(2));
-                            progress = percentage.toString()
-                            progress = progress.split('.')[1]
-                            if(progress.length == 1)
-                                progress = progress.concat("0%")
-                            else
-                                progress.concat('%')
-                            
-                        }
-                        else
-                            progress = "0%";
+                        if (!user.level)
+                        progress = "0%";
+                       else{
+        
+                         let xp = user.XP ?? 0
+                         let currentLevelXP = (user.level) * 250;
+                         let levelXP = (user.level + 1) * 250;
+                         let percentage = ((xp - currentLevelXP) / (levelXP)) * 100;
+                         progress = percentage.toString()
+                         if(progress)
+                             progress += '%'
+                       }
                         if (user.avatar)
                         {
                             if (!user.avatar.includes('cdn.intra')  && !user.avatar.includes('https://lh3.googleusercontent.com')){
@@ -119,7 +119,7 @@ export class ProfileService {
             }
             else
                 throw new UnauthorizedException('User  not found')
-        }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
+        }catch(e){ }
     }
 
 
@@ -242,7 +242,7 @@ export class ProfileService {
         }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
 
-    async CalculatePercentage(username: string){
+      async CalculatePercentage(username: string){
         try{
 
             if(username){
@@ -265,7 +265,6 @@ export class ProfileService {
                 throw new UnauthorizedException('User  not found')
         }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
-
 
     async Friends(username: string, ownerId: string) {
         try{
@@ -425,7 +424,8 @@ export class ProfileService {
                           { playerId1: id },
                           { playerId2: id }
                         ],},
-                        {mode: {not: 'training'}} 
+                        {mode: {not: 'training'}} ,
+                        {status: 'finished'}
                     ]
                 },
                 select: {

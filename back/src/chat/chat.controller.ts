@@ -130,7 +130,6 @@ export class ChatController{
     async JoinProtectedChannel(@Req() req: Request, @Res() res: Response, @Param('roomId') Id: any, @Body(ValidationPipe) body: PasswordDTO){
         const roomId = parseInt(Id, 10)
         const user = req.user as User
-        console.log(body)
         const verified = await this.chat.VerifyPassword(roomId, body.password as string)
         if(verified){
             await this.chat.createMembership(roomId, user.id)

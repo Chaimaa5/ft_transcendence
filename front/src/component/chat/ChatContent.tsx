@@ -64,7 +64,7 @@ export const ChatContent = () => {
                                 
                                   {roomData?.isChannel && <Avatar src={message?.avatar} wd_="2.5vw"/>}  
 
-                                <div  className={[style.font3,( (message?.id != parseInt(data?.id) ) ? "text-[white]  text-[0.7vw] ml-[0.5vw] flex justify-center items-center rounded-br-[0.8vw] rounded-bl-[0.8vw] rounded-tr-[0.8vw] w-fit max-w-[80%]  pt-[0.5vw] pb-[0.5vw] pl-[0.7vw] pr-[0.5vw] border-[#457B9D] bg-[#457B9D] mb-[0.8vw] mt-[0.8vw]" : "text-[white]  text-[0.7vw] mr-[0.5vw] flex justify-center items-center rounded-br-[0.8vw] rounded-bl-[0.8vw] rounded-tl-[0.8vw] w-fit max-w-[80%]  pt-[0.5vw] pb-[0.5vw] pl-[0.7vw] pr-[0.5vw] border-[#457B9D] bg-[#457B9D] mb-[0.8vw] mt-[0.8vw]")].join(" ")}>
+                                <div  className={[style.font3,( (message?.id != parseInt(data?.id) ) ? "whitespace-pre-wrap break-all text-[white]  text-[0.7vw] ml-[0.5vw] flex justify-center items-center rounded-br-[0.8vw] rounded-bl-[0.8vw] rounded-tr-[0.8vw] w-fit max-w-[80%]  pt-[0.5vw] pb-[0.5vw] pl-[0.7vw] pr-[0.5vw] border-[#457B9D] bg-[#457B9D] mb-[0.8vw] mt-[0.8vw]" : "whitespace-pre-wrap break-all text-[white]  text-[0.7vw] mr-[0.5vw] flex justify-center items-center rounded-br-[0.8vw] rounded-bl-[0.8vw] rounded-tl-[0.8vw] w-fit max-w-[80%]  pt-[0.5vw] pb-[0.5vw] pl-[0.7vw] pr-[0.5vw] border-[#457B9D] bg-[#457B9D] mb-[0.8vw] mt-[0.8vw]")].join(" ")}>
                                   
                                   {message?.content}
                                   

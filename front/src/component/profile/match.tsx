@@ -30,7 +30,6 @@ const Match = () => {
         Instanse.get("/profile/history/" + username)
                 .then((res) => {
                     setData(res.data);
-                    console.log("lol", res.data)
                 })
     },[])
     if(!data || !data.length){
@@ -50,7 +49,6 @@ const Match = () => {
     return(
         <>
         {data?.map((value, key) => {
-            console.log("ddd")
             if(!value)
                 return
             if(value.result === "loss")

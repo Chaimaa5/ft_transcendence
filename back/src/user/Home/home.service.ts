@@ -41,7 +41,7 @@ export class HomeService {
         const bestRanked = await this.prisma.user.findMany({
          take: 5,
          orderBy: {
-             rank: 'asc',
+             XP: 'desc',
          },
          where:{
             AND: [
@@ -67,54 +67,62 @@ export class HomeService {
          }
         });
 
-        const ModifiedObject = await this.userService.updateAvatar(bestRanked)
+        let ModifiedObject = await this.userService.updateAvatar(bestRanked)
+        const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}})
+        ModifiedObject = ModifiedObject.map((user) =>{
+          let name = user.username
+          user.rank  = users.findIndex(instance => instance.username === name) + 1;
+          return user
+
+        })
         return ModifiedObject;
       }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
      }
  
      async NavBar(id : string) {
       try{
-
-        if(id){
-  
-          const nav = await this.prisma.user.findFirst({
-              where: {id: id},
-              select: {
-                  username: true,
-                  avatar: true,
-                  XP: true,
-                  level: true,
-                  games: true,
-                  win: true,
-                  loss: true,
-                  badge: true,
-              }
-             });
+        // if(id){
+          
+          const nav = await this.prisma.user.findUnique({
+            where: {id: id},
+            select: {
+              username: true,
+              avatar: true,
+              XP: true,
+              level: true,
+              games: true,
+              win: true,
+              loss: true,
+              badge: true,
+            }
+          });
   
             let progress = "";
             if (nav)
             {
-              if (nav.level){
-                  let percentage = parseFloat((nav.level % 1).toFixed(2));
-                  progress = percentage.toString()
-                  progress = progress.split('.')[1]
-                  if(progress.length == 1)
-                      progress = progress.concat("0")
-                  progress = progress.concat('%')
+              if (!nav.level)
+               progress = "0%";
+              else{
+
+                let xp = nav.XP ?? 0
+                let currentLevelXP = (nav.level) * 250;
+                let levelXP = (nav.level + 1) * 250;
+                let percentage = ((xp - currentLevelXP) / (levelXP)) * 100;
+                progress = percentage.toString()
+                if(progress)
+                    progress += '%'
               }
-              else
-                  progress = "0%";
               if (!nav.avatar.includes('cdn.intra')  && !nav.avatar.includes('https://lh3.googleusercontent.com')){
                nav.avatar = 'http://' + process.env.HOST +':' + process.env.BPORT +'/api'+ nav.avatar
             }
+            return {
+              ...nav,
+             'progress': progress,
+           };
           }
-           return {
-             ...nav,
-            'progress': progress,
-          };
-        }
-        else
-            throw new UnauthorizedException('User  not found')
+        // }
+        // else
+        //     throw new UnauthorizedException('User  not found')
       }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
 
@@ -238,7 +246,6 @@ export class HomeService {
             res = res.filter((user) => {
               return user.username !== username;
             });
-            console.log(blocked)
             for(const block of blocked){
               res = res.filter((user) => {
                 return user.username !== block.username;

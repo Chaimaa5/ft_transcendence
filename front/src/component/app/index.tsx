@@ -60,7 +60,7 @@ function Container(){
                             <Navbar/>
                         </div>
                         <div className="page">
-                            {location.pathname == "/home" && <Home/>}
+                            {location.pathname == "/home"    && <Home/>}
                             {location.pathname.startsWith("/profile/") && <Profile/>}
                             {location.pathname == "/leaderboord" && <Leaderboord/>}
                             {location.pathname == "/setting" && <Setting/>}

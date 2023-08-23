@@ -85,7 +85,7 @@ const TfaContainer = () => {
                         SetCode("")
                     } else setIsActv(true)
                 })
-                .catch((err) => {console.log(err)})
+               
             }} className="h-[10%] w-[30%] rounded-[2vw] flex justify-center items-center hover:bg-[#457B9D] bg-[#1D3557]">
                 <h2 className="text-[#A8DADC] text-[0.8vw]">Verify</h2>
             </button>

@@ -151,7 +151,6 @@ export const PongBoard = ({gameProp ,gameIdProp}) => {
 	
 			return() => {
 				socket.off('connect', () => {
-					console.log('client side : client disconnected from the server');
 				});
 			}
 		}

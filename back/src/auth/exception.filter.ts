@@ -1,6 +1,5 @@
 import { Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { ExceptionFilter } from '@nestjs/common';
-import { stat } from 'fs';
 
 
 @Catch(HttpException)

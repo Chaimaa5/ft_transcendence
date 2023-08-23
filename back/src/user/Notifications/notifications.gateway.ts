@@ -19,11 +19,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 
     async afterInit(server: Socket) {
-        console.log('WebSocket gateway initialized!');
         this.notificationService.eventsEmitter.on('notifications', notification =>{
             const socket = this.clients.get(notification.receiverId)
             if(socket){
-                console.log(socket,"  " ,notification)
                 this.server.to(socket.id).emit('notifications', notification)
             }
         })
@@ -37,7 +35,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
             }
         });
         await this.userService.updateOnlineStatus(client.data.payload.id, false)
-        console.log('WebSocket gateway disconnected!');
     }
     
     async handleConnection(client: Socket) {
@@ -52,9 +49,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
                     await this.userService.updateOnlineStatus(user.id, true)
                     const notifications = await this.userService.GetNotifications(user.id)
                     this.server.to(client.id).emit('notifications', notifications);
-                    // this.server.emit('connectionSuccess', { message: 'Connected successfully!' });
                 }
-                console.log('WebSocket gateway connected!' );
             }
         }
 

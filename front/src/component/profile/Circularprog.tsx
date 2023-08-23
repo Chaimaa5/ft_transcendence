@@ -8,14 +8,14 @@ interface circle {
     name: string
 }
 
-const CircularProg = (name: string) => {
+const CircularProg = ({name}) => {
     const [data, SetData] = useState<{win:number, loss:number}>()
     useEffect(() => {
         Instanse.get("/profile/statistics/" + name)
                 .then((res) => {
                     SetData(res.data)
                 })
-    })
+    },[])
 
 
     return(

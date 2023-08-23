@@ -70,7 +70,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('joinChat')
     joinChat(client: Socket, roomId: string){
-        console.log('WebSocket gateway joined!');
         this.addToRoom(roomId, client);
         client.join(roomId);
     }
@@ -92,9 +91,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
             const isMuted = await this.chatService.checkMute(room, userId)
             const isBanned = await this.chatService.checkBan(room, userId)
             if(!isMuted && !isBanned){
-                const rcvData = await this.chatService.storeMessage(room, userId, message);
-                if(rcvData)
-                    this.emitMessage(rcvData, room, userId)
+                let members = await this.chatService.GetRoomMembers(room, userId)
+                if(members.some(member => member.userId === userId)){
+
+                    const rcvData = await this.chatService.storeMessage(room, userId, message);
+                    if(rcvData)
+                        this.emitMessage(rcvData, room, userId)
+                }
             }
         }
     }
@@ -104,9 +107,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
         if(ChatRoom ){
             let Banned = await this.userService.GetBanned(roomId);
             let Blocked = await this.userService.getBlockedUsers(userId);
+            let members = await this.chatService.GetRoomMembers(roomId, userId)
             ChatRoom = ChatRoom.filter(ChatRoom => {
                     const id = ChatRoom.data.payload.id;
-                    if(!Blocked.some(user => user.id === id) && !Banned?.some(member => member.userId === id))
+                    if(!Blocked.some(user => user.id === id) && !Banned?.some(member => member.userId === id) && members.some(member => member.userId === id))
                         return  id;
                 })
             ChatRoom.forEach(socket =>{

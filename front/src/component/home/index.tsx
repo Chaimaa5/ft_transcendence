@@ -49,7 +49,7 @@ const TopPlayers = ()=> {
     const plyrs = [1,2,3,4,5]
 
     return(
-        <motion.div /*animate={{x: "-43%", y: "-50%"}}*/ className="players w-[45%] pos">
+        <motion.div /*animate={{x: "-43%", y: "-50%"}}*/ className="players w-[45%] ">
             <div className="titels_ pl-[5%]">
                 <h3 className="inf ">Rank</h3>
                 <div className="flex justify-evenly pl-[15%] items-center w-[80%] ">
@@ -120,9 +120,8 @@ const Home = () => {
                     </div>                   
                     <div className="flex flex-col h-[75%] pl-[12%] justify-evenly">
                         <h5 className="dsc">To The <br /> Ultimate<br /> Pong<br /> Experience!</h5>
-                        {/* multiplayer  */}
 						<button onClick={async () => {
-							nav("/game/multi");
+							nav("/game/");
 						}} className="start_">
                             <Button_ option="Start"/>
                         </button>
@@ -133,16 +132,12 @@ const Home = () => {
                         <Modes/>
                 </motion.div>
             </div>
-            <div className="w-[100%] h-[50%] flex justify-evenly items-center">
-                <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream w-[45%] h-[90%] flex justify-evenly flex-col rounded-[1.7vw]">
+            <div className="w-[100%] h-[50%] flex justify-evenly items-end">
+                <motion.div  animate={{x: "50%", y: "-50%"}}  className="stream w-[45%] h-[92%] flex justify-evenly flex-col rounded-[1.7vw]">
                         <h3 className="title title_stream text-[3vw] leading-[1.25]">Embrace <br/>the Challenge</h3>
                         <h5 className="text-LightBlue text-[1.5vw]">it's paddle time!</h5>
-                <motion.img whileHover={{scale: 1.06}} className="h-[40%]" src={table_img}/>
+                        <motion.img whileHover={{scale: 1.06}} className="h-[40%]" src={table_img}/>
                 </motion.div>
-                {/* <motion.div animate={{x: "-50%", y: "50%"}} className="modes pos">
-                        <Modes/>
-                    </motion.div> */}
-
                 <TopPlayers/>
             </div>
         </div>

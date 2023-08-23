@@ -31,6 +31,12 @@ const VIRTUAL_PADDLE_HEIGHT = VIRTUAL_TABLE_HEIGHT/3;
 
 @Injectable()
 export class GameService {
+	async handleRemoveNotif(id: number) {
+		try{
+
+			await this.prisma.notification.deleteMany({where: {gameId: id}})
+		}catch(e){}
+	}
 	
     prisma = new PrismaClient();
 	roomIdCounter = 1;
@@ -208,7 +214,7 @@ export class GameService {
 
 	calculateSpeedIncrement(rounds : number, difficulty : string)  : number{
 		const minSpeedRatio : number = 0;
-		const maxSpeedRatio : number = 500;
+		const maxSpeedRatio : number = 400;
 		let speedIncrement : number = 0;
 		if(difficulty === 'flashy' || difficulty === 'decreasingPaddle') {
 			speedIncrement = (maxSpeedRatio - minSpeedRatio)/rounds;
@@ -268,12 +274,17 @@ export class GameService {
 		if(room){
 			let side: PaddleSide;
 			side = (room.playersNumber == 0) ? PaddleSide.Left : PaddleSide.Right;
-			console.log("player : " + username +  " side : " + side);
 			const x = (side === PaddleSide.Left) ? VIRTUAL_TABLE_WIDTH/100 : VIRTUAL_TABLE_WIDTH - VIRTUAL_PADDLE_WIDTH - VIRTUAL_TABLE_WIDTH/100;
 			const y = VIRTUAL_TABLE_HEIGHT/2 - (VIRTUAL_PADDLE_HEIGHT/2);
 				room.players.push({playerId : playerId, username : username, side: side, roundScore: 0, x : x, y : y});
 				room.playersNumber++;
 			return(side);
+		}
+	}
+
+	removeRoomById(roomId : string) {
+		if (this.rooms.has(roomId)) {
+			this.rooms.delete(roomId);
 		}
 	}
 
@@ -302,8 +313,7 @@ export class GameService {
 			player.socket = client;
 			player.status = 'waiting';
 			this.players.push(player);
-			console.log("player has been created : " + client.id + " username " + username + " id " + id);
-			const matchedPlayers = this.getMatchedPlayers();
+			const matchedPlayers = await this.getMatchedPlayers();
 			if(matchedPlayers && matchedPlayers.length === 2) {
 				const gameId = await this.createGame(matchedPlayers);
 			}
@@ -313,16 +323,15 @@ export class GameService {
 		}
 	}
 
-	getMatchedPlayers() {
+
+	async getMatchedPlayers() {
 		const waitingPlayers = this.players.filter(player => player.status === 'waiting');
-		if(waitingPlayers.length >= 2 && (waitingPlayers[0].id != waitingPlayers[1].id)) {
-			console.log(" waiting players : - " + waitingPlayers[0].id + " - " + waitingPlayers[1].id);
+		if(waitingPlayers.length >= 2 && (waitingPlayers[0].id != waitingPlayers[1].id ) ) {
 			const matchedPlayers = waitingPlayers.splice(0,2);
 			matchedPlayers.forEach(player => {
 				this.updateStatus(player.id, 'matched')
 			})
 			this.players = this.players.filter(player => player.status === 'waiting');
-			console.log("players length : " + this.players.length);
 			return(matchedPlayers)
 		}
 	}
@@ -346,6 +355,8 @@ export class GameService {
 		const game = await this.prisma.game.findUnique({where : {id: id}, select : {
 			status : true,
 		}})
+
+		await this.prisma.notification.deleteMany({where: {gameId: id}})
 		if(game?.status === 'pending' || game?.status === "waiting for another player") {
 			const game = await this.prisma.game.update({where :  {id : id}, data : {
 				playerId2 : user.id,
@@ -391,7 +402,6 @@ export class GameService {
 		if(game.rounds && game.pointsToWin && game.difficulty) {
 			this.createRoom(game.id, game.rounds, game.pointsToWin, game.difficulty);
 		}
-		console.log(body.isPlayerInvited)
 
 		if(body.isPlayerInvited)
 		{
@@ -508,7 +518,7 @@ export class GameService {
 	async deleteGameById(gameId:string) {
 		const id = parseInt(gameId);
 		const game = await this.prisma.game.findUnique({where : {id : id}});
-		if(game){
+		if(game && game.status != "finished"){
 			try {
 				await this.prisma.game.delete({where : {id : id}})
 			}
@@ -520,15 +530,99 @@ export class GameService {
 
 	async updatePlayerXp(playerXp : number, id : string, endGameStatus : string) {
 		let addedXp = (endGameStatus === "winner") ? 100 : (playerXp  < 10) ? 0 : -10;
-		await this.prisma.user.update({
-			where : {id : id}, data : {
-				XP : playerXp + addedXp,
-			}
-
-		})
-
+		
+		const user = await this.prisma.user.findUnique({where: {id: id}, select: {level: true, XP: true, win: true, loss: true, topaz: true, games: true}})
+		let updatedLevel 
+		let valueXP
+		let updatedXp
+		if(user){
+			if(!user.level)
+				user.level = 0
+				valueXP = (user.level + 1) * 250
+				if(addedXp  < 0 ){
+					if((addedXp + user.XP) < valueXP){
+						updatedLevel = user.level - 1;
+					 updatedXp =  valueXP - (addedXp + user.XP); 
+					}
+					else{
+						updatedLevel = user.level
+						updatedXp = addedXp + user.XP
+					}
+				}
+				if((addedXp + user.XP) >= valueXP){
+					updatedLevel = user.level + 1;
+					updatedXp = (addedXp + user.XP) - valueXP; 
+				}
+				else updatedLevel = user.level
+		let win = user.win
+		let loss = user.loss
+		let games = 1
+		if(user.games)
+			games = user.games + 1
+		if((endGameStatus === "winner")){
+			let topaz = 0;
+			if(user.topaz)
+				topaz = user.topaz + 1;
+			win += 1
+			await this.prisma.user.update({
+				where : {id : id}, data : {
+					XP : updatedXp,
+					level: updatedLevel,
+					topaz: topaz,
+					win: win ,
+					games: games 
+				}
+			})
+		}
+		else if(endGameStatus === "loser"){
+			loss += 1
+			await this.prisma.user.update({
+				where : {id : id}, data : {
+					XP : playerXp + addedXp,
+					level: updatedLevel,
+					loss: loss,
+					games: games
+				}
+			})
+		}
 	}
 
+	}
+	async updatePlayerAchievements(winner: string) {
+		const user = await this.prisma.user.findUnique({where: {username: winner },
+			 select:{
+				id: true, 
+				username: true, 
+				badge: true,
+				win: true,
+				XP: true
+			}})
+		if (user){
+			const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}})
+			let rank = users.findIndex(instance => instance.username === winner) + 1;
+			if(user.badge){
+				if (rank === 1)
+					this.updateSingleAchievement(user.id, "Golden Paddle")
+				else if(rank === 2)
+					this.updateSingleAchievement(user.id, "Sharpshooter")
+				else if(rank === 3)
+					this.updateSingleAchievement(user.id, "Backhand Master")
+				if (user.win === 1)
+					this.updateSingleAchievement(user.id, "Beginner's Luck")
+				if (user.XP >= 1000)
+					this.updateSingleAchievement(user.id, "Worthy Adversary")
+			}
+		}
+	}
+	async updateSingleAchievement(id: string, achievement: string) {
+		await this.prisma.achievement.updateMany({where: {
+			AND: [
+				{userId: id},
+				{Achievement: achievement}
+			]
+		}, data: {Achieved: true}})
+		this.notification.addAchievementNotification(id, achievement)
+	}
 	async postGameResult(room : RoomState) {
 		const gameId = room.roomId.slice("room_".length);
 		const id = parseInt(gameId);
@@ -558,10 +652,11 @@ export class GameService {
 			if(draw === false) {
 				const winner : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[0] : room.players[1];
 				const loser : PaddleState = (room.players[0].roundScore > room.players[1].roundScore) ? room.players[1] : room.players[0];
-				await this.prisma.game.update({where : {id : id}, data : {
+				const res = await this.prisma.game.update({where : {id : id}, data : {
 					winner : winner.username,
 					playerXp1 : player1.roundScore,
 					playerXp2 : player2.roundScore,
+					status : "finished",
 				}});
 				ret = {
 					winner : winner.username,
@@ -575,13 +670,16 @@ export class GameService {
 						roundScore : rightPlayer.roundScore
 					}
 				}
-				await this.updatePlayerXp(players.player1.XP, players.player1.id, (player1.username === winner.username ) ? "winner" : "loser");
-				await this.updatePlayerXp(players.player2.XP, players.player2.id, (player2.username === winner.username ) ? "winner" : "loser")
+				this.updatePlayerXp(players.player1.XP, players.player1.id, (player1.username === winner.username ) ? "winner" : "loser");
+				this.updatePlayerXp(players.player2.XP, players.player2.id, (player2.username === winner.username ) ? "winner" : "loser")
+				this.updatePlayerAchievements(winner.username)
+
 			} else {
 				await this.prisma.game.update({where : {id : id}, data : {
 					draw : true,
 					playerXp1 : player1.roundScore,
 					playerXp2 : player2.roundScore,
+					status : "finished"
 				}});
 				ret = {
 					winner : '',

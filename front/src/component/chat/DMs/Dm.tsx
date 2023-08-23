@@ -26,7 +26,7 @@ export const Dm = ({id, name, image, lastMsg, userId}:Props) => {
     }
 
     const invite = () => {
-        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: userId}).then((response) => {
+        Instanse.post('/game/create-challenge-game', {isPlayerInvited: true, rounds: 3, pointsToWin: 5, isFlashy: false, isDecreasingPaddle: true, Player: name}).then((response) => {
             nav('/game/' + response.data + "/challenge");
         });
     }

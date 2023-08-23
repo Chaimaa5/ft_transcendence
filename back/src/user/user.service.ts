@@ -95,7 +95,6 @@ export class UserService {
                 const Exists = await this.prisma.user.findUnique({
                     where:{id: user.id},
                 });
-                console.log(Exists)
                 if (Exists)
                     return 1;
                 else
@@ -407,7 +406,6 @@ export class UserService {
                             include: {
                                 membership: true}
                         })
-                        console.log('returned room: ' ,room?.id)
                         if(room){
                             await this.chatService.deleteMessages(room.id, id)
                             await this.chatService.deleteMessages(room.id, Id)

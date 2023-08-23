@@ -1,3 +1,4 @@
+
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { RoomState, PaddleState } from "./gameState.interface"
@@ -10,7 +11,7 @@ import { SocketStrategy } from '../auth/jwt/websocket.strategy';
 @WebSocketGateway({
 	namespace:'/game',
 	cors: {
-		origin: ['http://localhost:8080', 'http://localhost:8080', 'http://localhost:8000', 'http://localhost:3000'],
+		origin: ['http://localhost:8080', '10.14.10.6:8080', 'http://localhost:8000', 'http://localhost:3000'],
 		methods: ['GET', 'POST'],
 		credentials: true,
 	},
@@ -29,10 +30,7 @@ export class GameGateway implements OnGatewayConnection{
 	
 
 	afterInit(){
-		this.logger.log('game server initialized');
 		this.gameService.eventsEmitter.on('handleMatched', (matches : {player1 : Player, player1Side : PaddleSide, player2 : Player, player2Side : PaddleSide, gameId : number}) => {
-			console.log("player 1 : " + matches.player1.username + " is " + matches.player1Side);
-			console.log("player 2  : " + matches.player2.username + " is " + matches.player2Side);
 			matches.player1.socket.emit('match', {username : matches.player2.username, gameId : matches.gameId, side : matches.player1Side});
 			matches.player2.socket.emit('match', {username : matches.player1.username, gameId : matches.gameId, side : matches.player2Side});
 
@@ -62,7 +60,6 @@ export class GameGateway implements OnGatewayConnection{
 
 	
 	async handleConnection(client : Socket) {
-		this.logger.log(`server side : client connected : ${client.id}`);
 		let token : any =  client.handshake.headers['authorization'];
         if(token){
                 token = token.split(' ')[1]
@@ -71,13 +68,12 @@ export class GameGateway implements OnGatewayConnection{
                 if (user) {
                     this.clients.set(client.data.payload.id , client);
 				}
-                console.log('WebSocket gateway connected!');
             }
 		}
 		
-		handleDisconnection(client : Socket) {
-			console.log("client id  : " + client.id + "disconnected");
-		}
+	handleDisconnection(client : Socket) {
+
+	}
 		
 	@SubscribeMessage("getUsername")
 	async handleGetUserName(client : Socket) {
@@ -90,7 +86,6 @@ export class GameGateway implements OnGatewayConnection{
 	}
 	@SubscribeMessage('joinRoom')
 	async handleJoinRoom(client : Socket, payload : {roomId : string, mode : string, side: PaddleSide}) {
-		console.log("------ roomd id ----------------------------------------------------------------------- " + payload.roomId);
 		let pSide;
 		if(payload.mode === "multi") {
 			pSide = payload.side;
@@ -99,24 +94,21 @@ export class GameGateway implements OnGatewayConnection{
 		}
 		if(pSide === PaddleSide.Left)
 		{
-			console.log("left");
 			client.join(payload.roomId);
-			this.logger.log("waiting for another player in room " + payload.roomId)
-			this.logger.log("client socket : " + client.id);
+
 			client.emit('joinedRoom', {roomId : payload.roomId, pSide : PaddleSide.Left, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT, userId : client.data.payload.id, username : client.data.payload.username});
 		}
 		else if(pSide === PaddleSide.Right) {
-			console.log("right");
 			client.join(payload.roomId);
-			this.logger.log("joined an already created game in room " + payload.roomId);
-			this.logger.log("client socket : " + client.id);
 			client.emit('joinedRoom', {roomId : payload.roomId, pSide : PaddleSide.Right, serverTableWidth: VIRTUAL_TABLE_WIDTH, serverTableHeight : VIRTUAL_TABLE_HEIGHT});
 		}
 		const room = this.gameService.roomsMap.get(payload.roomId);
 		if(room && room.playersNumber === 2) {
-			this.logger.log("game is starting now... ");
 			this.gameService.startGameLoop(payload.roomId)
 			this.server.emit('startGame', {roomId: payload.roomId, initialBallAngle : this.gameService.randomInitialDirection(), leftPlayerObj :  room.players[0], rightPlayerObj: room.players[1], ballPosX : room.ball.x , ballPosY : room.ball.y, ballSpeedX: room.ball.ballSpeedX, ballSpeedY : room.ball.ballSpeedY, paddleHeight : room.paddleHeight});
+		}
+		else if(!room) {
+			this.server.emit("roomNotFound", {roomId : payload.roomId});
 		}
 	}
 
@@ -145,6 +137,11 @@ export class GameGateway implements OnGatewayConnection{
 				this.server.emit('gameCorrupted', {roomId : roomId});
 			}
 		}
+	}
+
+	@SubscribeMessage('removeRoom')
+	handleRemoveRoom(client : Socket, payload : {roomId : string}) {
+		this.gameService.removeRoomById(payload.roomId);
 	}
 
 	@SubscribeMessage('newPaddlePosition')

@@ -78,7 +78,7 @@ const Leaderboord = () => {
                     return(
                         <> 
                         {value.rank == 2 &&
-                        <div key={key} className="h-[85%] pt-[1%] w-[20%] m-[1%] z-[2] leader-box order-1 relative">
+                        <div key={key} className="h-[85%] pt-[1%] w-[20%] m-[1%] z-[2] leader-box order-3 relative">
                             <img className="h-[65%] w-[100%] absolute bottom-[0%]" src={cube}/>
                                 <>
                                 <Link className="h-[20%] w-[100%] flex justify-center items center" to={"/profile/" + value.username}  >
@@ -97,7 +97,7 @@ const Leaderboord = () => {
                         }
                     
                         {value.rank == 1 &&
-                            <div key={key} className="h-[95%] w-[20%] m-[1%] z-[2] leader-box order-1 relative">
+                            <div key={key} className="h-[95%] w-[20%] m-[1%] z-[2] leader-box order-2 relative">
                                 <img className="w-[100%] h-[75%] absolute z-[-1] bottom-[0%]" src={cube}/>
                                 <Link className="h-[20%] w-[100%] flex justify-center items center" to={"/profile/" + value.username}  >
                                     <Avatar src={value.avatar} wd_="3.5vw"/>

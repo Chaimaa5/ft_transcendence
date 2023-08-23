@@ -15,27 +15,28 @@ import { TrainingApp } from './component/game/training/TrainingApp'
 import	{GameApp}	from './component/game/GameApp';
 import	{MultiApp}	from './component/game/MultiApp';
 import { GameProvider } from './component/game/GameContext';
+import { NotFound } from './component/errorPages/NotFound';
 
 function App() {
   let isLogged = false
-  console.log(Cookies.get("logged"))
-  if(Cookies.get("logged") == "true")
+  if(Cookies.get("logged") === "true")
     isLogged = true
   return (
      <div className="app-">
     <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={ (<Login/>)} />
           <Route path="/home" element={isLogged ? <Container /> : <Login/>} />
           <Route path="/profile/:username" element={ isLogged ? <Container /> : <Login/>} />
           <Route path="/leaderboord" element={ isLogged ? <Container /> : <Login/>} />
           <Route path='/setting' element={ isLogged ? <Container /> : <Login/>}/>
           <Route path='/tfa' element={isLogged ? <TfaPage/> : <Login/> }/>
           <Route path="/setup" element={isLogged ? <Setup /> : <Login/> } />
-          <Route path="/chat/:roomId?" element={<Container />} />
-		  <Route path="/training/:id" element={<TrainingApp />} />
-		  <Route path="/game/:id/:mode" element={<GameProvider> <GameApp/> </GameProvider>} />
-		  <Route path="/game/:mode" element={<GameProvider><MultiApp/></GameProvider>}/>
+          <Route path="/chat/:roomId?" element={isLogged ? <Container /> : <Login/>} />
+		      <Route path="/training/:id" element={isLogged ? <TrainingApp /> : <Login/>} />
+		      <Route path="/game/:id/:mode" element={isLogged ? <GameProvider> <GameApp/> </GameProvider> : <Login/>} />
+		      <Route path="/game" element={isLogged ? <GameProvider><MultiApp/></GameProvider> : <Login/>}/>
+          <Route path='*' element={<NotFound/>} />
         </Routes>
     </Router>
     </div>

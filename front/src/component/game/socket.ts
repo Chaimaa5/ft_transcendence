@@ -12,11 +12,10 @@ class skt {
 }
 
 const initializeSocket = async (Skt : skt) => {
-	console.log("Initializing the socket manager.");
 	await Instanse.get("/access")
 	.then((res) => {Skt.setToken(res.data)});
 
-	const socketInstance = io('http://localhost:3000/game', {
+	const socketInstance = io('http://10.14.10.6:8080/game', {
 		extraHeaders: {
 			Authorization: `Bearer ${Skt.token}`
 		}
@@ -25,7 +24,6 @@ const initializeSocket = async (Skt : skt) => {
 	  // Create a Promise that resolves when the socket connects
 	  const connectPromise = new Promise<void>((resolve) => {
 		socketInstance.on('connect', () => {
-		  console.log("Socket connected.");
 		  resolve();
 		});
 	  });

@@ -12,6 +12,7 @@ import { Game, Player } from './classes/Game';
 import { PaddleSide } from './classes/Paddle';
 import { GameCorrupted } from './GameCorrupted';
 import GameOver from './GameOver';
+import { RoomNotFound } from './RoomNotFound';
 
 
 export interface GameResults{
@@ -38,6 +39,7 @@ export const GameComponent = (username) => {
 	const accepted = queryParams.get('accepted');
 	const roomId = "room_" + gameId;
 	const [gameResult, setGameResult] = useState<GameResults>();
+	const [roomNotFound, setRoomNotFound] = useState(false);
 
 	const gameRef = useRef(new Game(0, 0));
 
@@ -49,8 +51,14 @@ export const GameComponent = (username) => {
 		if(socket) {
 			socket.emit('joinRoom', { roomId: "room_" + gameId , mode : "challenge"});
 			
+			socket.on("roomNotFound" , (payload) => {
+				if(payload.roomId === ("room_" + gameId) ) {
+					setRoomNotFound(true);
+					setGamePending(false);
+				}
+			})
+
 			socket.on('joinedRoom', (payload) =>{
-				console.log(" the client has joined the room : " + payload.roomId);
 				gameRef.current.table.roomId = payload.roomId;
 				gameRef.current.myPaddle.side = payload.pSide;
 				gameRef.current.opponentPaddle.side = (payload.pSide === PaddleSide.Left) ? PaddleSide.Right : PaddleSide.Left;
@@ -68,7 +76,7 @@ export const GameComponent = (username) => {
 			});
 		
 			const handleDisconnect = () => {
-				console.log(`Socket disconnected`);
+				socket.emit("removeRoom", {roomId : "room_" + gameId});
 				socket.disconnect();
 			};
 			
@@ -76,7 +84,6 @@ export const GameComponent = (username) => {
 			socket.on('endGame', (payload) => {
 				if(payload.roomId === roomId) {
 					gameRef.current.endGame();
-					console.log("game result  : ", payload.gameResult)
 					setGameResult(payload.gameResult);
 					setGameEnded(true);
 				}
@@ -121,6 +128,8 @@ export const GameComponent = (username) => {
 			<GameOver username={username} side={gameRef.current.myPaddle.side} results={gameResult}/> 
 		) : (gameCorrupted === true) ? (
 			<GameCorrupted />
+		) : (roomNotFound === true) ? (
+			<RoomNotFound gameId={gameId}/>
 		) : (
 			<>
 				<TwoPlayersRoundsBoard  gameMode={mode} gameIdProp={gameId}/>
