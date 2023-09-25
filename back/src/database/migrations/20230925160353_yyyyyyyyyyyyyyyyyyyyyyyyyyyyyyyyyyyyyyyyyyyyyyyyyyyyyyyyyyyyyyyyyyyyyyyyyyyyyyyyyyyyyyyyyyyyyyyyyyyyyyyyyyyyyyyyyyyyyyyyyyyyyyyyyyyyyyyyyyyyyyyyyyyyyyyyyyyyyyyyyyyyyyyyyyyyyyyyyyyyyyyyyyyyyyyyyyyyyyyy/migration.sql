@@ -3,6 +3,7 @@ CREATE TABLE "Achievement" (
     "id" SERIAL NOT NULL,
     "Achievement" TEXT NOT NULL,
     "Achieved" BOOLEAN NOT NULL,
+    "Image" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Achievement_pkey" PRIMARY KEY ("id")
@@ -17,11 +18,11 @@ CREATE TABLE "User" (
     "isTwoFacEnabled" BOOLEAN NOT NULL,
     "TwoFacSecret" TEXT NOT NULL,
     "XP" INTEGER NOT NULL,
-    "level" DOUBLE PRECISION,
-    "topaz" INTEGER,
+    "level" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "topaz" INTEGER NOT NULL DEFAULT 0,
     "win" INTEGER NOT NULL,
     "loss" INTEGER NOT NULL,
-    "games" INTEGER,
+    "games" INTEGER NOT NULL DEFAULT 0,
     "rank" INTEGER NOT NULL,
     "refreshToken" TEXT,
     "status" BOOLEAN NOT NULL,
@@ -99,7 +100,7 @@ CREATE TABLE "Game" (
     "pointsToWin" INTEGER,
     "paddleSize" TEXT,
     "lossLimit" INTEGER,
-    "ballSpeed" TEXT,
+    "ballSpeed" INTEGER,
     "decreasingpaddleSize" BOOLEAN,
     "difficulty" TEXT,
     "map" TEXT,
@@ -115,7 +116,7 @@ CREATE TABLE "Notification" (
     "id" SERIAL NOT NULL,
     "type" TEXT NOT NULL,
     "status" BOOLEAN NOT NULL,
-    "senderId" TEXT NOT NULL,
+    "senderId" TEXT,
     "receiverId" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "gameId" INTEGER,
@@ -158,7 +159,7 @@ ALTER TABLE "Game" ADD CONSTRAINT "Game_playerId1_fkey" FOREIGN KEY ("playerId1"
 ALTER TABLE "Game" ADD CONSTRAINT "Game_playerId2_fkey" FOREIGN KEY ("playerId2") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Notification" ADD CONSTRAINT "Notification_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_receiverId_fkey" FOREIGN KEY ("receiverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

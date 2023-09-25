@@ -6,7 +6,7 @@ COPY *.json ./
 
 RUN npm install 
 
-COPY . ./app
+COPY . .
 
 COPY vite.config.js ./
 

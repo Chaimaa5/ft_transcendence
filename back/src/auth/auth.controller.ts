@@ -28,15 +28,16 @@ export class AuthController {
     async handleAuth(@Req() req: Request, @Res() res: Response){
         try{
             const check = await this.authservice.signIn(res, req);
+            let redirect = 'http://' + process.env.HOST + ':' + process.env.FROTENDPORT;
             if (check == 1){
                 const user = req.user as User
                 const isTwoFA = await this.authservice.isEnabled(user.id)
                 if(isTwoFA)
-                    return res.redirect('http://10.14.10.6:8080/tfa');
-                return res.redirect('http://10.14.10.6:8080/home');
+                    return res.redirect(redirect + '/tfa');
+                return res.redirect(redirect + '/home');
             }
             else
-                return res.redirect('http://10.14.10.6:8080/setup');
+                return res.redirect(redirect + '/setup');
         }catch(e){}
     }
 
@@ -46,15 +47,17 @@ export class AuthController {
     async handleGoogleAuth(@Req() req: Request, @Res() res: Response){
         try{
             const check = await this.authservice.signIn(res, req);
+            let redirect = 'http://' + process.env.HOST + ':' + process.env.FROTENDPORT;
+
             if (check == 1){
                 const user = req.user as User
                 const isTwoFA = await this.authservice.isEnabled(user.id)
                 if(isTwoFA)
-                    return res.redirect('http://10.14.10.6:8080/tfa');
-                return res.redirect('http://10.14.10.6:8080/home');
+                    return res.redirect(redirect + '/tfa');
+                return res.redirect(redirect + '/home');
             }
             else
-                return res.redirect('http://10.14.10.6:8080/setup');
+                return res.redirect(redirect + '/setup');
         }catch(e){}
     }
 

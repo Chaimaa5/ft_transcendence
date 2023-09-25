@@ -73,7 +73,7 @@ const TopPlayers = ()=> {
                        <h3 className="inf w-[15%]">{data.XP} Xp</h3>
                        <h3 className="inf w-[15%]">{data.level} Lv</h3>
                        <div className="elem">
-                           <h3 className="inf">{0}</h3>
+                           <h3 className="inf">{data.topaz}</h3>
                            <img className="w-[2.5vw]" src={topaz}/>
                        </div>
                     </div>

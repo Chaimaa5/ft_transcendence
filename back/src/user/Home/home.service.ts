@@ -41,7 +41,7 @@ export class HomeService {
         const bestRanked = await this.prisma.user.findMany({
          take: 5,
          orderBy: {
-             XP: 'desc',
+             level: 'desc',
          },
          where:{
             AND: [
@@ -68,7 +68,7 @@ export class HomeService {
         });
 
         let ModifiedObject = await this.userService.updateAvatar(bestRanked)
-        const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}})
+        const users = await this.prisma.user.findMany({orderBy: {level: 'desc'}})
         ModifiedObject = ModifiedObject.map((user) =>{
           let name = user.username
           user.rank  = users.findIndex(instance => instance.username === name) + 1;
@@ -80,9 +80,7 @@ export class HomeService {
      }
  
      async NavBar(id : string) {
-      try{
-        // if(id){
-          
+      try{          
           const nav = await this.prisma.user.findUnique({
             where: {id: id},
             select: {
@@ -100,14 +98,13 @@ export class HomeService {
             let progress = "";
             if (nav)
             {
-              if (!nav.level)
+              if (!nav.XP)
                progress = "0%";
               else{
 
                 let xp = nav.XP ?? 0
-                let currentLevelXP = (nav.level) * 250;
                 let levelXP = (nav.level + 1) * 250;
-                let percentage = ((xp - currentLevelXP) / (levelXP)) * 100;
+                let percentage = (xp / (levelXP)) * 100;
                 progress = percentage.toString()
                 if(progress)
                     progress += '%'
@@ -120,9 +117,6 @@ export class HomeService {
              'progress': progress,
            };
           }
-        // }
-        // else
-        //     throw new UnauthorizedException('User  not found')
       }catch(e){throw new HttpException('Undefined Parameters', HttpStatus.BAD_REQUEST) }
     }
 

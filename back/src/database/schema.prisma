@@ -23,11 +23,11 @@ model User {
   isTwoFacEnabled  Boolean
   TwoFacSecret     String
   XP            Int
-  level         Float?
-  topaz         Int?
+  level         Float @default(0)
+  topaz         Int @default(0)
   win           Int
   loss          Int
-  games         Int?
+  games         Int @default(0)
   rank          Int
   refreshToken  String?
   status        Boolean

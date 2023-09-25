@@ -44,8 +44,6 @@ services:
      context: ./front
     env_file:
         - .env
-    volumes:
-      - ./front/:/app
     ports:
       - '8000:8080'
     networks:
@@ -55,8 +53,6 @@ volumes:
    driver: local
   backend:
    driver: local
-  frontend:
-    driver: local
 networks:
   app-network:
    driver: bridge

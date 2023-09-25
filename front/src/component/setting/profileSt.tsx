@@ -50,7 +50,7 @@ const ProfileSt = () => {
     UpdateUserDTO.append('username', username);
     UpdateUserDTO.append('avatar', ImageFile);
 
-     axios.post('http://10.14.10.6:8080/api/user/setup', UpdateUserDTO, header)
+     axios.post('http://localhost:8080/api/user/setup', UpdateUserDTO, header)
         .then((res) => {
             // if(res.data)
                 SetDone("done");

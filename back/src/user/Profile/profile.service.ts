@@ -24,7 +24,7 @@ export class ProfileService {
                 const owner = await this.prisma.user.findUnique({where:{id : id},})
                 const friends = await this.CountFriends(username);
                 const user = await this.prisma.user.findUnique({where:{username : username},});
-                const users = await this.prisma.user.findMany({orderBy: {XP: 'desc'}});
+                const users = await this.prisma.user.findMany({orderBy: {level: 'desc'}});
                 if(user){
                     let name = user?.username
                     rank = users.findIndex(instance => instance.username === name) + 1;
@@ -34,14 +34,13 @@ export class ProfileService {
                     isOwner = false;
                     let progress = "";
                     if (user){
-                        if (!user.level)
+                        if (!user.XP)
                         progress = "0%";
                        else{
         
                          let xp = user.XP ?? 0
-                         let currentLevelXP = (user.level) * 250;
                          let levelXP = (user.level + 1) * 250;
-                         let percentage = ((xp - currentLevelXP) / (levelXP)) * 100;
+                         let percentage = (xp / (levelXP)) * 100;
                          progress = percentage.toString()
                          if(progress)
                              progress += '%'
@@ -416,7 +415,6 @@ export class ProfileService {
             if(username){
                 const user  = await this.prisma.user.findUnique({where: {username: username}});
                 const id = user?.id
-                //should add the result
                let games =  await this.prisma.game.findMany({
                 where: {
                     AND: [
@@ -450,14 +448,22 @@ export class ProfileService {
                 
         
                });
-    
+               
                if(games){
-                 let result = await Promise.all( games.map(async(game) => {
-                    if (game.player1.avatar){
-                        if(!game.player1.avatar.includes('cdn.intra') && !game.player1.avatar.includes('https://lh3.googleusercontent.com'))
-                            game.player1.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + '/api' + game.player1.avatar
+                   let result = await Promise.all( games.map(async(game) => {
+                       if (game.player1.avatar){
+                           if(!game.player1.avatar.includes('cdn.intra') && !game.player1.avatar.includes('https://lh3.googleusercontent.com'))
+                           game.player1.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + '/api' + game.player1.avatar
                     }
                     if (game.player2){
+                        let player =  game.player1 
+                        let xp = game.playerXp1
+                        if(game.player2.username === username){
+                            game.player1 = game.player2
+                            game.player2 = player
+                            game.playerXp1 = game.playerXp2
+                            game.playerXp2 = xp
+                        }
                         if (game.player2.avatar){
                             if(!game.player2.avatar.includes('cdn.intra')  && !game.player2.avatar.includes('https://lh3.googleusercontent.com'))
                                 game.player2.avatar = 'http://' + process.env.HOST + ':' + process.env.BPORT + '/api' + game.player2.avatar

@@ -19,6 +19,7 @@ type Match_ = {
           hits: number
         },
         result: string
+        
 }
 
 
@@ -51,7 +52,9 @@ const Match = () => {
         {data?.map((value, key) => {
             if(!value)
                 return
-            if(value.result === "loss")
+            if(value.result === "win")
+                icon = up_icon;
+            else if(value.result === "loss")
                 icon = down_icon;
             else if (value.result === "draw")
                 icon = ""

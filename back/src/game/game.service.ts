@@ -528,64 +528,81 @@ export class GameService {
 		}
 	}
 
-	async updatePlayerXp(playerXp : number, id : string, endGameStatus : string) {
-		let addedXp = (endGameStatus === "winner") ? 100 : (playerXp  < 10) ? 0 : -10;
-		
-		const user = await this.prisma.user.findUnique({where: {id: id}, select: {level: true, XP: true, win: true, loss: true, topaz: true, games: true}})
-		let updatedLevel 
-		let valueXP
-		let updatedXp
-		if(user){
-			if(!user.level)
-				user.level = 0
-				valueXP = (user.level + 1) * 250
-				if(addedXp  < 0 ){
-					if((addedXp + user.XP) < valueXP){
+	async updatePlayerXp(playerXp: number, id: string, endGameStatus: string) {
+		let addedXp = (endGameStatus === "winner") ? 100 : (playerXp < 10) ? 0 : -10;
+		console.log("addedXp ", addedXp)
+
+		const user = await this.prisma.user.findUnique({ where: { id: id }, select: { level: true, XP: true, win: true, loss: true, topaz: true, games: true } })
+		let updatedLevel = 0
+		let valueXP = 0
+		let updatedXp = 0
+		if (user) {
+			valueXP = (user.level + 1) * 250
+			if (addedXp < 0) {
+				if ((addedXp + user.XP) <= valueXP) {
+					if(user.level != 0)
 						updatedLevel = user.level - 1;
-					 updatedXp =  valueXP - (addedXp + user.XP); 
-					}
-					else{
-						updatedLevel = user.level
+					updatedXp = valueXP - (addedXp + user.XP);
+					console.log("in the if of <= valueXP: ", updatedXp)
+
+				}
+				else {
+					updatedLevel = user.level
+					if(addedXp < user.XP)
 						updatedXp = addedXp + user.XP
-					}
+						console.log("in here : ", addedXp, " userxp ", user.XP)
+
 				}
-				if((addedXp + user.XP) >= valueXP){
+				console.log("in here : ", addedXp, "updatedXp: ", updatedXp, "updatedLevel: ", updatedLevel)
+
+
+			}
+			else{
+				console.log("in here valueXP : ", valueXP, "user.XP: ", user.XP, "updatedLevel: ", updatedLevel)
+
+				if ((addedXp + user.XP) >= valueXP) {
 					updatedLevel = user.level + 1;
-					updatedXp = (addedXp + user.XP) - valueXP; 
+					updatedXp = (addedXp + user.XP) - valueXP;
+					console.log("in the if of 100: ", updatedXp)
+				}else{
+					updatedXp = addedXp + user.XP;
+				console.log("in here: ")
+
 				}
-				else updatedLevel = user.level
-		let win = user.win
-		let loss = user.loss
-		let games = 1
-		if(user.games)
-			games = user.games + 1
-		if((endGameStatus === "winner")){
-			let topaz = 0;
-			if(user.topaz)
-				topaz = user.topaz + 1;
-			win += 1
-			await this.prisma.user.update({
-				where : {id : id}, data : {
-					XP : updatedXp,
-					level: updatedLevel,
-					topaz: topaz,
-					win: win ,
-					games: games 
-				}
-			})
+				console.log("updatedXp: ", updatedXp)
+				console.log("updatedLevel: ", updatedLevel)
+			}
+			let win = user.win
+			let loss = user.loss
+			let topaz = user.topaz
+			let games = 1
+			if (user.games)
+				games = user.games + 1
+			if ((endGameStatus === "winner")) {
+				topaz += 1;
+				win += 1
+				await this.prisma.user.update({
+					where: { id: id }, data: {
+						XP: updatedXp,
+						level: updatedLevel,
+						topaz: topaz,
+						win: win,
+						games: games
+					}
+				})
+			}
+			else if (endGameStatus === "loser") {
+				loss += 1
+				await this.prisma.user.update({
+					where: { id: id }, data: {
+						XP: playerXp + addedXp,
+						level: updatedLevel,
+						loss: loss,
+						games: games
+					}
+				})
+			}
 		}
-		else if(endGameStatus === "loser"){
-			loss += 1
-			await this.prisma.user.update({
-				where : {id : id}, data : {
-					XP : playerXp + addedXp,
-					level: updatedLevel,
-					loss: loss,
-					games: games
-				}
-			})
-		}
-	}
 
 	}
 	async updatePlayerAchievements(winner: string) {
